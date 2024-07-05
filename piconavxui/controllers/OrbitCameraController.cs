@@ -93,7 +93,7 @@ namespace piconavx.ui.controllers
 
         private void Scene_MouseScroll(ScrollWheel scroll)
         {
-            camera.Fov = Math.Clamp(camera.Fov - scroll.Y, 1.0f, 90f);
+            Distance = Math.Clamp(Distance - scroll.Y * 0.3f, 1.0f, 20f);
         }
     }
 }

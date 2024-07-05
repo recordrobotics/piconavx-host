@@ -1,1 +1,5 @@
 ﻿SystemParametersInfo
+RECT
+GetScaleFactorForMonitor
+MonitorFromPoint
+S_OK
