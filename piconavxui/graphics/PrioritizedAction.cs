@@ -7,6 +7,49 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics
 {
+    public class PrioritizedAction<P>(P? priority, Action action) : IComparable<PrioritizedAction<P>>, IEquatable<PrioritizedAction<P>> where P : Enum
+    {
+        public P? Priority { get; } = priority;
+        public Action Action { get; } = action;
+
+        public int CompareTo(PrioritizedAction<P>? other)
+        {
+            if (other == null)
+                return -1;
+            return Priority?.CompareTo(other.Priority) ?? (other.Priority == null ? 0 : 1);
+        }
+
+        public bool Equals(PrioritizedAction<P>? other)
+        {
+            if (other == null) return false;
+            return Action.Equals(other.Action);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is PrioritizedAction<P> p)
+                return Equals(p);
+            else if (obj is Action a)
+                return Action.Equals(a);
+            else return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Action.GetHashCode();
+        }
+
+        public static implicit operator Action(PrioritizedAction<P> obj)
+        {
+            return obj.Action;
+        }
+
+        public static implicit operator PrioritizedAction<P>(Action obj)
+        {
+            return new PrioritizedAction<P>(default, obj);
+        }
+    }
+
     public class PrioritizedAction<P, T>(P? priority, Action<T> action) : IComparable<PrioritizedAction<P, T>>, IEquatable<PrioritizedAction<P, T>> where P : Enum
     {
         public P? Priority { get; } = priority;

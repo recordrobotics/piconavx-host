@@ -34,6 +34,12 @@ namespace piconavx.ui.graphics
             OrbitCameraController cameraController = AddController(new OrbitCameraController(camera));
         }
 
+        public static void CreateUIServer(int port)
+        {
+            UIServer server = AddController(new UIServer(port));
+            server.Start();
+        }
+
         public static void DestroyResources()
         {
             foreach (var resource in resources)
@@ -76,6 +82,7 @@ namespace piconavx.ui.graphics
         public static PrioritizedList<PrioritizedAction<GenericPriority, ScrollWheel>> MouseScroll = new();
         public static PrioritizedList<PrioritizedAction<UpdatePriority, double>> Update = new();
         public static PrioritizedList<PrioritizedAction<RenderPriority, double, RenderProperties>> Render = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority>> AppExit = new();
 
         public static void NotifyViewportChange(Rectangle<int> viewport)
         {
@@ -130,6 +137,14 @@ namespace piconavx.ui.graphics
             foreach (var action in Render)
             {
                 action.Action.Invoke(deltaTime, properties);
+            }
+        }
+
+        public static void NotifyAppExit()
+        {
+            foreach (var action in AppExit)
+            {
+                action.Action.Invoke();
             }
         }
     }

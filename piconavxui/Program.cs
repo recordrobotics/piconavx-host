@@ -11,16 +11,12 @@ namespace piconavx.ui
 {
     internal static class Program
     {
-        private static HighLevelServer? server;
-
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            server = new HighLevelServer(65432);
-
             RECT rcWorkArea = new RECT();
             bool ok;
             unsafe
@@ -64,6 +60,7 @@ namespace piconavx.ui
             Window.Current.Internal.IsVisible = true; // only show window after loading graphics api
             Window.Current.Internal.WindowState = Silk.NET.Windowing.WindowState.Maximized;
             Scene.CreateTestScene();
+            Scene.CreateUIServer(65432);
         }
     }
 }

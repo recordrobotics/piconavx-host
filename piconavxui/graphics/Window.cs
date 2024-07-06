@@ -126,6 +126,7 @@ namespace piconavx.ui.graphics
         private void Window_Closing()
         {
             currentWindow = this;
+            Scene.NotifyAppExit();
             Scene.DestroyResources();
         }
     }
