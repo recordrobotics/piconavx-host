@@ -33,8 +33,15 @@ namespace piconavx.ui.controllers
 
         public void Shutdown()
         {
+            server.ClientConnected -= Server_ClientConnected;
+            server.ClientDisconnected -= Server_ClientDisconnected;
+
             server.Stop();
             serverTask?.Wait(500);
+
+            clientUpdates.Clear();
+            clientConnects.Clear();
+            clientDisconnects.Clear();
         }
 
         public override void Subscribe()
@@ -80,6 +87,7 @@ namespace piconavx.ui.controllers
 
         private void Server_ClientDisconnected(object? sender, ClientDisconnectedEventArgs e)
         {
+            e.Client.UpdateReceieved -= Client_UpdateReceieved;
             clientDisconnects.Enqueue(e.Client);
         }
 
