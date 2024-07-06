@@ -48,7 +48,7 @@ namespace piconavx.ui.graphics
             _handle = Window.GL.GenTexture();
             Bind();
 
-            using (var img = Image.Load<Rgba32>(path))
+            using (var img = Image.Load<Rgba32>(EmbeddedResource.GetResource(path)!))
             {
                 Window.GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, (uint)img.Width, (uint)img.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, null);
 

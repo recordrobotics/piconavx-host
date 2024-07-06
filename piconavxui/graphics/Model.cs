@@ -32,7 +32,8 @@ namespace piconavx.ui.graphics
 
         private unsafe void LoadModel(string path)
         {
-            var scene = _assimp.ImportFile(path, (uint)PostProcessSteps.Triangulate);
+            byte[] bytes = EmbeddedResource.ReadAllBytes(path)!;
+            var scene = _assimp.ImportFileFromMemory(new ReadOnlySpan<byte>(bytes), (uint)bytes.Length, (uint)PostProcessSteps.Triangulate, (byte*)null);
 
             if (scene == null || scene->MFlags == Silk.NET.Assimp.Assimp.SceneFlagsIncomplete || scene->MRootNode == null)
             {
