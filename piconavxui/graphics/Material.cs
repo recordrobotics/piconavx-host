@@ -20,6 +20,9 @@ namespace piconavx.ui.graphics
 
         protected Shader Shader { get; }
 
+        public bool EnableDepthTest { get; set; } = true;
+        public bool EnableBlend { get; set; } = false;
+
         public Material(Shader shader)
         {
             this.Shader = shader;
@@ -31,6 +34,19 @@ namespace piconavx.ui.graphics
             Shader.SetUniform("uModel", properties.Transform!.Matrix);
             Shader.SetUniform("uView", properties.Camera!.GetViewMatrix());
             Shader.SetUniform("uProjection", properties.Camera.GetProjectionMatrix());
+
+            if (EnableDepthTest)
+                Window.GL.Enable(EnableCap.DepthTest);
+            else
+                Window.GL.Disable(EnableCap.DepthTest);
+
+            if (EnableBlend)
+            {
+                Window.GL.Enable(EnableCap.Blend);
+                Window.GL.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
+            }
+            else
+                Window.GL.Disable(EnableCap.Blend);
         }
 
         public void Dispose()

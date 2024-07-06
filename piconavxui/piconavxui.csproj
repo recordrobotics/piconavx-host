@@ -19,17 +19,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\fonts\Roboto-Regular.ttf" />
     <None Remove="assets\models\cube.obj" />
     <None Remove="assets\models\sphere.obj" />
     <None Remove="assets\shaders\default.glsl" />
+    <None Remove="assets\shaders\font.glsl" />
+    <None Remove="assets\shaders\fontvert.glsl" />
     <None Remove="assets\shaders\light.glsl" />
     <None Remove="assets\shaders\lit.glsl" />
+    <None Remove="assets\shaders\uiimage.glsl" />
+    <None Remove="assets\shaders\uivertex.glsl" />
     <None Remove="assets\shaders\vertex.glsl" />
     <None Remove="assets\textures\diffuse.png" />
     <None Remove="assets\textures\specular.png" />
+    <None Remove="assets\textures\uvtest.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="assets\fonts\Roboto-Regular.ttf" />
     <EmbeddedResource Include="assets\models\cube.obj">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -39,6 +46,10 @@
     <EmbeddedResource Include="assets\shaders\default.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="assets\shaders\uiimage.glsl" />
+    <EmbeddedResource Include="assets\shaders\font.glsl" />
+    <EmbeddedResource Include="assets\shaders\uivertex.glsl" />
+    <EmbeddedResource Include="assets\shaders\fontvert.glsl" />
     <EmbeddedResource Include="assets\shaders\light.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -54,16 +65,21 @@
     <EmbeddedResource Include="assets\textures\specular.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="assets\textures\uvtest.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FontStashSharp" Version="1.3.7" />
+    <PackageReference Include="FontStashSharp.Base" Version="1.1.9" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Silk.NET" Version="2.21.0" />
     <PackageReference Include="Silk.NET.Assimp" Version="2.21.0" />
+    <PackageReference Include="SixLabors.Fonts" Version="2.0.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.3" />
   </ItemGroup>
 
   <ItemGroup>

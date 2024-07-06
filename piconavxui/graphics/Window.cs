@@ -1,13 +1,9 @@
-﻿using Silk.NET.Input;
+﻿using FontStashSharp;
+using piconavx.ui.graphics.font;
+using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics
 {
@@ -17,9 +13,13 @@ namespace piconavx.ui.graphics
         private IKeyboard? primaryKeyboard;
         private IInputContext? input;
         private static GL? gl;
+        private static FontSystem? fontSystem;
+        private static Renderer? fontRenderer;
         private Vector2 prevMousePos;
 
         public static GL GL { get => gl!; }
+        public static FontSystem FontSystem { get => fontSystem!; }
+        public static Renderer FontRenderer { get => fontRenderer!; }
 
         private static Window? currentWindow;
         public static Window Current { get => currentWindow!; }
@@ -68,6 +68,18 @@ namespace piconavx.ui.graphics
             currentWindow = this;
             gl = GL.GetApi(window);
             gl.Viewport(window.FramebufferSize);
+
+            fontRenderer = new Renderer();
+
+            fontSystem = new FontSystem(new FontSystemSettings
+            {
+                FontLoader = new SixLaborsFontLoader(),
+                FontResolutionFactor = 2,
+                KernelWidth = 2,
+                KernelHeight = 2
+            });
+            fontSystem.AddFont(EmbeddedResource.ReadAllBytes("assets/fonts/Roboto-Regular.ttf"));
+
             Scene.CreateStaticResources();
 
             input = window.CreateInput();
@@ -128,6 +140,7 @@ namespace piconavx.ui.graphics
             currentWindow = this;
             Scene.NotifyAppExit();
             Scene.DestroyResources();
+            fontRenderer?.Dispose();
         }
     }
 }

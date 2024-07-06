@@ -210,13 +210,15 @@ namespace piconavx.ui.graphics
         public void Render(double deltaTime, RenderProperties properties)
         {
             properties.Transform = Transform;
+
+            if (Material == null)
+                Material.DefaultMaterial.Use(properties);
+            else
+                Material.Use(properties);
+
             foreach (var mesh in Meshes)
             {
                 mesh.Bind();
-                if (Material == null)
-                    Material.DefaultMaterial.Use(properties);
-                else
-                    Material.Use(properties);
                 unsafe
                 {
                     Window.GL.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);

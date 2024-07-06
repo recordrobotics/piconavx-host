@@ -18,14 +18,14 @@ namespace piconavx.ui.graphics
             Indices = indices;
             Textures = textures;
 
-            EBO = new BufferObject<uint>(Indices, BufferTargetARB.ElementArrayBuffer);
-            VBO = new BufferObject<float>(Vertices, BufferTargetARB.ArrayBuffer);
+            EBO = new BufferObject<uint>(Indices, BufferTargetARB.ElementArrayBuffer, false);
+            VBO = new BufferObject<float>(Vertices, BufferTargetARB.ArrayBuffer, false);
             VAO = new VertexArrayObject<float, uint>(VBO, EBO);
-            VAO.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 14, 0);
-            VAO.VertexAttributePointer(1, 3, VertexAttribPointerType.Float, 14, 3);
-            VAO.VertexAttributePointer(2, 3, VertexAttribPointerType.Float, 14, 6);
-            VAO.VertexAttributePointer(3, 2, VertexAttribPointerType.Float, 14, 9);
-            VAO.VertexAttributePointer(4, 3, VertexAttribPointerType.Float, 14, 11);
+            VAO.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 14, false, 0 * sizeof(float));
+            VAO.VertexAttributePointer(1, 3, VertexAttribPointerType.Float, 14, false, 3 * sizeof(float));
+            VAO.VertexAttributePointer(2, 3, VertexAttribPointerType.Float, 14, false, 6 * sizeof(float));
+            VAO.VertexAttributePointer(3, 2, VertexAttribPointerType.Float, 14, false, 9 * sizeof(float));
+            VAO.VertexAttributePointer(4, 3, VertexAttribPointerType.Float, 14, false, 11 * sizeof(float));
         }
 
         public float[] Vertices { get; private set; }
@@ -38,6 +38,7 @@ namespace piconavx.ui.graphics
         public void Bind()
         {
             VAO.Bind();
+            EBO.Bind();
         }
 
         public void Dispose()

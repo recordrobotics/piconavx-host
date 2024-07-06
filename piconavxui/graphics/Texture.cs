@@ -2,7 +2,6 @@
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
 using Image = SixLabors.ImageSharp.Image;
 
 namespace piconavx.ui.graphics
@@ -12,6 +11,7 @@ namespace piconavx.ui.graphics
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static Texture White;
         public static Texture Black;
+        public static Texture UVTest;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 
@@ -43,6 +43,8 @@ namespace piconavx.ui.graphics
 
         public string? Path { get; set; }
         public TextureType Type { get; }
+        public readonly int Width;
+        public readonly int Height;
 
         public unsafe Texture(string path, TextureType type = TextureType.None)
         {
@@ -65,6 +67,9 @@ namespace piconavx.ui.graphics
                         }
                     }
                 });
+
+                Width = img.Width;
+                Height = img.Height;
             }
 
             SetParameters();
@@ -80,6 +85,35 @@ namespace piconavx.ui.graphics
                 Window.GL.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, d);
                 SetParameters();
             }
+
+            Width = (int)width;
+            Height = (int)height;
+        }
+
+        public unsafe Texture(uint width, uint height)
+        {
+            _handle = Window.GL.GenTexture();
+            Bind();
+
+            Window.GL.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, null);
+            SetParameters();
+
+            Width = (int)width;
+            Height = (int)height;
+        }
+
+        public unsafe void SetData(Rectangle bounds, byte[] data)
+        {
+            Bind();
+            fixed (byte* d = &data[0])
+            {
+                Window.GL.TexSubImage2D(TextureTarget.Texture2D, 0, bounds.Left, bounds.Top, (uint)bounds.Width, (uint)bounds.Height, PixelFormat.Rgba, PixelType.UnsignedByte, d);
+            }
+        }
+
+        public unsafe void SetData(System.Drawing.Rectangle bounds, byte[] data)
+        {
+            SetData(new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height), data);
         }
 
         private void SetParameters()

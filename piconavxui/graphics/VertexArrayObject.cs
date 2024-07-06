@@ -22,10 +22,10 @@ namespace piconavx.ui.graphics
             ebo.Bind();
         }
 
-        public unsafe void VertexAttributePointer(uint index, int count, VertexAttribPointerType type, uint vertexSize, int offSet)
+        public unsafe void VertexAttributePointer(uint index, int count, VertexAttribPointerType type, uint vertexSize, bool normalized, int offSet)
         {
             //Setting up a vertex attribute pointer
-            Window.GL.VertexAttribPointer(index, count, type, false, vertexSize * (uint)sizeof(TVertexType), (void*)(offSet * sizeof(TVertexType)));
+            Window.GL.VertexAttribPointer(index, count, type, normalized, vertexSize * (uint)sizeof(TVertexType), (void*)(offSet));
             Window.GL.EnableVertexAttribArray(index);
         }
 
@@ -33,6 +33,12 @@ namespace piconavx.ui.graphics
         {
             //Binding the vertex array.
             Window.GL.BindVertexArray(_handle);
+        }
+
+        public void Unbind()
+        {
+            //Binding the vertex array.
+            Window.GL.BindVertexArray(0);
         }
 
         public void Dispose()

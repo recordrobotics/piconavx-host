@@ -1,6 +1,9 @@
-﻿using piconavx.ui.controllers;
+﻿using FontStashSharp;
+using piconavx.ui.controllers;
+using piconavx.ui.graphics.ui;
 using Silk.NET.Input;
 using Silk.NET.Maths;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Numerics;
 
 namespace piconavx.ui.graphics
@@ -13,8 +16,10 @@ namespace piconavx.ui.graphics
         public static void CreateStaticResources()
         {
             Material.DefaultMaterial = AddResource(Material.CreateDefault());
+            UIMaterial.DefaultMaterial = AddResource(UIMaterial.CreateDefault());
             Texture.White = AddResource(Texture.CreateWhite(1, 1));
             Texture.Black = AddResource(Texture.CreateBlack(1, 1));
+            Texture.UVTest = AddResource(new Texture("assets/textures/uvtest.png"));
         }
 
         public static void CreateTestScene()
@@ -32,6 +37,26 @@ namespace piconavx.ui.graphics
             Camera camera = AddController(new Camera(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY));
 
             OrbitCameraController cameraController = AddController(new OrbitCameraController(camera));
+
+            Canvas canvas = AddController(new Canvas());
+
+            Label label = AddController(new Label("Hello World!!", canvas));
+            canvas.AddComponent(label);
+
+            Label label2 = AddController(new Label("This is a label", canvas));
+            canvas.AddComponent(label2);
+            label2.Bounds = new System.Drawing.RectangleF(0, 70, 20, 10);
+            label2.Color = FSColor.OrangeRed;
+            label2.ZIndex = 999; // always on top
+
+            Image image = AddController(new Image(canvas));
+            canvas.AddComponent(image);
+            image.ZIndex = -1; // background
+            image.Color = new Rgba32(0, 0, 0, 100);
+            image.Bounds = new System.Drawing.RectangleF(0, 0, 800, 0);
+            AnchorLayout imageLayout = AddController(new AnchorLayout(image));
+            imageLayout.Anchor = Anchor.TopLeft | Anchor.Bottom;
+            imageLayout.Insets = new Insets(0);
         }
 
         public static void CreateUIServer(int port)
@@ -162,6 +187,7 @@ namespace piconavx.ui.graphics
         SetupContext = 1,
         DrawObjects = 2,
         PostProcess = 3,
-        Cleanup = 4
+        UI = 4,
+        Cleanup = 5
     }
 }

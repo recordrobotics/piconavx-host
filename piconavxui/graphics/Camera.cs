@@ -1,6 +1,7 @@
 ﻿using Silk.NET.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -54,7 +55,7 @@ namespace piconavx.ui.graphics
 
         private void Render(double deltaTime, RenderProperties properties)
         {
-            Window.GL.Enable(EnableCap.DepthTest);
+            Window.GL.ClearColor(Color.FromArgb(33, 33, 33));
             Window.GL.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit));
             properties.Camera = this;
         }
