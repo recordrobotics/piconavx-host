@@ -9,7 +9,9 @@ namespace piconavx.ui.graphics
 {
     public class Material : IDisposable
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static Material DefaultMaterial;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static Material CreateDefault()
         {
@@ -26,8 +28,8 @@ namespace piconavx.ui.graphics
         public virtual void Use(RenderProperties properties)
         {
             Shader.Use();
-            Shader.SetUniform("uModel", properties.Transform.Matrix);
-            Shader.SetUniform("uView", properties.Camera.GetViewMatrix());
+            Shader.SetUniform("uModel", properties.Transform!.Matrix);
+            Shader.SetUniform("uView", properties.Camera!.GetViewMatrix());
             Shader.SetUniform("uProjection", properties.Camera.GetProjectionMatrix());
         }
 

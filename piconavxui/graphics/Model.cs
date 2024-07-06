@@ -24,7 +24,7 @@ namespace piconavx.ui.graphics
         }
 
         private Assimp _assimp;
-        private List<Texture> _texturesLoaded = new List<Texture>();
+        private List<Texture>? _texturesLoaded = new List<Texture>();
         public string Directory { get; protected set; } = string.Empty;
         public List<Mesh> Meshes { get; protected set; } = new List<Mesh>();
         public Transform Transform { get; set; }
@@ -147,7 +147,7 @@ namespace piconavx.ui.graphics
                 AssimpString path;
                 _assimp.GetMaterialTexture(mat, type, i, &path, null, null, null, null, null, null);
                 bool skip = false;
-                for (int j = 0; j < _texturesLoaded.Count; j++)
+                for (int j = 0; j < _texturesLoaded!.Count; j++)
                 {
                     if (_texturesLoaded[j].Path == path)
                     {

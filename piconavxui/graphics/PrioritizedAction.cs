@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics
 {
-    public class PrioritizedAction<P, T>(P priority, Action<T> action) : IComparable<PrioritizedAction<P, T>>, IEquatable<PrioritizedAction<P, T>> where P : Enum
+    public class PrioritizedAction<P, T>(P? priority, Action<T> action) : IComparable<PrioritizedAction<P, T>>, IEquatable<PrioritizedAction<P, T>> where P : Enum
     {
-        public P Priority { get; } = priority;
+        public P? Priority { get; } = priority;
         public Action<T> Action { get; } = action;
 
         public int CompareTo(PrioritizedAction<P, T>? other)
         {
             if (other == null)
                 return -1;
-            return Priority.CompareTo(other.Priority);
+            return Priority?.CompareTo(other.Priority) ??( other.Priority == null ? 0 : 1);
         }
 
         public bool Equals(PrioritizedAction<P, T>? other)
@@ -50,16 +50,16 @@ namespace piconavx.ui.graphics
         }
     }
 
-    public class PrioritizedAction<P, T1, T2>(P priority, Action<T1, T2> action) : IComparable<PrioritizedAction<P, T1, T2>>, IEquatable<PrioritizedAction<P, T1, T2>> where P : Enum
+    public class PrioritizedAction<P, T1, T2>(P? priority, Action<T1, T2> action) : IComparable<PrioritizedAction<P, T1, T2>>, IEquatable<PrioritizedAction<P, T1, T2>> where P : Enum
     {
-        public P Priority { get; } = priority;
+        public P? Priority { get; } = priority;
         public Action<T1, T2> Action { get; } = action;
 
         public int CompareTo(PrioritizedAction<P, T1, T2>? other)
         {
             if (other == null)
                 return -1;
-            return Priority.CompareTo(other.Priority);
+            return Priority?.CompareTo(other.Priority) ?? (other.Priority == null ? 0 : 1);
         }
 
         public bool Equals(PrioritizedAction<P, T1, T2>? other)
@@ -93,16 +93,16 @@ namespace piconavx.ui.graphics
         }
     }
 
-    public class PrioritizedAction<P, T1, T2, T3>(P priority, Action<T1, T2, T3> action) : IComparable<PrioritizedAction<P, T1, T2, T3>>, IEquatable<PrioritizedAction<P, T1, T2, T3>> where P : Enum
+    public class PrioritizedAction<P, T1, T2, T3>(P? priority, Action<T1, T2, T3> action) : IComparable<PrioritizedAction<P, T1, T2, T3>>, IEquatable<PrioritizedAction<P, T1, T2, T3>> where P : Enum
     {
-        public P Priority { get; } = priority;
+        public P? Priority { get; } = priority;
         public Action<T1, T2, T3> Action { get; } = action;
 
         public int CompareTo(PrioritizedAction<P, T1, T2, T3>? other)
         {
             if (other == null)
                 return -1;
-            return Priority.CompareTo(other.Priority);
+            return Priority?.CompareTo(other.Priority) ?? (other.Priority == null ? 0 : 1);
         }
 
         public bool Equals(PrioritizedAction<P, T1, T2, T3>? other)
@@ -136,16 +136,16 @@ namespace piconavx.ui.graphics
         }
     }
 
-    public class PrioritizedAction<P, T1, T2, T3, T4>(P priority, Action<T1, T2, T3, T4> action) : IComparable<PrioritizedAction<P, T1, T2, T3, T4>>, IEquatable<PrioritizedAction<P, T1, T2, T3, T4>> where P : Enum
+    public class PrioritizedAction<P, T1, T2, T3, T4>(P? priority, Action<T1, T2, T3, T4> action) : IComparable<PrioritizedAction<P, T1, T2, T3, T4>>, IEquatable<PrioritizedAction<P, T1, T2, T3, T4>> where P : Enum
     {
-        public P Priority { get; } = priority;
+        public P? Priority { get; } = priority;
         public Action<T1, T2, T3, T4> Action { get; } = action;
 
         public int CompareTo(PrioritizedAction<P, T1, T2, T3, T4>? other)
         {
             if (other == null)
                 return -1;
-            return Priority.CompareTo(other.Priority);
+            return Priority?.CompareTo(other.Priority) ?? (other.Priority == null ? 0 : 1);
         }
 
         public bool Equals(PrioritizedAction<P, T1, T2, T3, T4>? other)

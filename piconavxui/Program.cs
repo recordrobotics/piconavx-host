@@ -11,7 +11,7 @@ namespace piconavx.ui
 {
     internal static class Program
     {
-        private static HighLevelServer server;
+        private static HighLevelServer? server;
 
         /// <summary>
         ///  The main entry point for the application.

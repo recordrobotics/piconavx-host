@@ -17,18 +17,7 @@ namespace piconavx.ui.graphics
             Vertices = vertices;
             Indices = indices;
             Textures = textures;
-            SetupMesh();
-        }
 
-        public float[] Vertices { get; private set; }
-        public uint[] Indices { get; private set; }
-        public IReadOnlyList<Texture> Textures { get; private set; }
-        public VertexArrayObject<float, uint> VAO { get; set; }
-        public BufferObject<float> VBO { get; set; }
-        public BufferObject<uint> EBO { get; set; }
-
-        public unsafe void SetupMesh()
-        {
             EBO = new BufferObject<uint>(Indices, BufferTargetARB.ElementArrayBuffer);
             VBO = new BufferObject<float>(Vertices, BufferTargetARB.ArrayBuffer);
             VAO = new VertexArrayObject<float, uint>(VBO, EBO);
@@ -38,6 +27,13 @@ namespace piconavx.ui.graphics
             VAO.VertexAttributePointer(3, 2, VertexAttribPointerType.Float, 14, 9);
             VAO.VertexAttributePointer(4, 3, VertexAttribPointerType.Float, 14, 11);
         }
+
+        public float[] Vertices { get; private set; }
+        public uint[] Indices { get; private set; }
+        public IReadOnlyList<Texture>? Textures { get; private set; }
+        public VertexArrayObject<float, uint> VAO { get; set; }
+        public BufferObject<float> VBO { get; set; }
+        public BufferObject<uint> EBO { get; set; }
 
         public void Bind()
         {

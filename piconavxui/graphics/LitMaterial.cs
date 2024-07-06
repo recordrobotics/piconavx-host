@@ -29,14 +29,14 @@ namespace piconavx.ui.graphics
             (Diffuse ?? Texture.White).Bind(TextureUnit.Texture0);
             (Specular ?? Texture.White).Bind(TextureUnit.Texture1);
 
-            Shader.SetUniform("viewPos", properties.Camera.Position);
+            Shader.SetUniform("viewPos", properties.Camera!.Position);
             Shader.SetUniform("material.diffuse", 0);
             Shader.SetUniform("material.diffuse_tint", DiffuseColor);
             Shader.SetUniform("material.specular", 1);
             Shader.SetUniform("material.specular_tint", SpecularColor);
             Shader.SetUniform("material.smoothness", Smoothness);
 
-            Shader.SetUniform("light.ambient", properties.Light.AmbientColor);
+            Shader.SetUniform("light.ambient", properties.Light!.AmbientColor);
             Shader.SetUniform("light.color", properties.Light.Color);
             Shader.SetUniform("light.position", properties.Light.Transform.Position);
         }

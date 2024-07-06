@@ -9,8 +9,11 @@ namespace piconavx.ui.graphics
 {
     public class Texture : IDisposable
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static Texture White;
         public static Texture Black;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
 
         public static Texture CreateSolidColor(Rgba32 color, uint width, uint height)
         {
