@@ -21,6 +21,7 @@ namespace piconavx.ui.controllers
 
         public Anchor Anchor { get; set; } = Anchor.TopLeft;
         public Insets Insets { get; set; }
+        public bool AllowResize { get; set; } = true;
 
         public AnchorLayout(UIController component):this(component, null)
         {}
@@ -52,8 +53,15 @@ namespace piconavx.ui.controllers
 
             if (Anchor.HasFlag(Anchor.Left) && Anchor.HasFlag(Anchor.Right)) // horizontal stretch
             {
-                bounds.X = container.Left + Insets.Left;
-                bounds.Width = container.Width - Insets.Horizontal;
+                RectangleF target = new RectangleF(container.Left + Insets.Left, bounds.Y, container.Width - Insets.Horizontal, bounds.Height);
+
+                if (AllowResize)
+                {
+                    bounds = target;
+                } else
+                {
+                    bounds.X = target.X + target.Width / 2 - bounds.Width / 2;
+                }
             }
             else if (Anchor.HasFlag(Anchor.Left))
             {
@@ -66,8 +74,15 @@ namespace piconavx.ui.controllers
 
             if (Anchor.HasFlag(Anchor.Top) && Anchor.HasFlag(Anchor.Bottom)) // vertical stretch
             {
-                bounds.Y = container.Top + Insets.Top;
-                bounds.Height = container.Height - Insets.Vertical;
+                RectangleF target = new RectangleF(bounds.X, container.Top + Insets.Top, bounds.Width, container.Height - Insets.Vertical);
+                if (AllowResize)
+                {
+                    bounds = target;
+                }
+                else
+                {
+                    bounds.Y = target.Y + target.Height / 2 - bounds.Height / 2;
+                }
             }
             else if (Anchor.HasFlag(Anchor.Top))
             {
