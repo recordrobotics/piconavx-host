@@ -12,6 +12,7 @@ jobs:
 
     strategy:
       matrix:
+        os: [win]
         configuration: [Debug, Release]
         arch: [x86, x64]
 
@@ -51,15 +52,16 @@ jobs:
         
     # Create the app binary by building the project
     - name: Create app binary
-      run: dotnet publish $env:Project_Path --arch $env:Arch --configuration $env:Configuration --os win --self-contained true --output $env:Project_Directory\publish\ -p:PublishReadyToRun=true -p:PublishSingleFile=true
+      run: dotnet publish $env:Project_Path --arch $env:Arch --configuration $env:Configuration --os $env:Os --self-contained true --output $env:Project_Directory\publish\$env:Os-$env:Arch-$env:Configuration\ -p:PublishReadyToRun=true -p:PublishSingleFile=true
       env:
         Configuration: ${{ matrix.configuration }}
         Arch: ${{ matrix.arch }}
+        Os: ${{ matrix.os }}
 
     # Upload the published binary: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: Published Binary
-        path: ${{ env.Project_Directory }}\publish\
-        
+        name: binary-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.configuration }}
+        path: ${{ env.Project_Directory }}\publish\${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.configuration }}\
+        retention-days: 3
