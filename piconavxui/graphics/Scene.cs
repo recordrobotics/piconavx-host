@@ -27,6 +27,7 @@ namespace piconavx.ui.graphics
         {
             Model cube = AddController(AddResource(new Model("assets/models/cube.obj")));
             cube.Material = AddResource(new CatMaterial());
+            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(cube.Transform));
 
             Model lightModel = AddController(AddResource(new Model("assets/models/sphere.obj")));
             lightModel.Transform.Position = new Vector3(1.2f, 1.0f, 2.0f);
@@ -53,11 +54,13 @@ namespace piconavx.ui.graphics
             UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 dataPanel.Client = client;
+                livePreview.Client = client;
             });
 
             UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 dataPanel.Client = null;
+                livePreview.Client = null;
             });
         }
 
