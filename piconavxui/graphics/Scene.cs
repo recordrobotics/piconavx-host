@@ -42,6 +42,21 @@ namespace piconavx.ui.graphics
 
             Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));
             canvas.AddComponent(sidepanel);
+
+            Panel dataPanel = AddController(new Panel(canvas));
+            canvas.AddComponent(dataPanel);
+            AnchorLayout dataPanelLayout = AddController(new AnchorLayout(dataPanel, sidepanel));
+            dataPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
+            dataPanelLayout.Insets = new Insets(50, 130, 50, 0);
+            FlowLayout dataPanelFlow = AddController(new FlowLayout(dataPanel));
+            dataPanelFlow.Gap = 10;
+
+            for (int i = 0; i < 20; i++)
+            {
+                Label label = AddController(new Label("This is a label: " + i, canvas));
+                canvas.AddComponent(label);
+                dataPanelFlow.Components.Add(label);
+            }
         }
 
         public static void CreateUIServer(int port)

@@ -26,7 +26,7 @@ namespace piconavx.ui.graphics.ui
             this.header = new Label(Header, canvas);
             canvas.AddComponent(this.header);
             this.header.FontSize = 18;
-            this.header.ZIndex = ZIndex + 1;
+            this.header.ZIndex = ContentZIndex;
             this.header.Color = FSColor.White;
             headerAnchor = new AnchorLayout(this.header, this);
             headerAnchor.Anchor = Anchor.TopLeft | Anchor.Right;
@@ -54,10 +54,12 @@ namespace piconavx.ui.graphics.ui
             {
                 zIndex = value;
                 background.ZIndex = zIndex;
-                header.ZIndex = zIndex + 1;
+                header.ZIndex = ContentZIndex;
                 Canvas.InvalidateHierarchy();
             }
         }
+
+        public int ContentZIndex => zIndex + 1;
 
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
