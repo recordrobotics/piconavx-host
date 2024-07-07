@@ -46,12 +46,16 @@ namespace piconavx.ui.graphics
         private void Window_Update(double deltaTime)
         {
             currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextFrame);
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
+            Scene.ExecuteDeferredDelegates(DeferralMode.WhenAvailable);
             Scene.NotifyUpdate(deltaTime);
         }
 
         private void Window_Render(double deltaTime)
         {
             currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             RenderProperties properties = new RenderProperties();
             Scene.NotifyRender(deltaTime, properties);
         }
@@ -60,6 +64,7 @@ namespace piconavx.ui.graphics
         {
             currentWindow = this;
             gl?.Viewport(newSize);
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyViewportChange(new Silk.NET.Maths.Rectangle<int>(0, 0, newSize));
         }
 
@@ -107,6 +112,7 @@ namespace piconavx.ui.graphics
                 float dy = (position.Y - prevMousePos.Y);
                 prevMousePos = position;
 
+                Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
                 Scene.NotifyMouseMove(dx, dy);
             }
         }
@@ -114,18 +120,21 @@ namespace piconavx.ui.graphics
         private void Window_MouseDown(IMouse mouse, MouseButton button)
         {
             currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyMouseDown(button);
         }
 
         private void Window_MouseUp(IMouse mouse, MouseButton button)
         {
             currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyMouseUp(button);
         }
 
         private void Window_Scroll(IMouse mouse, ScrollWheel scroll)
         {
             currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyMouseScroll(scroll);
         }
 

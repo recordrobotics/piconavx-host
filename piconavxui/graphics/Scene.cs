@@ -4,6 +4,7 @@ using piconavx.ui.graphics.ui;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Collections.Concurrent;
 using System.Numerics;
 
 namespace piconavx.ui.graphics
@@ -43,20 +44,21 @@ namespace piconavx.ui.graphics
             Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));
             canvas.AddComponent(sidepanel);
 
-            Panel dataPanel = AddController(new Panel(canvas));
+            ClientDetails dataPanel = AddController(new ClientDetails(canvas));
             canvas.AddComponent(dataPanel);
             AnchorLayout dataPanelLayout = AddController(new AnchorLayout(dataPanel, sidepanel));
             dataPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
             dataPanelLayout.Insets = new Insets(50, 130, 50, 0);
-            FlowLayout dataPanelFlow = AddController(new FlowLayout(dataPanel));
-            dataPanelFlow.Gap = 10;
 
-            for (int i = 0; i < 20; i++)
+            UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
-                Label label = AddController(new Label("This is a label: " + i, canvas));
-                canvas.AddComponent(label);
-                dataPanelFlow.Components.Add(label);
-            }
+                dataPanel.Client = client;
+            });
+
+            UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
+            {
+                dataPanel.Client = null;
+            });
         }
 
         public static void CreateUIServer(int port)
@@ -172,6 +174,76 @@ namespace piconavx.ui.graphics
                 action.Action.Invoke();
             }
         }
+
+        private static ConcurrentQueue<Action> deferredDelegates_nextEvent = new ConcurrentQueue<Action>();
+        private static ConcurrentQueue<Action> deferredDelegates_nextFrame = new ConcurrentQueue<Action>();
+        private static ConcurrentQueue<Action> deferredDelegates_whenAvailable = new ConcurrentQueue<Action>();
+
+        public static void ExecuteDeferredDelegates(DeferralMode deferralMode)
+        {
+            switch (deferralMode)
+            {
+                case DeferralMode.NextEvent:
+                    {
+                        // Loop to process all delegates for this engine state-related deferral mode
+                        while (deferredDelegates_nextEvent.TryDequeue(out var action))
+                        {
+                            action.Invoke();
+                        }
+                        break;
+                    }
+                case DeferralMode.NextFrame:
+                    {
+                        // Loop to process all delegates for this engine state-related deferral mode
+                        while (deferredDelegates_nextFrame.TryDequeue(out var action))
+                        {
+                            action.Invoke();
+                        }
+                        break;
+                    }
+                case DeferralMode.WhenAvailable:
+                    {
+                        // Only dequeue once because WhenAvailable is not related to engine state and can be done at any time
+                        if (deferredDelegates_whenAvailable.TryDequeue(out var action))
+                        {
+                            action.Invoke();
+                        }
+                        break;
+                    }
+            }
+        }
+
+        public static void InvokeLater(Action action, DeferralMode deferralMode)
+        {
+            switch (deferralMode)
+            {
+                case DeferralMode.NextEvent:
+                    deferredDelegates_nextEvent.Enqueue(action);
+                    break;
+                case DeferralMode.NextFrame:
+                    deferredDelegates_nextFrame.Enqueue(action);
+                    break;
+                case DeferralMode.WhenAvailable:
+                    deferredDelegates_whenAvailable.Enqueue(action);
+                    break;
+            }
+        }
+    }
+
+    public enum DeferralMode
+    {
+        /// <summary>
+        /// Defers until before the engine dispatches a new event
+        /// </summary>
+        NextEvent,
+        /// <summary>
+        /// Defers until before the engine dispatches the update event (invoked before <see cref="DeferralMode.NextEvent"/>)
+        /// </summary>
+        NextFrame,
+        /// <summary>
+        /// Defers until before the engine dispatches the update event, split across multiple frames. (invoked after <see cref="DeferralMode.NextEvent"/>)
+        /// </summary>
+        WhenAvailable
     }
 
     public enum UpdatePriority : int

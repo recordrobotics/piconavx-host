@@ -22,6 +22,9 @@ namespace piconavx.ui.graphics.ui
             get => text; set => text = value;
         }
 
+        private Func<string>? textFunc;
+        public Func<string>? TextDelegate { get => textFunc; set => textFunc = value; }
+
         private float fontSize = 12.0f;
         public float FontSize
         {
@@ -47,6 +50,11 @@ namespace piconavx.ui.graphics.ui
             this.text = text;
             color = FSColor.White;
             bounds = GetAutoSizeBounds();
+        }
+
+        public Label(Func<string> textDelegate, Canvas canvas) : this(textDelegate.Invoke(), canvas)
+        {
+            this.textFunc = textDelegate;
         }
 
         public RectangleF GetAutoSizeBounds()
@@ -80,6 +88,9 @@ namespace piconavx.ui.graphics.ui
             {
                 bounds = GetAutoSizeBounds();
             }
+
+            if (textFunc != null)
+                text = textFunc.Invoke();
         }
     }
 }
