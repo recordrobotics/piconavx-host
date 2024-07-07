@@ -25,6 +25,28 @@ namespace piconavx.ui.graphics
 
         public static void CreateTestScene()
         {
+            Model reference = AddController(AddResource(new Model("assets/models/reference.obj")));
+            reference.RenderPriority = RenderPriority.DrawTransparent;
+            reference.SetMaterial("grid", AddResource(new GridMaterial()));
+            reference.SetMaterial("xaxis", AddResource(new LitMaterial()
+            {
+                EmissionColor = new Vector3(0.9f, 0.1f, 0.1f),
+                DiffuseColor = new Vector3(0, 0, 0),
+                SpecularColor = new Vector3(0, 0, 0)
+            }));
+            reference.SetMaterial("yaxis", AddResource(new LitMaterial()
+            {
+                EmissionColor = new Vector3(0.1f, 0.9f, 0.1f),
+                DiffuseColor = new Vector3(0, 0, 0),
+                SpecularColor = new Vector3(0, 0, 0)
+            }));
+            reference.SetMaterial("zaxis", AddResource(new LitMaterial()
+            {
+                EmissionColor = new Vector3(0.1f, 0.1f, 0.9f),
+                DiffuseColor = new Vector3(0, 0, 0),
+                SpecularColor = new Vector3(0, 0, 0)
+            }));
+
             Model cube = AddController(AddResource(new Model("assets/models/cube.obj")));
             cube.Material = AddResource(new CatMaterial());
             LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(cube.Transform));
@@ -39,6 +61,9 @@ namespace piconavx.ui.graphics
             Camera camera = AddController(new Camera(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY));
 
             OrbitCameraController cameraController = AddController(new OrbitCameraController(camera));
+            cameraController.Distance = 6;
+            cameraController.Yaw = 45;
+            cameraController.Pitch = 25;
 
             Canvas canvas = AddController(new Canvas());
 
@@ -105,6 +130,14 @@ namespace piconavx.ui.graphics
             return controller;
         }
 
+        private static bool inEvent = false;
+        /// <summary>
+        /// Is the engine currently in an event. Use this to make sure not to modify the
+        /// subscription list (or call <see cref="Controller.Subscribe"/> / <see cref="Controller.Unsubscribe"/>)
+        /// while in an event. Instead, defer the subscription (see <see cref="Scene.InvokeLater(Action, DeferralMode)"/>)
+        /// </summary>
+        public static bool InEvent { get { return inEvent; } }
+
         public static PrioritizedList<PrioritizedAction<GenericPriority, Rectangle<int>>> ViewportChange = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, float, float>> MouseMove = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, MouseButton>> MouseDown = new();
@@ -116,66 +149,82 @@ namespace piconavx.ui.graphics
 
         public static void NotifyViewportChange(Rectangle<int> viewport)
         {
+            inEvent = true;
             foreach (var action in ViewportChange)
             {
                 action.Action.Invoke(viewport);
             }
+            inEvent = false;
         }
 
         public static void NotifyMouseMove(float dx, float dy)
         {
+            inEvent = true;
             foreach (var action in MouseMove)
             {
                 action.Action.Invoke(dx, dy);
             }
+            inEvent = false;
         }
 
         public static void NotifyMouseDown(MouseButton button)
         {
+            inEvent = true;
             foreach (var action in MouseDown)
             {
                 action.Action.Invoke(button);
             }
+            inEvent = false;
         }
 
         public static void NotifyMouseUp(MouseButton button)
         {
+            inEvent = true;
             foreach (var action in MouseUp)
             {
                 action.Action.Invoke(button);
             }
+            inEvent = false;
         }
 
         public static void NotifyMouseScroll(ScrollWheel scroll)
         {
+            inEvent = true;
             foreach (var action in MouseScroll)
             {
                 action.Action.Invoke(scroll);
             }
+            inEvent = false;
         }
 
         public static void NotifyUpdate(double deltaTime)
         {
+            inEvent = true;
             foreach (var action in Update)
             {
                 action.Action.Invoke(deltaTime);
             }
+            inEvent = false;
         }
 
         public static void NotifyRender(double deltaTime, RenderProperties properties)
         {
+            inEvent = true;
             foreach (var action in Render)
             {
                 action.Action.Invoke(deltaTime, properties);
             }
+            inEvent = false;
         }
 
         public static void NotifyAppExit()
         {
+            inEvent = true;
             foreach (var action in AppExit)
             {
                 action.Action.Invoke();
             }
+            inEvent = false;
         }
 
         private static ConcurrentQueue<Action> deferredDelegates_nextEvent = new ConcurrentQueue<Action>();
@@ -260,9 +309,10 @@ namespace piconavx.ui.graphics
     {
         RestoreContext = 0,
         SetupContext = 1,
-        DrawObjects = 2,
-        PostProcess = 3,
-        UI = 4,
-        Cleanup = 5
+        DrawOpaque = 2,
+        DrawTransparent = 3,
+        PostProcess = 4,
+        UI = 5,
+        Cleanup = 6
     }
 }

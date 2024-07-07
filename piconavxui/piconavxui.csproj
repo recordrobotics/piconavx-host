@@ -21,10 +21,12 @@
   <ItemGroup>
     <None Remove="assets\fonts\Roboto-Regular.ttf" />
     <None Remove="assets\models\cube.obj" />
+    <None Remove="assets\models\reference.obj" />
     <None Remove="assets\models\sphere.obj" />
     <None Remove="assets\shaders\default.glsl" />
     <None Remove="assets\shaders\font.glsl" />
     <None Remove="assets\shaders\fontvert.glsl" />
+    <None Remove="assets\shaders\grid.glsl" />
     <None Remove="assets\shaders\light.glsl" />
     <None Remove="assets\shaders\lit.glsl" />
     <None Remove="assets\shaders\uiimage.glsl" />
@@ -40,10 +42,14 @@
     <EmbeddedResource Include="assets\models\cube.obj">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="assets\models\reference.obj" />
     <EmbeddedResource Include="assets\models\sphere.obj">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="assets\shaders\default.glsl">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="assets\shaders\grid.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="assets\shaders\uiimage.glsl" />

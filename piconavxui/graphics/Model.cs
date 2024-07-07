@@ -17,10 +17,12 @@ namespace piconavx.ui.graphics
     {
         public Model(string path, bool gamma = false)
         {
+            materialNames = new Dictionary<string, int>();
             Transform = new Transform();
             var assimp = Silk.NET.Assimp.Assimp.GetApi();
             _assimp = assimp;
             LoadModel(path);
+            Materials = new Material?[MaterialNames.Values.Max() + 1];
         }
 
         private Assimp _assimp;
@@ -28,7 +30,43 @@ namespace piconavx.ui.graphics
         public string Directory { get; protected set; } = string.Empty;
         public List<Mesh> Meshes { get; protected set; } = new List<Mesh>();
         public Transform Transform { get; set; }
-        public Material? Material { get; set; }
+
+        public Material?[] Materials { get; set; }
+        public Material? Material { get => GetMaterial(0); set
+            {
+                Materials = new Material?[MaterialNames.Values.Max() + 1];
+                Array.Fill(Materials, value);
+            }
+        }
+
+        private Dictionary<string, int> materialNames;
+        public IReadOnlyDictionary<string, int> MaterialNames { get => materialNames.AsReadOnly(); }
+
+        public Material? GetMaterial(int index)
+        {
+            if (Materials.Length > index)
+                return Materials[index];
+            else
+                return null;
+        }
+
+        public void SetMaterial(string name, Material? material)
+        {
+            Materials[MaterialNames[name]] = material;
+        }
+
+        private RenderPriority renderPriority = RenderPriority.DrawOpaque;
+        public RenderPriority RenderPriority
+        {
+            get => renderPriority; set
+            {
+                renderPriority = value;
+                if (Scene.InEvent) // If set from inside an event, defer until finished
+                    Scene.InvokeLater(Resubscribe, DeferralMode.NextEvent);
+                else
+                    Resubscribe();
+            }
+        }
 
         private unsafe void LoadModel(string path)
         {
@@ -108,7 +146,17 @@ namespace piconavx.ui.graphics
             }
 
             // process materials
-            AssimpMaterial* material = scene->MMaterials[mesh->MMaterialIndex];
+            int materialIndex = (int)mesh->MMaterialIndex;
+            AssimpMaterial* material = scene->MMaterials[materialIndex];
+            AssimpString name;
+            string materialName = string.Empty;
+            if(_assimp.GetMaterialString(material, Assimp.MaterialNameBase, 0, 0, &name) == Return.Success)
+            {
+                materialName = name.AsString;
+            }
+
+            materialNames.Add(materialName, materialIndex);
+
             // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
             // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
             // Same applies to other texture as the following list summarizes:
@@ -134,7 +182,7 @@ namespace piconavx.ui.graphics
                 textures.AddRange(heightMaps);
 
             // return a mesh object created from the extracted mesh data
-            var result = new Mesh(BuildVertices(vertices), BuildIndices(indices), textures);
+            var result = new Mesh(BuildVertices(vertices), BuildIndices(indices), textures, materialIndex);
             return result;
         }
 
@@ -199,7 +247,7 @@ namespace piconavx.ui.graphics
 
         public override void Subscribe()
         {
-            Scene.Render += new PrioritizedAction<RenderPriority, double, RenderProperties>(RenderPriority.DrawObjects, Render);
+            Scene.Render += new PrioritizedAction<RenderPriority, double, RenderProperties>(renderPriority, Render);
         }
 
         public override void Unsubscribe()
@@ -207,17 +255,27 @@ namespace piconavx.ui.graphics
             Scene.Render -= Render;
         }
 
+        private void Resubscribe()
+        {
+            Unsubscribe();
+            Subscribe();
+        }
+
         public void Render(double deltaTime, RenderProperties properties)
         {
             properties.Transform = Transform;
 
-            if (Material == null)
-                Material.DefaultMaterial.Use(properties);
-            else
-                Material.Use(properties);
+            Material? lastMaterial = null;
 
             foreach (var mesh in Meshes)
             {
+                Material material = GetMaterial(mesh.Material) ?? Material.DefaultMaterial;
+                if (material != lastMaterial)
+                {
+                    lastMaterial = material;
+                    material.Use(properties);
+                }
+
                 mesh.Bind();
                 unsafe
                 {

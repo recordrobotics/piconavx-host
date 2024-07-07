@@ -86,6 +86,16 @@ namespace piconavx.ui.graphics
             Window.GL.Uniform3(location, value.X, value.Y, value.Z);
         }
 
+        public void SetUniform(string name, Vector4 value)
+        {
+            int location = Window.GL.GetUniformLocation(_handle, name);
+            if (location == -1)
+            {
+                throw new Exception($"{name} uniform not found on shader.");
+            }
+            Window.GL.Uniform4(location, value.X, value.Y, value.Z, value.W);
+        }
+
         public void Dispose()
         {
             //Remember to delete the program when we are done.

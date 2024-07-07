@@ -43,7 +43,7 @@ namespace piconavx.ui.graphics
             if (EnableBlend)
             {
                 Window.GL.Enable(EnableCap.Blend);
-                Window.GL.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
+                Window.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             }
             else
                 Window.GL.Disable(EnableCap.Blend);

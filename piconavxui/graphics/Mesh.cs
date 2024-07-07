@@ -12,8 +12,9 @@ namespace piconavx.ui.graphics
 {
     public class Mesh : IDisposable
     {
-        public Mesh(float[] vertices, uint[] indices, List<Texture> textures)
+        public Mesh(float[] vertices, uint[] indices, List<Texture> textures, int material)
         {
+            Material = material;
             Vertices = vertices;
             Indices = indices;
             Textures = textures;
@@ -28,6 +29,7 @@ namespace piconavx.ui.graphics
             VAO.VertexAttributePointer(4, 3, VertexAttribPointerType.Float, 14, false, 11 * sizeof(float));
         }
 
+        public int Material { get; }
         public float[] Vertices { get; private set; }
         public uint[] Indices { get; private set; }
         public IReadOnlyList<Texture>? Textures { get; private set; }

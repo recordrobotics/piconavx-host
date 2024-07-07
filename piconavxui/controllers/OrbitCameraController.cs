@@ -15,6 +15,9 @@ namespace piconavx.ui.controllers
         public Vector3 Target { get; set; } = Vector3.Zero;
         public float Distance { get; set; } = 10.0f;
 
+        public float Yaw { get => yaw; set => yaw = value; }
+        public float Pitch { get => pitch; set => pitch = value; }
+
         private Camera camera;
         private float yaw = 0;
         private float pitch = 0;
@@ -71,7 +74,7 @@ namespace piconavx.ui.controllers
         {
             if (button == MouseButton.Left && Window.Current.Input != null)
             {
-                foreach(var mouse in Window.Current.Input.Mice)
+                foreach (var mouse in Window.Current.Input.Mice)
                 {
                     mouse.Cursor.CursorMode = CursorMode.Raw;
                     movingCamera = true;
