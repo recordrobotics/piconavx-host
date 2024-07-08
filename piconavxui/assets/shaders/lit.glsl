@@ -27,9 +27,10 @@ out vec4 FragColor;
 
 void main()
 {
-    vec3 diffuseColor = material.diffuse_tint * texture(material.diffuse, fTexCoords).rgb;
-    vec3 specularColor = material.specular_tint * texture(material.specular, fTexCoords).rgb;
-    vec3 emissionColor = material.emission_tint * texture(material.emission, fTexCoords).rgb;
+    vec2 uv = vec2(fTexCoords.x, 1.0 - fTexCoords.y);
+    vec3 diffuseColor = material.diffuse_tint * texture(material.diffuse, uv).rgb;
+    vec3 specularColor = material.specular_tint * texture(material.specular, uv).rgb;
+    vec3 emissionColor = material.emission_tint * texture(material.emission, uv).rgb;
 
     vec3 ambient = light.ambient * diffuseColor;
 

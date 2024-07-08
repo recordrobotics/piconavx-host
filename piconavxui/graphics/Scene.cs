@@ -47,9 +47,9 @@ namespace piconavx.ui.graphics
                 SpecularColor = new Vector3(0, 0, 0)
             }));
 
-            Model cube = AddController(AddResource(new Model("assets/models/cube.obj")));
-            cube.Material = AddResource(new CatMaterial());
-            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(cube.Transform));
+            Model sensor = AddController(AddResource(new Model("assets/models/navxmicro.obj")));
+            sensor.Material = AddResource(new SensorMaterial());
+            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
 
             Model lightModel = AddController(AddResource(new Model("assets/models/sphere.obj")));
             lightModel.Transform.Position = new Vector3(1.2f, 1.0f, 2.0f);

@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "piconavxui": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "With RenderDoc": {
+      "commandName": "Executable",
+      "executablePath": "cmd.exe",
+      "commandLineArgs": "/Q /C renderdoccmd.exe capture -d $(TargetDir) -c rd -w $(TargetDir)$(TargetName).exe && (FOR /F \"tokens=* USEBACKQ\" %F IN (`\"dir $(TargetDir) /s /b /O:D /T:W | findstr rd | findstr rdc\"`) DO (set cap=%F)) && call renderdocui.exe %^cap%",
+      "workingDirectory": "C:\\Program Files\\RenderDoc\\"
+    }
+  }
+}

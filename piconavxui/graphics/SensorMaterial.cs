@@ -7,19 +7,18 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics
 {
-    public class CatMaterial : LitMaterial, IDisposable
+    public class SensorMaterial : LitMaterial, IDisposable
     {
-        public CatMaterial() : base()
+        public SensorMaterial() : base()
         {
-            Diffuse = new Texture("assets/textures/diffuse.png");
-            Specular = new Texture("assets/textures/specular.png");
+            Diffuse = new Texture("assets/textures/navxmicro.png");
+            DiffuseColor = new System.Numerics.Vector3(1, 1, 1);
         }
 
         public new void Dispose()
         {
             GC.SuppressFinalize(this);
             Diffuse?.Dispose();
-            Specular?.Dispose();
             base.Dispose();
         }
     }

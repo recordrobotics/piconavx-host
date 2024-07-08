@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <None Remove="assets\fonts\Roboto-Regular.ttf" />
-    <None Remove="assets\models\cube.obj" />
+    <None Remove="assets\models\navxmicro.obj" />
     <None Remove="assets\models\reference.obj" />
     <None Remove="assets\models\sphere.obj" />
     <None Remove="assets\shaders\default.glsl" />
@@ -32,16 +32,13 @@
     <None Remove="assets\shaders\uiimage.glsl" />
     <None Remove="assets\shaders\uivertex.glsl" />
     <None Remove="assets\shaders\vertex.glsl" />
-    <None Remove="assets\textures\diffuse.png" />
-    <None Remove="assets\textures\specular.png" />
+    <None Remove="assets\textures\navxmicro.png" />
     <None Remove="assets\textures\uvtest.png" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="assets\fonts\Roboto-Regular.ttf" />
-    <EmbeddedResource Include="assets\models\cube.obj">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="assets\models\navxmicro.obj" />
     <EmbeddedResource Include="assets\models\reference.obj" />
     <EmbeddedResource Include="assets\models\sphere.obj">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -65,12 +62,7 @@
     <EmbeddedResource Include="assets\shaders\vertex.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="assets\textures\diffuse.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="assets\textures\specular.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="assets\textures\navxmicro.png" />
     <EmbeddedResource Include="assets\textures\uvtest.png" />
   </ItemGroup>
 

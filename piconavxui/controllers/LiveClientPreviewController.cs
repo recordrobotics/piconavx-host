@@ -1,4 +1,5 @@
 ﻿using piconavx.ui.graphics;
+using System.Numerics;
 
 namespace piconavx.ui.controllers
 {
@@ -44,11 +45,11 @@ namespace piconavx.ui.controllers
 
             if (client != null)
             {
-                Target.Rotation = new System.Numerics.Quaternion((float)lastUpdate.QuatX, (float)lastUpdate.QuatY, (float)lastUpdate.QuatZ, (float)lastUpdate.QuatW);
-                Target.Position = new System.Numerics.Vector3((float)lastUpdate.DispX, (float)lastUpdate.DispY, (float)lastUpdate.DispZ);
+                Target.Rotation = new Quaternion((float)lastUpdate.QuatX, (float)lastUpdate.QuatZ, -(float)lastUpdate.QuatY, (float)lastUpdate.QuatW);
+                Target.Position = new Vector3((float)lastUpdate.DispX, (float)lastUpdate.DispY, (float)lastUpdate.DispZ);
             } else
             {
-                Target.Rotation = System.Numerics.Quaternion.Identity;
+                Target.Rotation = Quaternion.Identity;
             }
         }
     }
