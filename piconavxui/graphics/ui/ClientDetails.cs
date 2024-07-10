@@ -99,7 +99,7 @@ namespace piconavx.ui.graphics.ui
                     "Sea level press set: " + (sealevelPressSet ? "YES" : "NO");
                 });
                 AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2")+"%)");
-                AddLabel(() => "Temperature: " + (0.0).ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | "+lastUpdate.BaroTemp.ToString("N2")+ "°c (Baro)") : ""));
+                AddLabel(() => "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | "+lastUpdate.BaroTemp.ToString("N2")+ "°c (Baro)") : ""));
                 AddLabel(() => "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll);
             }
         }

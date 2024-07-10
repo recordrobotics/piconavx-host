@@ -10,10 +10,11 @@ namespace piconavx
     {
         public int MemoryUsed;
         public int MemoryTotal;
+        public double CoreTemp;
 
         public override string ToString()
         {
-            return string.Format("{{Memory Used: {0}, Memory Total: {1}}}", MemoryUsed, MemoryTotal);
+            return string.Format("{{Memory Used: {0}, Memory Total: {1}, Core Temp: {2}}}", MemoryUsed, MemoryTotal, CoreTemp);
         }
     }
 }

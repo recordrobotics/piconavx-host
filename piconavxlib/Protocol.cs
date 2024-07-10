@@ -96,7 +96,8 @@
             return new HealthUpdate()
             {
                 MemoryUsed = int.Parse(parts[0]),
-                MemoryTotal = int.Parse(parts[1])
+                MemoryTotal = int.Parse(parts[1]),
+                CoreTemp = double.Parse(parts[2])
             };
         }
 
