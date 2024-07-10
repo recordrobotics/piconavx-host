@@ -14,10 +14,19 @@ namespace piconavx.ui.controllers
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client>> ClientConnected = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client>> ClientDisconnected = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client, AHRSPosUpdate>> ClientUpdate = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, Client, FeedChunk[]>> ClientFeedUpdate = new();
 
         private readonly ConcurrentQueue<(Client, AHRSPosUpdate)> clientUpdates = new();
+        private readonly ConcurrentQueue<(Client, FeedChunk[])> clientFeedUpdates = new();
         private readonly ConcurrentQueue<Client> clientConnects = new();
         private readonly ConcurrentQueue<Client> clientDisconnects = new();
+
+        private readonly Dictionary<Client, List<FeedChunk>> clientFeeds = new();
+
+        public IReadOnlyList<FeedChunk> GetClientFeed(Client client)
+        {
+            return clientFeeds[client].AsReadOnly();
+        }
 
         public UIServer(int port)
         {
@@ -37,7 +46,7 @@ namespace piconavx.ui.controllers
             server.ClientDisconnected -= Server_ClientDisconnected;
 
             server.Stop();
-            serverTask?.Wait(500);
+            serverTask?.Wait(200);
 
             clientUpdates.Clear();
             clientConnects.Clear();
@@ -69,24 +78,39 @@ namespace piconavx.ui.controllers
         private void Server_ClientConnected(object? sender, ClientConnectedEventArgs e)
         {
             ResetClient(e.Client);
+            clientFeeds.Add(e.Client, []);
             e.Client.UpdateReceieved += Client_UpdateReceieved;
             clientConnects.Enqueue(e.Client);
         }
 
         private void Client_UpdateReceieved(object? sender, ClientUpdateReceivedEventArgs e)
         {
-            if (e.DataType == DataType.AHRSPosUpdate)
+            switch (e.DataType)
             {
-                clientUpdates.Enqueue((e.Client, (AHRSPosUpdate)e.Data));
-            }
-            else
-            {
-                Debug.WriteLine("Unexpected data type received: " + e.DataType);
+                case DataType.AHRSPosUpdate:
+                    {
+                        clientUpdates.Enqueue((e.Client, (AHRSPosUpdate)e.Data));
+                    }
+                    break;
+                case DataType.FeedUpdate:
+                    {
+                        FeedChunk[] chunks = (FeedChunk[])e.Data;
+                        clientFeeds[e.Client].AddRange(chunks);
+                        clientFeedUpdates.Enqueue((e.Client, chunks));
+                    }
+                    break;
+                default:
+                    {
+                        Debug.WriteLine("Unexpected data type received: " + e.DataType);
+                    }
+                    break;
             }
         }
 
         private void Server_ClientDisconnected(object? sender, ClientDisconnectedEventArgs e)
         {
+            clientFeeds[e.Client].Clear();
+            clientFeeds.Remove(e.Client);
             e.Client.UpdateReceieved -= Client_UpdateReceieved;
             clientDisconnects.Enqueue(e.Client);
         }
@@ -111,6 +135,15 @@ namespace piconavx.ui.controllers
                 if (clientUpdates.TryDequeue(out (Client, AHRSPosUpdate) update))
                 {
                     foreach (var action in ClientUpdate)
+                    {
+                        action.Action.Invoke(update.Item1, update.Item2);
+                    }
+                }
+            }
+            {
+                if (clientFeedUpdates.TryDequeue(out (Client, FeedChunk[]) update))
+                {
+                    foreach (var action in ClientFeedUpdate)
                     {
                         action.Action.Invoke(update.Item1, update.Item2);
                     }

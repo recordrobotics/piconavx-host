@@ -11,6 +11,7 @@ namespace piconavx
     public class Client
     {
         public bool Connected { get; set; } = false;
+        public bool HighBandwidthMode { get; set; } = false;
         public string? Id { get; set; }
         public TcpClient Tcp { get; }
         public StreamReader Reader { get; }
@@ -61,6 +62,11 @@ namespace piconavx
         public void ZeroDisplacement()
         {
             CommandQueue.Enqueue(new ClientCommand(HostCommandType.ZeroDisplacement));
+        }
+
+        public void SetFeedOverflow(HostSetFeedOverflowType feedOverflow)
+        {
+            CommandQueue.Enqueue(new ClientCommand(HostCommandType.SetFeedOverflow, feedOverflow));
         }
 
         public async Task<HealthUpdate> GetHealth()
@@ -185,6 +191,13 @@ namespace piconavx
             Client = client;
             DataType = DataType.AHRSPosUpdate;
             Data = update;
+        }
+
+        public ClientUpdateReceivedEventArgs(Client client, FeedChunk[] chunks)
+        {
+            Client = client;
+            DataType = DataType.FeedUpdate;
+            Data = chunks;
         }
     }
 }

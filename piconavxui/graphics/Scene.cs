@@ -80,6 +80,8 @@ namespace piconavx.ui.graphics
             {
                 dataPanel.Client = client;
                 livePreview.Client = client;
+                client.SetDataType(HostSetDataType.Feed);
+                client.SetFeedOverflow(HostSetFeedOverflowType.DeleteOldest);
             });
 
             UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>

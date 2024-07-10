@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -13,6 +14,8 @@ namespace piconavx
     {
         public List<Client> Clients { get; } = new List<Client>();
         public int ClientTimeout = 1000;
+        // Longer timeout for high bandwidth clients because they send less frequent updates to fit more data through
+        public int ClientHighBandwidthTimeout = 10000;
 
         public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
         public event EventHandler<ClientDisconnectedEventArgs>? ClientDisconnected;
@@ -45,7 +48,7 @@ namespace piconavx
                 try
                 {
                     using CancellationTokenSource source = new CancellationTokenSource();
-                    source.CancelAfter(ClientTimeout);
+                    source.CancelAfter(client.HighBandwidthMode ? ClientHighBandwidthTimeout : ClientTimeout);
                     string? line = await client.Reader.ReadLineAsync(source.Token);
                     if (line == null)
                         break;
@@ -99,6 +102,12 @@ namespace piconavx
                                 client.FireRequestReturned(this, new ClientRequestReturnedEventArgs(client, DataType.BoardIdUpdate));
                             }
                             break;
+                        case DataType.FeedUpdate:
+                            {
+                                FeedChunk[] feedUpdate = await Protocol.ParseFeedUpdate(line, client.Reader.BaseStream, source.Token);
+                                client.FireUpdateReceieved(this, new ClientUpdateReceivedEventArgs(client, feedUpdate));
+                            }
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -124,7 +133,9 @@ namespace piconavx
                         switch (command.CommandType)
                         {
                             case HostCommandType.SetDataType:
-                                await client.Writer.WriteLineAsync(Protocol.SerializeSetDataTypeCommand((HostSetDataType)command.Data!));
+                                HostSetDataType value = (HostSetDataType)command.Data!;
+                                client.HighBandwidthMode = value == HostSetDataType.Feed; // enable high bandwidth mode for feed updates
+                                await client.Writer.WriteLineAsync(Protocol.SerializeSetDataTypeCommand(value));
                                 await client.Writer.FlushAsync(cancellationToken);
                                 break;
                             case HostCommandType.RequestHealth:
@@ -145,6 +156,10 @@ namespace piconavx
                                 break;
                             case HostCommandType.ZeroDisplacement:
                                 await client.Writer.WriteLineAsync(Protocol.SerializeZeroDisplacementCommand());
+                                await client.Writer.FlushAsync(cancellationToken);
+                                break;
+                            case HostCommandType.SetFeedOverflow:
+                                await client.Writer.WriteLineAsync(Protocol.SerializeSetFeedOverflowCommand((HostSetFeedOverflowType)command.Data!));
                                 await client.Writer.FlushAsync(cancellationToken);
                                 break;
                         }

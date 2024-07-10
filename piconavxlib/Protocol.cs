@@ -5,6 +5,8 @@
         const string HOST_INTRODUCTION = "PICONAVX-HOST";
 
         const char DATA_FIELD_SEPARATOR = '|';
+        const char DATA_FEED_TIMESTAMP_SEPARATOR = ':';
+        const char DATA_FEED_ENTRY_SEPARATOR= ';';
 
         const string TYPE_ID = "ID:";
         const string TYPE_RAW = "RAW:";
@@ -14,18 +16,25 @@
         const string TYPE_HEALTH = "HEALTH:";
         const string TYPE_BOARDSTATE = "BSTATE:";
         const string TYPE_BOARDID = "BID:";
+        const string TYPE_FEED = "FEED:";
 
         const string COMMAND_SET_DATA_TYPE = "SETDATA:";
         const string COMMAND_SET_DATA_TYPE_RAW = "RAW";
         const string COMMAND_SET_DATA_TYPE_AHRS = "AHRS";
         const string COMMAND_SET_DATA_TYPE_AHRSPOS = "AHRSPOS";
         const string COMMAND_SET_DATA_TYPE_YPR = "YPR";
+        const string COMMAND_SET_DATA_TYPE_FEED = "FEED";
 
         const string COMMAND_REQUEST_HEALTH = "GETHEALTH:";
         const string COMMAND_REQUEST_BOARDSTATE = "GETBSTATE:";
         const string COMMAND_REQUEST_BOARDID = "GETBID:";
         const string COMMAND_ZERO_YAW = "ZEROYAW:";
         const string COMMAND_ZERO_DISPLACEMENT = "ZERODISP:";
+
+        const string COMMAND_SET_FEED_OVERFLOW = "SETFEEDOVF:";
+        const string COMMAND_SET_FEED_OVERFLOW_DELETE_OLDEST = "DELETE";
+        const string COMMAND_SET_FEED_OVERFLOW_REDUCE_OLDEST_FREQUENCY = "LOWFREQ";
+        const string COMMAND_SET_FEED_OVERFLOW_SKIP = "SKIP";
 
         public static async Task<bool> IdentifyClient(Client client, CancellationToken cancellationToken)
         {
@@ -77,6 +86,10 @@
             else if (line.StartsWith(TYPE_BOARDID))
             {
                 return DataType.BoardIdUpdate;
+            }
+            else if (line.StartsWith(TYPE_FEED))
+            {
+                return DataType.FeedUpdate;
             }
             else
             {
@@ -235,6 +248,68 @@
             };
         }
 
+        public static async Task<FeedChunk[]> ParseFeedUpdate(string line, Stream stream, CancellationToken token)
+        {
+            line = line.Substring(TYPE_FEED.Length);
+            string[] parts = line.Split(DATA_FIELD_SEPARATOR);
+            int dataLength = int.Parse(parts[0]);
+            int chunkCount = int.Parse(parts[1]);
+            const int chunkSize = 92;
+
+            byte[] chunkData = new byte[chunkSize];
+            FeedChunk[] chunks = new FeedChunk[chunkCount];
+
+            uint decodeTimestamp()
+            {
+                Span<byte> view = new Span<byte>(chunkData, 0, 4);
+                if (BitConverter.IsLittleEndian)
+                    view.Reverse();
+                return BitConverter.ToUInt32(view);
+            }
+
+            float getFloat(int start)
+            {
+                Span<byte> view = new Span<byte>(chunkData, start, 4);
+                if (BitConverter.IsLittleEndian)
+                    view.Reverse();
+                return BitConverter.ToSingle(view);
+            }
+
+            for (int i = 0; i < chunkCount; i++)
+            {
+                await stream.ReadExactlyAsync(chunkData, 0, chunkSize, token);
+                uint timestamp = decodeTimestamp();
+                AHRSPosUpdate update = new AHRSPosUpdate()
+                {
+                    Yaw = getFloat(4),
+                    Pitch = getFloat(8),
+                    Roll = getFloat(12),
+                    CompassHeading = getFloat(16),
+                    Altitude = getFloat(20),
+                    FusedHeading = getFloat(24),
+                    LinearAccelX = getFloat(28),
+                    LinearAccelY = getFloat(32),
+                    LinearAccelZ = getFloat(36),
+                    MpuTemp = getFloat(40),
+                    QuatW = getFloat(44),
+                    QuatX = getFloat(48),
+                    QuatY = getFloat(52),
+                    QuatZ = getFloat(56),
+                    BarometricPressure = getFloat(60),
+                    BaroTemp = getFloat(64),
+                    VelX = getFloat(68),
+                    VelY = getFloat(72),
+                    VelZ = getFloat(76),
+                    DispX = getFloat(80),
+                    DispY = getFloat(84),
+                    DispZ = getFloat(88)
+                };
+                chunks[i] = new FeedChunk(timestamp, update);
+            }
+
+            return chunks;
+        }
+
         public static string SerializeSetDataTypeCommand(HostSetDataType dataType)
         {
             string value = COMMAND_SET_DATA_TYPE_AHRSPOS;
@@ -252,8 +327,29 @@
                 case HostSetDataType.YPR:
                     value = COMMAND_SET_DATA_TYPE_YPR;
                     break;
+                case HostSetDataType.Feed:
+                    value = COMMAND_SET_DATA_TYPE_FEED;
+                    break;
             }
             return string.Format("{0}{1}", COMMAND_SET_DATA_TYPE, value);
+        }
+
+        public static string SerializeSetFeedOverflowCommand(HostSetFeedOverflowType feedOverflow)
+        {
+            string value = COMMAND_SET_FEED_OVERFLOW_DELETE_OLDEST;
+            switch (feedOverflow)
+            {
+                case HostSetFeedOverflowType.DeleteOldest:
+                    value = COMMAND_SET_FEED_OVERFLOW_DELETE_OLDEST;
+                    break;
+                case HostSetFeedOverflowType.ReduceOldestFrequency:
+                    value = COMMAND_SET_FEED_OVERFLOW_REDUCE_OLDEST_FREQUENCY;
+                    break;
+                case HostSetFeedOverflowType.Skip:
+                    value = COMMAND_SET_FEED_OVERFLOW_SKIP;
+                    break;
+            }
+            return string.Format("{0}{1}", COMMAND_SET_FEED_OVERFLOW, value);
         }
 
         public static string SerializeRequestHealthCommand()
@@ -292,6 +388,7 @@
         HealthUpdate,
         BoardStateUpdate,
         BoardIdUpdate,
+        FeedUpdate,
         Unknown
     }
 
@@ -358,7 +455,8 @@
         RequestBoardState,
         RequestBoardId,
         ZeroYaw,
-        ZeroDisplacement
+        ZeroDisplacement,
+        SetFeedOverflow
     }
 
     public enum HostSetDataType
@@ -366,6 +464,14 @@
         Raw,
         AHRS,
         AHRSPos,
-        YPR
+        YPR,
+        Feed
+    }
+
+    public enum HostSetFeedOverflowType
+    {
+        DeleteOldest,
+        ReduceOldestFrequency,
+        Skip
     }
 }
