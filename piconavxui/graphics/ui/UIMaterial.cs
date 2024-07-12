@@ -31,5 +31,13 @@ namespace piconavx.ui.graphics.ui
             Shader.Use();
             Shader.SetUniform("uMatrix", properties.Canvas!.Matrix);
         }
+
+        public override void UpdateModelBuffer(RenderProperties properties)
+        {
+        }
+
+        public override void UpdateInstanceBuffer(RenderProperties properties)
+        {
+        }
     }
 }

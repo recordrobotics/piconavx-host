@@ -17,10 +17,16 @@ namespace piconavx.ui.graphics
         public float Smoothness { get; set; }
         public Texture? Emission { get; set; }
         public Vector3 EmissionColor { get; set; }
+        public float Alpha { get; set; }
 
-        public LitMaterial() : base(new Shader("assets/shaders/vertex.glsl", "assets/shaders/lit.glsl"))
+        public LitMaterial() : this("assets/shaders/vertex.glsl")
+        {
+        }
+
+        public LitMaterial(string vertexPath) : base(new Shader(vertexPath, "assets/shaders/lit.glsl"))
         {
             Smoothness = 0.5f;
+            Alpha = 1.0f;
             DiffuseColor = new Vector3(0.9f, 0.9f, 0.9f);
             SpecularColor = new Vector3(1, 1, 1);
             EmissionColor = new Vector3(0, 0, 0);
@@ -41,6 +47,7 @@ namespace piconavx.ui.graphics
             Shader.SetUniform("material.smoothness", Smoothness);
             Shader.SetUniform("material.emission", 2);
             Shader.SetUniform("material.emission_tint", EmissionColor);
+            Shader.SetUniform("material.alpha", Alpha);
 
             Shader.SetUniform("light.ambient", properties.Light!.AmbientColor);
             Shader.SetUniform("light.color", properties.Light.Color);

@@ -7,7 +7,7 @@ layout (location = 4) in vec3 vBitangent;
 
 layout(std140, binding = 0) uniform MatrixBlock
 {
-    mat4 uModel;
+    mat4 uModel[1024];
 } block_matrix;
 
 uniform mat4 uView;
@@ -21,9 +21,10 @@ out vec2 fTexCoords;
 
 void main()
 {
-    gl_Position = uProjection * uView * block_matrix.uModel * vec4(vPos, 1.0);
-    fPos = vec3(block_matrix.uModel * vec4(vPos, 1.0));
-    fNormal = mat3(transpose(inverse(block_matrix.uModel))) * vNormal;
+    mat4 modelMat = block_matrix.uModel[gl_InstanceID];
+    gl_Position = uProjection * uView * modelMat * vec4(vPos, 1.0);
+    fPos = vec3(modelMat * vec4(vPos, 1.0));
+    fNormal = mat3(transpose(inverse(modelMat))) * vNormal;
     fTangent = vTangent;
     fBitangent = vBitangent;
     fTexCoords = vTexCoords;

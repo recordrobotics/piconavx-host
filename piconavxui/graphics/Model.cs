@@ -18,7 +18,7 @@ namespace piconavx.ui.graphics
         public Model(string path, bool gamma = false)
         {
             materialNames = new Dictionary<string, int>();
-            Transform = new Transform();
+            Transforms = [new Transform()];
             var assimp = Silk.NET.Assimp.Assimp.GetApi();
             _assimp = assimp;
             LoadModel(path);
@@ -29,7 +29,22 @@ namespace piconavx.ui.graphics
         private List<Texture>? _texturesLoaded = new List<Texture>();
         public string Directory { get; protected set; } = string.Empty;
         public List<Mesh> Meshes { get; protected set; } = new List<Mesh>();
-        public Transform Transform { get; set; }
+        public Transform?[] Transforms { get; set; }
+        public Transform Transform
+        {
+            get => GetTransform(0)!; set
+            {
+                Array.Fill(Transforms, value);
+            }
+        }
+
+        public Transform? GetTransform(int index)
+        {
+            if (Transforms.Length > index)
+                return Transforms[index];
+            else
+                return null;
+        }
 
         public Material?[] Materials { get; set; }
         public Material? Material { get => GetMaterial(0); set
@@ -263,7 +278,7 @@ namespace piconavx.ui.graphics
 
         public void Render(double deltaTime, RenderProperties properties)
         {
-            properties.Transform = Transform;
+            properties.Transforms = Transforms;
 
             Material? lastMaterial = null;
 
@@ -279,7 +294,32 @@ namespace piconavx.ui.graphics
                 mesh.Bind();
                 unsafe
                 {
-                    Window.GL.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
+                    if (material.UseInstanced)
+                    {
+                        if (material.ExtendedDrawCall && Transforms.Length > Material.MAX_INSTANCE_COUNT)
+                        {
+                            int rendered = 0;
+                            while (rendered < Transforms.Length)
+                            {
+                                int left = Transforms.Length - rendered;
+                                int instances = left > Material.MAX_INSTANCE_COUNT ? Material.MAX_INSTANCE_COUNT : left;
+                                properties.Transforms = Transforms[rendered..(rendered + instances)];
+                                material.UpdateInstanceBuffer(properties);
+                                Window.GL.DrawElementsInstanced(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null, (uint)instances);
+                                rendered += instances;
+                            }
+                        }
+                        else
+                        {
+                            material.UpdateInstanceBuffer(properties);
+                            Window.GL.DrawElementsInstanced(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null, (uint)Math.Min(Material.MAX_INSTANCE_COUNT, Transforms.Length));
+                        }
+                    }
+                    else
+                    {
+                        material.UpdateModelBuffer(properties);
+                        Window.GL.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
+                    }
                 }
             }
         }

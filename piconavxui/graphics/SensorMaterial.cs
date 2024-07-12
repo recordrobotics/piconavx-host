@@ -9,10 +9,11 @@ namespace piconavx.ui.graphics
 {
     public class SensorMaterial : LitMaterial, IDisposable
     {
-        public SensorMaterial() : base()
+        public SensorMaterial() : base("assets/shaders/vertexinst.glsl")
         {
             Diffuse = new Texture("assets/textures/navxmicro.png");
             DiffuseColor = new System.Numerics.Vector3(1, 1, 1);
+            UseInstanced = true;
         }
 
         public new void Dispose()

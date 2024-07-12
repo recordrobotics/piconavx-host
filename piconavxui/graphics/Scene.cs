@@ -16,6 +16,7 @@ namespace piconavx.ui.graphics
 
         public static void CreateStaticResources()
         {
+            Material.CreateStaticResources();
             Material.DefaultMaterial = AddResource(Material.CreateDefault());
             UIMaterial.DefaultMaterial = AddResource(UIMaterial.CreateDefault());
             Texture.White = AddResource(Texture.CreateWhite(1, 1));
@@ -48,8 +49,14 @@ namespace piconavx.ui.graphics
             }));
 
             Model sensor = AddController(AddResource(new Model("assets/models/navxmicro.obj")));
-            sensor.Material = AddResource(new SensorMaterial());
-            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
+            sensor.Material = AddResource(new SensorMaterial()
+            {
+                Alpha = 0.2f,
+                EnableBlend = true,
+                ExtendedDrawCall = true
+            });
+            //LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
+            FeedClientPreviewController feedPreview = AddController(new FeedClientPreviewController(sensor));
 
             Model lightModel = AddController(AddResource(new Model("assets/models/sphere.obj")));
             lightModel.Transform.Position = new Vector3(1.2f, 1.0f, 2.0f);
@@ -79,7 +86,8 @@ namespace piconavx.ui.graphics
             UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 dataPanel.Client = client;
-                livePreview.Client = client;
+                //livePreview.Client = client;
+                feedPreview.Client = client;
                 client.SetDataType(HostSetDataType.Feed);
                 client.SetFeedOverflow(HostSetFeedOverflowType.DeleteOldest);
             });
@@ -87,7 +95,8 @@ namespace piconavx.ui.graphics
             UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 dataPanel.Client = null;
-                livePreview.Client = null;
+                feedPreview.Client = null;
+                //livePreview.Client = null;
             });
         }
 

@@ -21,11 +21,11 @@ namespace piconavx.ui.controllers
         private readonly ConcurrentQueue<Client> clientConnects = new();
         private readonly ConcurrentQueue<Client> clientDisconnects = new();
 
-        private readonly Dictionary<Client, List<FeedChunk>> clientFeeds = new();
+        private static readonly Dictionary<Client, List<FeedChunk>> clientFeeds = new();
 
-        public IReadOnlyList<FeedChunk> GetClientFeed(Client client)
+        public static IReadOnlyList<FeedChunk>? GetClientFeed(Client client)
         {
-            return clientFeeds[client].AsReadOnly();
+            return clientFeeds.ContainsKey(client) ? clientFeeds[client].AsReadOnly() : null;
         }
 
         public UIServer(int port)
@@ -95,8 +95,13 @@ namespace piconavx.ui.controllers
                 case DataType.FeedUpdate:
                     {
                         FeedChunk[] chunks = (FeedChunk[])e.Data;
-                        clientFeeds[e.Client].AddRange(chunks);
-                        clientFeedUpdates.Enqueue((e.Client, chunks));
+                        if (chunks.Length == 0)
+                            break;
+                        if (chunks[0].Data.MpuTemp > 20 && chunks[0].Data.MpuTemp < 100)
+                        {
+                            clientFeeds[e.Client].AddRange(chunks);
+                            clientFeedUpdates.Enqueue((e.Client, chunks));
+                        }
                     }
                     break;
                 default:
@@ -113,6 +118,10 @@ namespace piconavx.ui.controllers
             clientFeeds.Remove(e.Client);
             e.Client.UpdateReceieved -= Client_UpdateReceieved;
             clientDisconnects.Enqueue(e.Client);
+            if (e.ReadException != null)
+                Debug.WriteLine(e.ReadException);
+            if (e.WriteException != null)
+                Debug.WriteLine(e.WriteException);
         }
 
         private void Scene_AppExit()

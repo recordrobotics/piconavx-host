@@ -51,7 +51,10 @@ namespace piconavx
                     source.CancelAfter(client.HighBandwidthMode ? ClientHighBandwidthTimeout : ClientTimeout);
                     string? line = await client.Reader.ReadLineAsync(source.Token);
                     if (line == null)
+                    {
+                        Debug.WriteLine("Error: client reader got null");
                         break;
+                    }
 
                     DataType dataType = Protocol.ParseDataType(line);
 

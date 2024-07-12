@@ -26,6 +26,15 @@ namespace piconavx.ui.graphics
             }
         }
 
+        public unsafe BufferObject(TDataType data, BufferTargetARB bufferType, bool isDynamic)
+        {
+            _bufferType = bufferType;
+
+            _handle = Window.GL.GenBuffer();
+            Bind();
+            Window.GL.BufferData(bufferType, (nuint)sizeof(TDataType), &data, isDynamic ? BufferUsageARB.StreamDraw : BufferUsageARB.StaticDraw);
+        }
+
         public unsafe BufferObject(int size, BufferTargetARB bufferType, bool isDynamic)
         {
             _bufferType = bufferType;
@@ -46,10 +55,21 @@ namespace piconavx.ui.graphics
             }
         }
 
+        public unsafe void SetData(TDataType data)
+        {
+            Bind();
+            Window.GL.BufferSubData(_bufferType, 0, (nuint)sizeof(TDataType), &data);
+        }
+
         public void Bind()
         {
             //Binding the buffer object, with the correct buffer type.
             Window.GL.BindBuffer(_bufferType, _handle);
+        }
+
+        public void BindBufferBase(uint index)
+        {
+            Window.GL.BindBufferBase(_bufferType, index, _handle);
         }
 
         public void Unbind()

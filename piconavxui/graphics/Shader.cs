@@ -2,10 +2,12 @@
 using Silk.NET.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace piconavx.ui.graphics
 {
@@ -66,6 +68,20 @@ namespace piconavx.ui.graphics
             Window.GL.UniformMatrix4(location, 1, false, (float*)&value);
         }
 
+        public unsafe void SetUniform(string name, Matrix4x4[] value)
+        {
+            //A new overload has been created for setting a uniform so we can use the transform in our shader.
+            int location = Window.GL.GetUniformLocation(_handle, name);
+            if (location == -1)
+            {
+                throw new Exception($"{name} uniform not found on shader.");
+            }
+            fixed (Matrix4x4* d = value)
+            {
+                Window.GL.UniformMatrix4(location, (uint)value.Length, false, (float*)d);
+            }
+        }
+
         public void SetUniform(string name, float value)
         {
             int location = Window.GL.GetUniformLocation(_handle, name);
@@ -94,6 +110,21 @@ namespace piconavx.ui.graphics
                 throw new Exception($"{name} uniform not found on shader.");
             }
             Window.GL.Uniform4(location, value.X, value.Y, value.Z, value.W);
+        }
+
+        public uint GetUniformBlockIndex(string name)
+        {
+            uint index = Window.GL.GetUniformBlockIndex(_handle, name);
+            if(index == 0xFFFFFFFF)
+            {
+                throw new Exception($"{name} uniform block not found on shader.");
+            }
+            return index;
+        }
+
+        public void SetUniformBlock(string name, uint binding)
+        {
+            Window.GL.UniformBlockBinding(_handle, GetUniformBlockIndex(name), binding);
         }
 
         public void Dispose()

@@ -10,7 +10,7 @@ namespace piconavx.ui.graphics
     public class RenderProperties
     {
         public Camera? Camera;
-        public Transform? Transform;
+        public Transform?[]? Transforms;
         public Light? Light;
         public Canvas? Canvas;
     }
