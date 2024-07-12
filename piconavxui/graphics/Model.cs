@@ -25,6 +25,24 @@ namespace piconavx.ui.graphics
             Materials = new Material?[MaterialNames.Values.Max() + 1];
         }
 
+        private Model(Dictionary<string, int> materialNames, Assimp assimp, List<Texture>? texturesLoaded, List<Mesh> meshes)
+        {
+            this.materialNames = materialNames;
+            Transforms = [new Transform()];
+            _assimp = assimp;
+            Materials = new Material?[MaterialNames.Values.Max() + 1];
+            _texturesLoaded = texturesLoaded;
+            Meshes = meshes;
+        }
+
+        public Model Clone()
+        {
+            return new Model(materialNames, _assimp, _texturesLoaded, Meshes)
+            {
+                renderPriority = this.renderPriority
+            };
+        }
+
         private Assimp _assimp;
         private List<Texture>? _texturesLoaded = new List<Texture>();
         public string Directory { get; protected set; } = string.Empty;

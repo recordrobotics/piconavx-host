@@ -46,7 +46,7 @@ namespace piconavx.ui.controllers
             if (client != null)
             {
                 Target.Rotation = new Quaternion((float)lastUpdate.QuatX, (float)lastUpdate.QuatZ, -(float)lastUpdate.QuatY, (float)lastUpdate.QuatW);
-                Target.Position = new Vector3((float)lastUpdate.DispX, (float)lastUpdate.DispZ, -(float)lastUpdate.DispY);
+                Target.Position = new Vector3(10*(float)lastUpdate.DispX, 10 * (float)lastUpdate.DispZ, 10 * -(float)lastUpdate.DispY);
             } else
             {
                 Target.Rotation = Quaternion.Identity;

@@ -49,14 +49,12 @@ namespace piconavx.ui.graphics
             }));
 
             Model sensor = AddController(AddResource(new Model("assets/models/navxmicro.obj")));
-            sensor.Material = AddResource(new SensorMaterial()
-            {
-                Alpha = 0.2f,
-                EnableBlend = true,
-                ExtendedDrawCall = true
-            });
-            //LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
-            FeedClientPreviewController feedPreview = AddController(new FeedClientPreviewController(sensor));
+            sensor.Material = AddResource(new SensorMaterial());
+            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
+
+            Model feedSensor = AddController(sensor.Clone());
+            feedSensor.Material = AddResource(new SensorFeedMaterial());
+            FeedClientPreviewController feedPreview = AddController(new FeedClientPreviewController(feedSensor));
 
             Model lightModel = AddController(AddResource(new Model("assets/models/sphere.obj")));
             lightModel.Transform.Position = new Vector3(1.2f, 1.0f, 2.0f);
@@ -86,9 +84,9 @@ namespace piconavx.ui.graphics
             UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 dataPanel.Client = client;
-                //livePreview.Client = client;
+                livePreview.Client = client;
                 feedPreview.Client = client;
-                client.SetDataType(HostSetDataType.Feed);
+                //client.SetDataType(HostSetDataType.Feed);
                 client.SetFeedOverflow(HostSetFeedOverflowType.DeleteOldest);
             });
 
@@ -96,7 +94,7 @@ namespace piconavx.ui.graphics
             {
                 dataPanel.Client = null;
                 feedPreview.Client = null;
-                //livePreview.Client = null;
+                livePreview.Client = null;
             });
         }
 

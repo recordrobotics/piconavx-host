@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics
 {
-    public class SensorMaterial : LitMaterial, IDisposable
+    public class SensorFeedMaterial : LitMaterial, IDisposable
     {
-        public SensorMaterial() : base()
+        public SensorFeedMaterial() : base("assets/shaders/vertexinst.glsl")
         {
             Diffuse = new Texture("assets/textures/navxmicro.png");
             DiffuseColor = new System.Numerics.Vector3(1, 1, 1);
+            UseInstanced = true;
+            Alpha = 0.2f;
+            EnableBlend = true;
+            ExtendedDrawCall = true;
         }
 
         public new void Dispose()
