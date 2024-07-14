@@ -13,6 +13,10 @@ namespace piconavx.ui.graphics.ui
         public abstract int ZIndex { get; set; }
         public abstract RectangleF Bounds { get; set; }
 
+        private RaycastTransparency _raycastTransparency = RaycastTransparency.Opaque;
+        public virtual RaycastTransparency RaycastTransparency { get => _raycastTransparency; set => _raycastTransparency = value; }
+        public virtual bool IsRenderable { get => true; }
+
         protected UIController(Canvas canvas)
         {
             Canvas = canvas;
@@ -23,6 +27,7 @@ namespace piconavx.ui.graphics.ui
             return ZIndex.CompareTo(other?.ZIndex);
         }
 
-        public abstract void Render(double deltaTime, RenderProperties properties);
+        public virtual void Render(double deltaTime, RenderProperties properties) { }
+        public virtual void HitTest(byte id) { }
     }
 }

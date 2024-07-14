@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -252,6 +253,35 @@ namespace piconavx
         {
             cancelSource.Dispose();
             listener.Dispose();
+        }
+
+        public Client ConnectSimulatedClient(string? id)
+        {
+#pragma warning disable CS8625
+            Client client = new Client(id, null, null, null);
+#pragma warning restore CS8625
+            client.Connected = true;
+            Clients.Add(client);
+            FireClientConnected(this, new ClientConnectedEventArgs(client));
+            return client;
+        }
+
+        public void DisconnectClient(Client client)
+        {
+            DisconnectClient(client, null, null);
+        }
+
+        public void DisconnectClient(Client client, Exception? readException, Exception? writeException)
+        {
+            if (client.Tcp == null)
+            {
+                client.Connected = false;
+                FireClientDisconnected(this, new ClientDisconnectedEventArgs(client, readException, writeException));
+                Clients.Remove(client);
+            } else
+            {
+                client.Tcp.Close();
+            }
         }
     }
 

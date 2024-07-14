@@ -16,14 +16,11 @@ namespace piconavx.ui.graphics.ui
 
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
+        public override bool IsRenderable => false;
 
         public Panel(Canvas canvas) : base(canvas)
         {
             bounds = new RectangleF(0, 0, 0, 0);
-        }
-
-        public override void Render(double deltaTime, RenderProperties properties)
-        {
         }
 
         public override void Subscribe()

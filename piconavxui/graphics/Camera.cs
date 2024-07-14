@@ -1,4 +1,5 @@
 ﻿using Silk.NET.OpenGL;
+using Silk.NET.Windowing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -55,6 +56,8 @@ namespace piconavx.ui.graphics
 
         private void Render(double deltaTime, RenderProperties properties)
         {
+            Window.GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            Window.GL.Viewport(Window.Current.Internal.FramebufferSize);
             Window.GL.ClearColor(Color.FromArgb(33, 33, 33));
             Window.GL.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit));
             properties.Camera = this;

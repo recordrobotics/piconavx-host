@@ -63,7 +63,6 @@ namespace piconavx.ui.graphics
         private void Window_FramebufferResize(Silk.NET.Maths.Vector2D<int> newSize)
         {
             currentWindow = this;
-            gl?.Viewport(newSize);
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyViewportChange(new Silk.NET.Maths.Rectangle<int>(0, 0, newSize));
         }
@@ -72,7 +71,6 @@ namespace piconavx.ui.graphics
         {
             currentWindow = this;
             gl = GL.GetApi(window);
-            gl.Viewport(window.FramebufferSize);
 
             fontRenderer = new Renderer();
 
@@ -113,7 +111,7 @@ namespace piconavx.ui.graphics
                 prevMousePos = position;
 
                 Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
-                Scene.NotifyMouseMove(dx, dy);
+                Scene.NotifyMouseMove(position.X, position.Y, dx, dy);
             }
         }
 

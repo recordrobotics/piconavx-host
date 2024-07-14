@@ -19,6 +19,7 @@ namespace piconavx.ui.graphics.ui
             canvas.AddComponent(background);
             background.ZIndex = ZIndex; // background
             background.Color = new Rgba32(10, 10, 10, 200);
+
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
@@ -64,9 +65,7 @@ namespace piconavx.ui.graphics.ui
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
 
-        public override void Render(double deltaTime, RenderProperties properties)
-        {
-        }
+        public override bool IsRenderable => false;
 
         public override void Subscribe()
         {

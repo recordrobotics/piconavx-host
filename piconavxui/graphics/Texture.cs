@@ -1,4 +1,6 @@
-﻿using Silk.NET.Assimp;
+﻿using piconavx.ui.controllers;
+using piconavx.ui.graphics.ui;
+using Silk.NET.Assimp;
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -12,6 +14,7 @@ namespace piconavx.ui.graphics
         public static Texture White;
         public static Texture Black;
         public static Texture UVTest;
+        public static Texture RoundedRect;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 
@@ -45,6 +48,21 @@ namespace piconavx.ui.graphics
         public TextureType Type { get; }
         public readonly int Width;
         public readonly int Height;
+
+        private TextureWrapMode wrapModeU = TextureWrapMode.Repeat;
+        private TextureWrapMode wrapModeV = TextureWrapMode.Repeat;
+        private TextureWrapMode wrapModeW = TextureWrapMode.Repeat;
+
+        public TextureWrapMode WrapModeU { get=>wrapModeU; set=>wrapModeU = value; }
+        public TextureWrapMode WrapModeV { get=>wrapModeV; set=>wrapModeV = value; }
+        public TextureWrapMode WrapModeW { get=>wrapModeW; set=>wrapModeW = value; }
+        public TextureWrapMode WrapMode { get => wrapModeU; set => wrapModeU = wrapModeV = wrapModeW = value; }
+
+        private FilterMode filterMode = FilterMode.Trilinear;
+        public FilterMode FilterMode { get => filterMode; set => filterMode = value; }
+
+        private Insets border = new Insets(0);
+        public Insets Border { get => border; set => border = value; }
 
         public unsafe Texture(string path, TextureType type = TextureType.None)
         {
@@ -116,15 +134,66 @@ namespace piconavx.ui.graphics
             SetData(new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height), data);
         }
 
+        private GLEnum getWrapMode(TextureWrapMode mode)
+        {
+            switch (mode)
+            {
+                case TextureWrapMode.Repeat:
+                    return GLEnum.Repeat;
+                case TextureWrapMode.Clamp:
+                    return GLEnum.ClampToEdge;
+                case TextureWrapMode.Mirror:
+                    return GLEnum.MirroredRepeat;
+                case TextureWrapMode.MirrorOnce:
+                    return GLEnum.MirrorClampToEdge;
+            }
+            return GLEnum.Repeat;
+        }
+
+        private GLEnum getFilterMode(FilterMode mode)
+        {
+            switch (mode)
+            {
+                case FilterMode.Point:
+                    return GLEnum.Nearest;
+                case FilterMode.Bilinear:
+                    return GLEnum.Linear;
+                case FilterMode.Trilinear:
+                    return GLEnum.Linear;
+            }
+            return GLEnum.Linear;
+        }
+
+        private GLEnum getFilterModeMipmap(FilterMode mode)
+        {
+            switch (mode)
+            {
+                case FilterMode.Point:
+                    return GLEnum.NearestMipmapLinear;
+                case FilterMode.Bilinear:
+                    return GLEnum.LinearMipmapNearest;
+                case FilterMode.Trilinear:
+                    return GLEnum.LinearMipmapLinear;
+            }
+            return GLEnum.Linear;
+        }
+
         private void SetParameters()
         {
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)getWrapMode(wrapModeU));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)getWrapMode(wrapModeV));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)getWrapMode(wrapModeW));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)getFilterModeMipmap(filterMode));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)getFilterMode(filterMode));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 8);
             Window.GL.GenerateMipmap(TextureTarget.Texture2D);
+        }
+
+        public void UpdateSettings()
+        {
+            Bind();
+            SetParameters();
         }
 
         public void Bind(TextureUnit textureSlot = TextureUnit.Texture0)
@@ -137,5 +206,20 @@ namespace piconavx.ui.graphics
         {
             Window.GL.DeleteTexture(_handle);
         }
+    }
+
+    public enum TextureWrapMode
+    {
+        Repeat,
+        Clamp,
+        Mirror,
+        MirrorOnce
+    }
+
+    public enum FilterMode
+    {
+        Point,
+        Bilinear,
+        Trilinear
     }
 }

@@ -19,9 +19,14 @@ namespace piconavx.ui.graphics
             Material.CreateStaticResources();
             Material.DefaultMaterial = AddResource(Material.CreateDefault());
             UIMaterial.DefaultMaterial = AddResource(UIMaterial.CreateDefault());
+            UIMaterial.ColorMaterial = AddResource(UIMaterial.CreateColorMaterial());
             Texture.White = AddResource(Texture.CreateWhite(1, 1));
             Texture.Black = AddResource(Texture.CreateBlack(1, 1));
             Texture.UVTest = AddResource(new Texture("assets/textures/uvtest.png"));
+            Texture.RoundedRect = AddResource(new Texture("assets/textures/roundrect.png")
+            {
+                Border = new Insets(12)
+            });
         }
 
         public static void CreateTestScene()
@@ -70,7 +75,7 @@ namespace piconavx.ui.graphics
             cameraController.Yaw = 45;
             cameraController.Pitch = 25;
 
-            Canvas canvas = AddController(new Canvas());
+            Canvas canvas = AddController(AddResource(new Canvas()));
 
             Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));
             canvas.AddComponent(sidepanel);
@@ -86,8 +91,6 @@ namespace piconavx.ui.graphics
                 dataPanel.Client = client;
                 livePreview.Client = client;
                 feedPreview.Client = client;
-                //client.SetDataType(HostSetDataType.Feed);
-                client.SetFeedOverflow(HostSetFeedOverflowType.DeleteOldest);
             });
 
             UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
@@ -148,7 +151,7 @@ namespace piconavx.ui.graphics
         public static bool InEvent { get { return inEvent; } }
 
         public static PrioritizedList<PrioritizedAction<GenericPriority, Rectangle<int>>> ViewportChange = new();
-        public static PrioritizedList<PrioritizedAction<GenericPriority, float, float>> MouseMove = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, float, float, float, float>> MouseMove = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, MouseButton>> MouseDown = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, MouseButton>> MouseUp = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, ScrollWheel>> MouseScroll = new();
@@ -166,12 +169,12 @@ namespace piconavx.ui.graphics
             inEvent = false;
         }
 
-        public static void NotifyMouseMove(float dx, float dy)
+        public static void NotifyMouseMove(float x, float y, float dx, float dy)
         {
             inEvent = true;
             foreach (var action in MouseMove)
             {
-                action.Action.Invoke(dx, dy);
+                action.Action.Invoke(x, y, dx, dy);
             }
             inEvent = false;
         }

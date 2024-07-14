@@ -23,6 +23,7 @@
     <None Remove="assets\models\navxmicro.obj" />
     <None Remove="assets\models\reference.obj" />
     <None Remove="assets\models\sphere.obj" />
+    <None Remove="assets\shaders\color.glsl" />
     <None Remove="assets\shaders\default.glsl" />
     <None Remove="assets\shaders\font.glsl" />
     <None Remove="assets\shaders\fontvert.glsl" />
@@ -30,10 +31,12 @@
     <None Remove="assets\shaders\light.glsl" />
     <None Remove="assets\shaders\lit.glsl" />
     <None Remove="assets\shaders\uiimage.glsl" />
+    <None Remove="assets\shaders\uiimage.hittest.glsl" />
     <None Remove="assets\shaders\uivertex.glsl" />
     <None Remove="assets\shaders\vertex.glsl" />
     <None Remove="assets\shaders\vertexinst.glsl" />
     <None Remove="assets\textures\navxmicro.png" />
+    <None Remove="assets\textures\roundrect.png" />
     <None Remove="assets\textures\uvtest.png" />
   </ItemGroup>
 
@@ -50,6 +53,8 @@
     <EmbeddedResource Include="assets\shaders\grid.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="assets\shaders\color.glsl" />
+    <EmbeddedResource Include="assets\shaders\uiimage.hittest.glsl" />
     <EmbeddedResource Include="assets\shaders\uiimage.glsl" />
     <EmbeddedResource Include="assets\shaders\font.glsl" />
     <EmbeddedResource Include="assets\shaders\uivertex.glsl" />
@@ -67,6 +72,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="assets\textures\navxmicro.png" />
+    <EmbeddedResource Include="assets\textures\roundrect.png" />
     <EmbeddedResource Include="assets\textures\uvtest.png" />
   </ItemGroup>
 

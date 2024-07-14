@@ -47,6 +47,7 @@ namespace piconavx.ui.graphics.ui
 
         public Label(string text, Canvas canvas) : base(canvas)
         {
+            RaycastTransparency = RaycastTransparency.Hidden; // don't perform input events on text
             this.text = text;
             color = FSColor.White;
             bounds = GetAutoSizeBounds();
@@ -61,14 +62,14 @@ namespace piconavx.ui.graphics.ui
         {
             var font = Window.FontSystem.GetFont(fontSize);
             Vector2 size = font.MeasureString(text, new Vector2(Window.FontSystem.FontResolutionFactor, Window.FontSystem.FontResolutionFactor), CharSpacing);
-            return new RectangleF(bounds.X, bounds.Y, size.X, size.Y);
+            return new RectangleF(bounds.X, bounds.Y, size.X+10, size.Y-13);
         }
 
         public override void Render(double deltaTime, RenderProperties properties)
         {
             var font = Window.FontSystem.GetFont(fontSize);
             Window.FontRenderer.Begin();
-            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, default, new Vector2(Window.FontSystem.FontResolutionFactor, Window.FontSystem.FontResolutionFactor), 0, CharSpacing);
+            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y-16), color, 0, default, new Vector2(Window.FontSystem.FontResolutionFactor, Window.FontSystem.FontResolutionFactor), 0, CharSpacing);
             Window.FontRenderer.End();
         }
 

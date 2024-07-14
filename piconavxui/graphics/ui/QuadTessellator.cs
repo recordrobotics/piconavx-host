@@ -123,7 +123,6 @@ namespace piconavx.ui.graphics.ui
 
             _vao?.Bind();
             _indexBuffer?.Bind();
-            _vertexBuffer?.Bind();
 
             _vertexBuffer?.SetData(_vertexData!, 0, _vertexIndex);
 

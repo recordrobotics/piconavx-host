@@ -14,9 +14,14 @@ namespace piconavx.ui.graphics
     public class Shader : IDisposable
     {
         private uint _handle;
+        
+        public string VertexPath { get; }
+        public string FragmentPath { get; }
 
         public Shader(string vertexPath, string fragmentPath)
         {
+            VertexPath = vertexPath;
+            FragmentPath = fragmentPath;
             //Load the individual shaders.
             uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);
             uint fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
@@ -47,6 +52,17 @@ namespace piconavx.ui.graphics
 
         //Uniforms are properties that applies to the entire geometry
         public void SetUniform(string name, int value)
+        {
+            //Setting a uniform on a shader using a name.
+            int location = Window.GL.GetUniformLocation(_handle, name);
+            if (location == -1) //If GetUniformLocation returns -1 the uniform is not found.
+            {
+                throw new Exception($"{name} uniform not found on shader.");
+            }
+            Window.GL.Uniform1(location, value);
+        }
+
+        public void SetUniform(string name, uint value)
         {
             //Setting a uniform on a shader using a name.
             int location = Window.GL.GetUniformLocation(_handle, name);

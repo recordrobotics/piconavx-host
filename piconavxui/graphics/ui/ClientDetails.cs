@@ -101,6 +101,13 @@ namespace piconavx.ui.graphics.ui
                 AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2")+"%)");
                 AddLabel(() => "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | "+lastUpdate.BaroTemp.ToString("N2")+ "°c (Baro)") : ""));
                 AddLabel(() => "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll);
+
+                Button recordButton = new Button("Start Recording", Canvas);
+                //recordButton.IsIconButton = true;
+                //recordButton.Padding = new Insets(20);
+                Canvas.AddComponent(recordButton);
+                flowLayout.Components.Add(recordButton);
+                Scene.InvokeLater(recordButton.Subscribe, DeferralMode.NextFrame);
             }
         }
 

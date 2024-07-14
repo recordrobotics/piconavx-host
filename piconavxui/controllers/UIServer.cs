@@ -37,7 +37,11 @@ namespace piconavx.ui.controllers
 
         public void Start()
         {
-            serverTask = server.Start();
+            //serverTask = server.Start();
+            Scene.InvokeLater(() =>
+            {
+                server.ConnectSimulatedClient("Demo Client");
+            }, DeferralMode.WhenAvailable);
         }
 
         public void Shutdown()
@@ -68,6 +72,7 @@ namespace piconavx.ui.controllers
         private void ResetClient(Client client)
         {
             client.SetDataType(HostSetDataType.AHRSPos);
+            client.SetFeedOverflow(HostSetFeedOverflowType.DeleteOldest);
             client.ZeroYaw();
             client.ZeroDisplacement();
             client.RequestHealth();

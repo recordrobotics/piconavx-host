@@ -13,7 +13,7 @@ namespace piconavx
         public bool Connected { get; set; } = false;
         public bool HighBandwidthMode { get; set; } = false;
         public string? Id { get; set; }
-        public TcpClient Tcp { get; }
+        public TcpClient? Tcp { get; }
         public StreamReader Reader { get; }
         public StreamWriter Writer { get; }
         public ConcurrentQueue<ClientCommand> CommandQueue { get; }
@@ -25,7 +25,7 @@ namespace piconavx
         public event EventHandler<ClientRequestReturnedEventArgs>? RequestReturned;
         public event EventHandler<ClientUpdateReceivedEventArgs>? UpdateReceieved;
 
-        public Client(string? id, TcpClient tcp, StreamReader reader, StreamWriter writer)
+        public Client(string? id, TcpClient? tcp, StreamReader reader, StreamWriter writer)
         {
             Id = id;
             Tcp = tcp;

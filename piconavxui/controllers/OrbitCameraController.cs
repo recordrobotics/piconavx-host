@@ -31,7 +31,7 @@ namespace piconavx.ui.controllers
 
         public override void Subscribe()
         {
-            Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float>(GenericPriority.Medium, Scene_MouseMove);
+            Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float, float, float>(GenericPriority.Medium, Scene_MouseMove);
             Scene.MouseDown += new PrioritizedAction<GenericPriority, MouseButton>(GenericPriority.Medium, Scene_MouseDown);
             Scene.MouseUp += new PrioritizedAction<GenericPriority, MouseButton>(GenericPriority.Medium, Scene_MouseUp);
             Scene.MouseScroll += new PrioritizedAction<GenericPriority, ScrollWheel>(GenericPriority.Medium, Scene_MouseScroll);
@@ -61,7 +61,7 @@ namespace piconavx.ui.controllers
             camera.Front = cameraDirection;
         }
 
-        private void Scene_MouseMove(float dx, float dy)
+        private void Scene_MouseMove(float x, float y, float dx, float dy)
         {
             if (movingCamera)
             {
