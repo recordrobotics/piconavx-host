@@ -133,7 +133,8 @@ namespace piconavx.ui.graphics.ui
             target = RaycastAt(new Vector2(x, y));
             foreach(var component in components)
             {
-                component.MouseOver = component == target;
+                if(component.IsRenderable)
+                    component.MouseOver = component == target;
             }
         }
 
@@ -142,7 +143,8 @@ namespace piconavx.ui.graphics.ui
             target = RaycastAt(Window.Current.Input!.Mice[0].Position);
             foreach (var component in components)
             {
-                component.MouseDown = component == target;
+                if (component.IsRenderable)
+                    component.MouseDown = component == target;
             }
         }
 

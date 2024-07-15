@@ -11,6 +11,14 @@ namespace piconavx.ui.controllers
     public class InputCanvasDebugController : Controller
     {
         /// <summary>
+        /// Draws a thin blue outline showing the bounds of every renderable (<see cref="UIController.IsRenderable"/>) component
+        /// </summary>
+        public bool ShowBounds { get; set; } = false;
+        /// <summary>
+        /// When true, draws bounds on all components, even if <see cref="UIController.IsRenderable"/> = false. (<see cref="ShowBounds"/>)
+        /// </summary>
+        public bool ShowNonRenderableBounds { get; set; } = false;
+        /// <summary>
         /// Draws a thin yellow outline around the current <see cref="Canvas.Target"/> of the <see cref="Canvas.InputCanvas"/>
         /// </summary>
         public bool TargetBoundsOutline { get; set; } = false;
@@ -18,6 +26,18 @@ namespace piconavx.ui.controllers
         /// Calculates the input raycast (<see cref="Canvas.RaycastAt(System.Numerics.Vector2)"/>) every frame for easier debugging in graphics debuggers
         /// </summary>
         public bool DebugRaycastGraphics { get; set; } = false;
+        /// <summary>
+        /// Draws a semi-transparent overlay over every component where <see cref="UIController.MouseOver"/> = true
+        /// </summary>
+        public bool HighlightMouseOver { get; set; } = false;
+        /// <summary>
+        /// Draws a semi-transparent overlay over every component where <see cref="UIController.MouseDown"/> = true
+        /// </summary>
+        public bool HighlightMouseDown { get; set; } = false;
+        /// <summary>
+        /// When true, performs highlighting on all components, even if <see cref="UIController.IsRenderable"/> = false
+        /// </summary>
+        public bool HighlightNonRenderable {  get; set; } = false;
 
         public override void Subscribe()
         {
@@ -45,15 +65,42 @@ namespace piconavx.ui.controllers
 
         private void Scene_Render(double deltaTime, RenderProperties properties)
         {
-            if (Canvas.InputCanvas != null && Canvas.InputCanvas.Target != null)
+            if (Canvas.InputCanvas != null)
             {
-                // Draw outline around target bounds
-                if (TargetBoundsOutline)
+                UIMaterial.ColorMaterial.Use(properties);
+
+                // Highlight MouseDown and MouseOver
+                if (HighlightMouseDown || HighlightMouseOver || ShowBounds)
                 {
-                    UIMaterial.ColorMaterial.Use(properties);
-                    Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
-                    Tessellator.Quad.Flush();
+                    foreach (var component in Canvas.InputCanvas.Components)
+                    {
+                        if (ShowBounds && (ShowNonRenderableBounds || component.IsRenderable))
+                        {
+                            Tessellator.Quad.DrawRectangleOutline(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 0, 255, 255), 1);
+                        }
+
+                        if (component.MouseOver && HighlightMouseOver && (HighlightNonRenderable || component.IsRenderable))
+                        {
+                            Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 255, 50));
+                        }
+
+                        if(component.MouseDown && HighlightMouseDown && (HighlightNonRenderable || component.IsRenderable))
+                        {
+                            Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 0, 50));
+                        }
+                    }
                 }
+
+                if (Canvas.InputCanvas.Target != null)
+                {
+                    // Draw outline around target bounds
+                    if (TargetBoundsOutline)
+                    {
+                        Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
+                    }
+                }
+
+                Tessellator.Quad.Flush();
             }
         }
     }
