@@ -11,6 +11,7 @@ namespace piconavx.ui.controllers
         public List<UIController> Components { get; }
 
         public FlowDirection Direction { get; set; }
+        public AlignItems AlignItems { get; set; }
 
         public bool Reversed { get; set; } = false;
 
@@ -22,6 +23,7 @@ namespace piconavx.ui.controllers
             Container = container;
             Components = new List<UIController>();
             Direction = FlowDirection.Vertical;
+            AlignItems = AlignItems.Start;
         }
 
         public RectangleF GetAutoSizeBounds()
@@ -83,13 +85,37 @@ namespace piconavx.ui.controllers
                 {
                     case FlowDirection.Horizontal:
                         {
-                            component.Bounds = new RectangleF(Container.Bounds.X + accum, Container.Bounds.Y, component.Bounds.Width, component.Bounds.Height);
+                            float y = Container.Bounds.Y;
+
+                            switch (AlignItems)
+                            {
+                                case AlignItems.Middle:
+                                    y += Container.Bounds.Height / 2 - component.Bounds.Height / 2;
+                                    break;
+                                case AlignItems.End:
+                                    y = Container.Bounds.Bottom - component.Bounds.Height;
+                                    break;
+                            }
+
+                            component.Bounds = new RectangleF(Container.Bounds.X + accum, y, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Width;
                             break;
                         }
                     case FlowDirection.Vertical:
                         {
-                            component.Bounds = new RectangleF(Container.Bounds.X, Container.Bounds.Y + accum, component.Bounds.Width, component.Bounds.Height);
+                            float x = Container.Bounds.X;
+
+                            switch (AlignItems)
+                            {
+                                case AlignItems.Middle:
+                                    x += Container.Bounds.Width / 2 - component.Bounds.Width / 2;
+                                    break;
+                                case AlignItems.End:
+                                    x = Container.Bounds.Right - component.Bounds.Width;
+                                    break;
+                            }
+
+                            component.Bounds = new RectangleF(x, Container.Bounds.Y + accum, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Height;
                             break;
                         }
@@ -104,5 +130,12 @@ namespace piconavx.ui.controllers
     {
         Horizontal,
         Vertical
+    }
+
+    public enum AlignItems
+    {
+        Start,
+        Middle,
+        End
     }
 }

@@ -78,7 +78,7 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-                TargetBoundsOutline = true
+                
             });
 
             Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));

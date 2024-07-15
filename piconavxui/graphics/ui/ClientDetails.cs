@@ -8,71 +8,56 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
-    public class ClientDetails : Panel
+    public class ClientDetails : FlowPanel
     {
         private AHRSPosUpdate lastUpdate;
         private Client? client;
         public Client? Client { get; set; }
 
-        private FlowLayout flowLayout;
-
         public ClientDetails(Canvas canvas) : base(canvas)
         {
-            flowLayout = new FlowLayout(this);
-            flowLayout.Gap = 3;
+            Gap = 3;
         }
 
         public override void Subscribe()
         {
-            base.Subscribe();
             UIServer.ClientUpdate += new PrioritizedAction<GenericPriority, Client, AHRSPosUpdate>(GenericPriority.Medium, Server_ClientUpdate);
             Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
-
-            foreach (var component in flowLayout.Components)
-            {
-                component.Subscribe();
-            }
-            flowLayout.Subscribe();
+            base.Subscribe();
         }
 
         public override void Unsubscribe()
         {
-            base.Unsubscribe();
             UIServer.ClientUpdate -= Server_ClientUpdate;
             Scene.Update -= Scene_Update;
-
-            foreach (var component in flowLayout.Components)
-            {
-                component.Unsubscribe();
-            }
-            flowLayout.Unsubscribe();
+            base.Unsubscribe();
         }
 
         private void AddLabel(Func<string> textDelegate)
         {
             Label label = new Label(textDelegate, Canvas);
             Canvas.AddComponent(label);
-            flowLayout.Components.Add(label);
+            Components.Add(label);
             label.ZIndex = ZIndex;
             Scene.InvokeLater(label.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
         public void InvalidateComponents()
         {
-            foreach (var component in flowLayout.Components)
+            foreach (var component in Components)
             {
                 Scene.InvokeLater(component.Unsubscribe, DeferralMode.NextEvent); // Destroy as soon as possible
                 Canvas.RemoveComponent(component);
             }
 
-            flowLayout.Components.Clear();
+            Components.Clear();
 
             if (Client != null)
             {
                 AddLabel(() => "Connected: " + client?.Id);
                 AddLabel(() => "Firmware: v" + client?.BoardId.FwVerMajor + "." + client?.BoardId.FwVerMinor + "." + client?.BoardId.FwRevision);
                 AddLabel(() => "Board: v" + string.Join('.', client?.BoardId.HwRev.ToString().ToCharArray() ?? []));
-                AddLabel(() => "Status: " + client?.BoardState.OpStatus.ToString()+" | Calibration: " + client?.BoardState.CalStatus.ToString());
+                AddLabel(() => "Status: " + client?.BoardState.OpStatus.ToString() + " | Calibration: " + client?.BoardState.CalStatus.ToString());
                 AddLabel(() =>
                 {
                     if (client == null) return "GYRO:NO | ACCEL:NO | MAG:NO | BARO:NO";
@@ -99,23 +84,32 @@ namespace piconavx.ui.graphics.ui
                     "Yaw Stable: " + (yawStable ? "YES" : "NO") + "\n" +
                     "Sea level press set: " + (sealevelPressSet ? "YES" : "NO");
                 });
-                AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2")+"%)");
-                AddLabel(() => "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | "+lastUpdate.BaroTemp.ToString("N2")+ "°c (Baro)") : ""));
+                AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2") + "%)");
+                AddLabel(() => "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | " + lastUpdate.BaroTemp.ToString("N2") + "°c (Baro)") : ""));
                 AddLabel(() => "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll);
 
-                for (int i = 0; i < 20; i++)
-                {
-                    Button recordButton = new Button("Start Recording", Canvas);
-                    if (i % 2 == 0)
-                    {
-                        recordButton.IsIconButton = true;
-                        recordButton.Padding = new Insets(20);
-                    }
-                    Canvas.AddComponent(recordButton);
-                    flowLayout.Components.Add(recordButton);
-                    recordButton.ZIndex = ZIndex;
-                    Scene.InvokeLater(recordButton.Subscribe, DeferralMode.NextFrame);
-                }
+                FlowPanel recordingRow = new FlowPanel(Canvas);
+                Canvas.AddComponent(recordingRow);
+                Components.Add(recordingRow);
+                recordingRow.ZIndex = ZIndex;
+                recordingRow.Direction = FlowDirection.Horizontal;
+                recordingRow.AlignItems = AlignItems.Middle;
+                recordingRow.Gap = 10;
+                Scene.InvokeLater(recordingRow.Subscribe, DeferralMode.NextFrame);
+
+                Button startRecordingButton = new Button("Start Recording", Canvas);
+                Canvas.AddComponent(startRecordingButton);
+                recordingRow.Components.Add(startRecordingButton);
+                startRecordingButton.ZIndex = ZIndex;
+                Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
+
+                Button stopRecordingButton = new Button("Stop Recording", Canvas);
+                stopRecordingButton.IsIconButton = true;
+                stopRecordingButton.Padding = new Insets(20);
+                Canvas.AddComponent(stopRecordingButton);
+                recordingRow.Components.Add(stopRecordingButton);
+                stopRecordingButton.ZIndex = ZIndex;
+                Scene.InvokeLater(stopRecordingButton.Subscribe, DeferralMode.NextFrame);
             }
         }
 

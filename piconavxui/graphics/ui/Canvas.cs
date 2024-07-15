@@ -119,6 +119,7 @@ namespace piconavx.ui.graphics.ui
             Scene.ViewportChange += new PrioritizedAction<GenericPriority, Silk.NET.Maths.Rectangle<int>>(GenericPriority.Highest, Scene_ViewportChange);
             Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float, float, float>(GenericPriority.Highest, Scene_MouseMove);
             Scene.MouseDown += new PrioritizedAction<GenericPriority, Silk.NET.Input.MouseButton>(GenericPriority.Highest, Scene_MouseDown);
+            Scene.MouseUp += new PrioritizedAction<GenericPriority, Silk.NET.Input.MouseButton>(GenericPriority.Highest, Scene_MouseUp);
         }
 
         public override void Unsubscribe()
@@ -130,11 +131,27 @@ namespace piconavx.ui.graphics.ui
         private void Scene_MouseMove(float x, float y, float dx, float dy)
         {
             target = RaycastAt(new Vector2(x, y));
+            foreach(var component in components)
+            {
+                component.MouseOver = component == target;
+            }
         }
 
         private void Scene_MouseDown(Silk.NET.Input.MouseButton button)
         {
             target = RaycastAt(Window.Current.Input!.Mice[0].Position);
+            foreach (var component in components)
+            {
+                component.MouseDown = component == target;
+            }
+        }
+
+        private void Scene_MouseUp(Silk.NET.Input.MouseButton button)
+        {
+            foreach (var component in components)
+            {
+                component.MouseDown = false;
+            }
         }
 
         private void Scene_Render(double deltaTime, RenderProperties properties)

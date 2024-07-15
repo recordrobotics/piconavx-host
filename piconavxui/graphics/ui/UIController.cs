@@ -17,6 +17,9 @@ namespace piconavx.ui.graphics.ui
         public virtual RaycastTransparency RaycastTransparency { get => _raycastTransparency; set => _raycastTransparency = value; }
         public virtual bool IsRenderable { get => true; }
 
+        public virtual bool MouseOver { get; set; } = false;
+        public virtual bool MouseDown { get; set; } = false;
+
         protected UIController(Canvas canvas)
         {
             Canvas = canvas;

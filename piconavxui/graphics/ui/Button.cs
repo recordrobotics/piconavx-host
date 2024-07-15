@@ -9,13 +9,17 @@ namespace piconavx.ui.graphics.ui
 {
     public class Button : UIController
     {
+        public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#383838");
+        public readonly Rgba32 BACKGROUND_HOVER = Rgba32.ParseHex("#424242");
+        public readonly Rgba32 BACKGROUND_ACTIVE = Rgba32.ParseHex("#4d4d4d");
+
         public Button(string text, Canvas canvas) : base(canvas)
         {
             background = new Image(canvas);
             canvas.AddComponent(background);
             background.ZIndex = ZIndex; // background
             background.HitTestAlphaClip = 0.9f;
-            background.Color = new Rgba32(56, 56, 56, 255);
+            background.Color = BACKGROUND;
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;
             background.Size = new Size(15,15);
@@ -85,6 +89,8 @@ namespace piconavx.ui.graphics.ui
 
         public override RaycastTransparency RaycastTransparency { get => base.RaycastTransparency; set => base.RaycastTransparency = background.RaycastTransparency = value; }
         public override bool IsRenderable => false;
+        public override bool MouseDown { get => background.MouseDown; set => background.MouseDown = value; }
+        public override bool MouseOver { get => background.MouseOver; set => background.MouseOver = value; }
 
         public Texture? Icon { get => icon.Texture; set => icon.Texture = value; }
 
@@ -143,6 +149,8 @@ namespace piconavx.ui.graphics.ui
             {
                 bounds = GetAutoSizeBounds();
             }
+
+            background.Color = MouseDown ? BACKGROUND_ACTIVE : MouseOver ? BACKGROUND_HOVER : BACKGROUND;
         }
     }
 }
