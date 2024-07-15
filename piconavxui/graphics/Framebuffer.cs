@@ -32,7 +32,7 @@ namespace piconavx.ui.graphics
         {
             _texHandle = Window.GL.GenTexture();
             Window.GL.BindTexture(TextureTarget.Texture2D, _texHandle);
-            Window.GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat, Width, Height, 0, PixelFormat, PixelType, null);
+            Window.GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat, Math.Max(1, Width), Math.Max(1, Height), 0, PixelFormat, PixelType, null);
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToBorder);
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToBorder);
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
