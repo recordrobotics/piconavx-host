@@ -21,6 +21,8 @@ namespace piconavx
         public HealthUpdate Health { get; set; }
         public BoardIdUpdate BoardId { get; set; }
         public BoardStateUpdate BoardState { get; set; }
+        public HostSetDataType DataType { get; set; }
+        public HostSetFeedOverflowType FeedOverflow { get; set; }
 
         public event EventHandler<ClientRequestReturnedEventArgs>? RequestReturned;
         public event EventHandler<ClientUpdateReceivedEventArgs>? UpdateReceieved;
@@ -77,7 +79,7 @@ namespace piconavx
             EventHandler<ClientRequestReturnedEventArgs>? handler = null;
             handler = (s,e) =>
             {
-                if (handler != null && e.DataType == DataType.HealthUpdate)
+                if (handler != null && e.DataType == piconavx.DataType.HealthUpdate)
                 {
                     source.Cancel();
                     RequestReturned -= handler;
@@ -97,7 +99,7 @@ namespace piconavx
             EventHandler<ClientRequestReturnedEventArgs>? handler = null;
             handler = (s, e) =>
             {
-                if (handler != null && e.DataType == DataType.BoardStateUpdate)
+                if (handler != null && e.DataType == piconavx.DataType.BoardStateUpdate)
                 {
                     source.Cancel();
                     RequestReturned -= handler;
@@ -117,7 +119,7 @@ namespace piconavx
             EventHandler<ClientRequestReturnedEventArgs>? handler = null;
             handler = (s, e) =>
             {
-                if (handler != null && e.DataType == DataType.BoardIdUpdate)
+                if (handler != null && e.DataType == piconavx.DataType.BoardIdUpdate)
                 {
                     source.Cancel();
                     RequestReturned -= handler;

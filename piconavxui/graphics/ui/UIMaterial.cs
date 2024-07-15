@@ -11,7 +11,7 @@ namespace piconavx.ui.graphics.ui
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static new UIMaterial DefaultMaterial;
-        public static new UIMaterial ColorMaterial;
+        public static UIMaterial ColorMaterial;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static new UIMaterial CreateDefault()
@@ -19,7 +19,7 @@ namespace piconavx.ui.graphics.ui
             return new UIMaterial(new Shader("assets/shaders/uivertex.glsl", "assets/shaders/default.glsl"), null);
         }
 
-        public static new UIMaterial CreateColorMaterial()
+        public static UIMaterial CreateColorMaterial()
         {
             return new UIMaterial(new Shader("assets/shaders/uivertex.glsl", "assets/shaders/color.glsl"), null);
         }

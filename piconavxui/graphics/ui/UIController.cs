@@ -20,6 +20,8 @@ namespace piconavx.ui.graphics.ui
         public virtual bool MouseOver { get; set; } = false;
         public virtual bool MouseDown { get; set; } = false;
 
+        public PrioritizedList<PrioritizedAction<GenericPriority>> Click = new();
+
         protected UIController(Canvas canvas)
         {
             Canvas = canvas;
@@ -32,5 +34,12 @@ namespace piconavx.ui.graphics.ui
 
         public virtual void Render(double deltaTime, RenderProperties properties) { }
         public virtual void HitTest(byte id) { }
+        public void NotifyClick()
+        {
+            foreach (var action in Click)
+            {
+                action.Action.Invoke();
+            }
+        }
     }
 }

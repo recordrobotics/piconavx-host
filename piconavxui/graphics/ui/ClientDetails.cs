@@ -95,20 +95,31 @@ namespace piconavx.ui.graphics.ui
                 recordingRow.Direction = FlowDirection.Horizontal;
                 recordingRow.AlignItems = AlignItems.Middle;
                 recordingRow.Gap = 10;
+                recordingRow.Padding = new Insets(0, 6, 0, 6);
                 Scene.InvokeLater(recordingRow.Subscribe, DeferralMode.NextFrame);
 
                 Button startRecordingButton = new Button("Start Recording", Canvas);
                 Canvas.AddComponent(startRecordingButton);
                 recordingRow.Components.Add(startRecordingButton);
                 startRecordingButton.ZIndex = ZIndex;
+                startRecordingButton.Disabled = client?.DataType == HostSetDataType.Feed;
+                startRecordingButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Medium, () =>
+                {
+                    client?.SetDataType(HostSetDataType.Feed);
+                });
                 Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
 
                 Button stopRecordingButton = new Button("Stop Recording", Canvas);
                 stopRecordingButton.IsIconButton = true;
-                stopRecordingButton.Padding = new Insets(20);
+                stopRecordingButton.Padding = new Insets(16);
                 Canvas.AddComponent(stopRecordingButton);
                 recordingRow.Components.Add(stopRecordingButton);
                 stopRecordingButton.ZIndex = ZIndex;
+                stopRecordingButton.Disabled = client?.DataType != HostSetDataType.Feed;
+                stopRecordingButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Medium, () =>
+                {
+                    client?.SetDataType(HostSetDataType.AHRSPos);
+                });
                 Scene.InvokeLater(stopRecordingButton.Subscribe, DeferralMode.NextFrame);
             }
         }

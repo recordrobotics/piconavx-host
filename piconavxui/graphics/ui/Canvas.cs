@@ -141,18 +141,32 @@ namespace piconavx.ui.graphics.ui
         private void Scene_MouseDown(Silk.NET.Input.MouseButton button)
         {
             target = RaycastAt(Window.Current.Input!.Mice[0].Position);
-            foreach (var component in components)
+            if (button == Silk.NET.Input.MouseButton.Left)
             {
-                if (component.IsRenderable)
-                    component.MouseDown = component == target;
+                foreach (var component in components)
+                {
+                    if (component.IsRenderable)
+                        component.MouseDown = component == target;
+                }
             }
         }
 
         private void Scene_MouseUp(Silk.NET.Input.MouseButton button)
         {
-            foreach (var component in components)
+            if (button == Silk.NET.Input.MouseButton.Left)
             {
-                component.MouseDown = false;
+                foreach (var component in components)
+                {
+                    if (component.IsRenderable)
+                    {
+                        if (component.MouseDown && component.MouseOver)
+                        {
+                            component.NotifyClick();
+                        }
+
+                        component.MouseDown = false;
+                    }
+                }
             }
         }
 

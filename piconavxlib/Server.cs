@@ -137,10 +137,13 @@ namespace piconavx
                         switch (command.CommandType)
                         {
                             case HostCommandType.SetDataType:
-                                HostSetDataType value = (HostSetDataType)command.Data!;
-                                client.HighBandwidthMode = value == HostSetDataType.Feed; // enable high bandwidth mode for feed updates
-                                await client.Writer.WriteLineAsync(Protocol.SerializeSetDataTypeCommand(value));
-                                await client.Writer.FlushAsync(cancellationToken);
+                                {
+                                    HostSetDataType value = (HostSetDataType)command.Data!;
+                                    client.HighBandwidthMode = value == HostSetDataType.Feed; // enable high bandwidth mode for feed updates
+                                    await client.Writer.WriteLineAsync(Protocol.SerializeSetDataTypeCommand(value));
+                                    await client.Writer.FlushAsync(cancellationToken);
+                                    client.DataType = value;
+                                }
                                 break;
                             case HostCommandType.RequestHealth:
                                 await client.Writer.WriteLineAsync(Protocol.SerializeRequestHealthCommand());
@@ -163,8 +166,12 @@ namespace piconavx
                                 await client.Writer.FlushAsync(cancellationToken);
                                 break;
                             case HostCommandType.SetFeedOverflow:
-                                await client.Writer.WriteLineAsync(Protocol.SerializeSetFeedOverflowCommand((HostSetFeedOverflowType)command.Data!));
-                                await client.Writer.FlushAsync(cancellationToken);
+                                {
+                                    HostSetFeedOverflowType value = (HostSetFeedOverflowType)command.Data!;
+                                    await client.Writer.WriteLineAsync(Protocol.SerializeSetFeedOverflowCommand(value));
+                                    await client.Writer.FlushAsync(cancellationToken);
+                                    client.FeedOverflow = value;
+                                }
                                 break;
                         }
                     }

@@ -17,6 +17,7 @@ namespace piconavx.ui.controllers
 
         public bool AutoSizeContainer { get; set; } = true;
         public float Gap { get; set; } = 0;
+        public Insets Padding { get; set; } = new Insets(0);
 
         public FlowLayout(UIController container)
         {
@@ -41,7 +42,7 @@ namespace piconavx.ui.controllers
                             height = MathF.Max(height, component.Bounds.Height);
                         }
 
-                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width + Gap * (Components.Count - 1), height);
+                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width + Gap * (Components.Count - 1) + Padding.Horizontal, height + Padding.Vertical);
                     }
                 case FlowDirection.Vertical:
                     {
@@ -54,7 +55,7 @@ namespace piconavx.ui.controllers
                             height += component.Bounds.Height;
                         }
 
-                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width, height + Gap * (Components.Count - 1));
+                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width + Padding.Horizontal, height + Gap * (Components.Count - 1) + Padding.Vertical);
                     }
             }
 
@@ -85,37 +86,37 @@ namespace piconavx.ui.controllers
                 {
                     case FlowDirection.Horizontal:
                         {
-                            float y = Container.Bounds.Y;
+                            float y = Container.Bounds.Y + Padding.Top;
 
                             switch (AlignItems)
                             {
                                 case AlignItems.Middle:
-                                    y += Container.Bounds.Height / 2 - component.Bounds.Height / 2;
+                                    y += (Container.Bounds.Height - Padding.Vertical) / 2 - component.Bounds.Height / 2;
                                     break;
                                 case AlignItems.End:
-                                    y = Container.Bounds.Bottom - component.Bounds.Height;
+                                    y = Container.Bounds.Bottom - Padding.Bottom - component.Bounds.Height;
                                     break;
                             }
 
-                            component.Bounds = new RectangleF(Container.Bounds.X + accum, y, component.Bounds.Width, component.Bounds.Height);
+                            component.Bounds = new RectangleF(Container.Bounds.X + Padding.Left + accum, y, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Width;
                             break;
                         }
                     case FlowDirection.Vertical:
                         {
-                            float x = Container.Bounds.X;
+                            float x = Container.Bounds.X + Padding.Left;
 
                             switch (AlignItems)
                             {
                                 case AlignItems.Middle:
-                                    x += Container.Bounds.Width / 2 - component.Bounds.Width / 2;
+                                    x += (Container.Bounds.Width - Padding.Horizontal) / 2 - component.Bounds.Width / 2;
                                     break;
                                 case AlignItems.End:
-                                    x = Container.Bounds.Right - component.Bounds.Width;
+                                    x = Container.Bounds.Right - Padding.Right - component.Bounds.Width;
                                     break;
                             }
 
-                            component.Bounds = new RectangleF(x, Container.Bounds.Y + accum, component.Bounds.Width, component.Bounds.Height);
+                            component.Bounds = new RectangleF(x, Container.Bounds.Y + Padding.Top + accum, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Height;
                             break;
                         }

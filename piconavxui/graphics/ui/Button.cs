@@ -10,8 +10,11 @@ namespace piconavx.ui.graphics.ui
     public class Button : UIController
     {
         public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#383838");
+        public readonly Rgba32 BACKGROUND_DISABLED = Rgba32.ParseHex("#242424");
         public readonly Rgba32 BACKGROUND_HOVER = Rgba32.ParseHex("#424242");
         public readonly Rgba32 BACKGROUND_ACTIVE = Rgba32.ParseHex("#4d4d4d");
+        public readonly Rgba32 COLOR = Rgba32.ParseHex("#fff");
+        public readonly Rgba32 COLOR_DISABLED = Rgba32.ParseHex("#b3b3b3");
 
         public Button(string text, Canvas canvas) : base(canvas)
         {
@@ -22,7 +25,8 @@ namespace piconavx.ui.graphics.ui
             background.Color = BACKGROUND;
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;
-            background.Size = new Size(15,15);
+            background.Size = new Size(15, 15);
+            background.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, NotifyClick);
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
@@ -33,11 +37,11 @@ namespace piconavx.ui.graphics.ui
             canvas.AddComponent(icon);
             icon.ZIndex = ContentZIndex;
             icon.RaycastTransparency = RaycastTransparency.Hidden;
-            icon.Color = new Rgba32(255, 255, 255, 255);
+            icon.Color = COLOR;
             icon.Texture = Texture.UVTest;
             icon.Bounds = new RectangleF(0, 0, 20, 20);
             iconAnchor = new AnchorLayout(icon, this);
-            iconAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
+            iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
             iconAnchor.Insets = new Insets(padding.Left, padding.Top, padding.Right, padding.Top); // padding.Top for bottom to keep symmetry
             iconAnchor.AllowResize = false;
 
@@ -45,10 +49,10 @@ namespace piconavx.ui.graphics.ui
             canvas.AddComponent(this.text);
             this.text.FontSize = 10;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = FSColor.White;
+            this.text.Color = new FSColor(COLOR.ToVector4());
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
-            textAnchor.Insets = new Insets(padding.Left+33, padding.Top, padding.Right, padding.Bottom);
+            textAnchor.Insets = new Insets(padding.Left + 33, padding.Top, padding.Right, padding.Bottom);
             textAnchor.AllowResize = false; // instead of stretching, center it
 
             bounds = GetAutoSizeBounds();
@@ -95,13 +99,17 @@ namespace piconavx.ui.graphics.ui
         public Texture? Icon { get => icon.Texture; set => icon.Texture = value; }
 
         private bool isIconButton = false;
-        public bool IsIconButton { get => isIconButton; set
+        public bool IsIconButton
+        {
+            get => isIconButton; set
             {
                 isIconButton = value;
+                iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
                 if (isIconButton)
                 {
                     Canvas.RemoveComponent(text);
-                } else
+                }
+                else
                 {
                     Canvas.AddComponent(text);
                 }
@@ -109,12 +117,16 @@ namespace piconavx.ui.graphics.ui
             }
         }
 
+        private bool isDisabled = false;
+        public bool Disabled { get => isDisabled; set => isDisabled = value; }
+
         public RectangleF GetAutoSizeBounds()
         {
             if (isIconButton)
             {
                 return new RectangleF(bounds.X, bounds.Y, icon.Bounds.Width + padding.Horizontal, icon.Bounds.Height + padding.Vertical);
-            } else
+            }
+            else
             {
                 var textSize = text.GetAutoSizeBounds();
                 return new RectangleF(bounds.X, bounds.Y, textSize.Width + padding.Horizontal + 33, textSize.Height + padding.Vertical);
@@ -150,7 +162,9 @@ namespace piconavx.ui.graphics.ui
                 bounds = GetAutoSizeBounds();
             }
 
-            background.Color = MouseDown ? BACKGROUND_ACTIVE : MouseOver ? BACKGROUND_HOVER : BACKGROUND;
+            background.Color = isDisabled ? BACKGROUND_DISABLED : MouseDown ? BACKGROUND_ACTIVE : MouseOver ? BACKGROUND_HOVER : BACKGROUND;
+            icon.Color = isDisabled ? COLOR_DISABLED : COLOR;
+            text.Color = new FSColor((isDisabled ? COLOR_DISABLED : COLOR).ToVector4());
         }
     }
 }

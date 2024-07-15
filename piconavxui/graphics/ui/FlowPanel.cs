@@ -20,6 +20,7 @@ namespace piconavx.ui.graphics.ui
 
         public bool AutoSize { get => flowLayout.AutoSizeContainer; set => flowLayout.AutoSizeContainer = value; }
         public float Gap { get => flowLayout.Gap; set => flowLayout.Gap = value; }
+        public Insets Padding { get => flowLayout.Padding; set => flowLayout.Padding = value; }
 
         public FlowPanel(Canvas canvas) : base(canvas)
         {
