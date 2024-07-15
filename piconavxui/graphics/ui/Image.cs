@@ -10,6 +10,7 @@ namespace piconavx.ui.graphics.ui
         public class ImageMaterial : UIMaterial
         {
             public Texture? Texture { get; set; }
+            public float HitTestAlphaClip { get; set; } = 0.5f;
 
             public ImageMaterial() : base(new Shader("assets/shaders/uivertex.glsl", "assets/shaders/uiimage.glsl"), new Shader("assets/shaders/uivertex.glsl", "assets/shaders/uiimage.hittest.glsl"))
             {
@@ -27,7 +28,10 @@ namespace piconavx.ui.graphics.ui
                 base.UseHitTest(canvas, id);
                 (Texture ?? Texture.White).Bind(TextureUnit.Texture0);
                 if (HitTestShader != null)
+                {
                     HitTestShader.SetUniform("TextureSampler", 0);
+                    HitTestShader.SetUniform("uAlphaClip", HitTestAlphaClip);
+                }
             }
         }
 
@@ -49,6 +53,9 @@ namespace piconavx.ui.graphics.ui
 
         private Rgba32 color;
         public Rgba32 Color { get => color; set => color = value; }
+
+        private float hitTestAlphaClip = 0.5f;
+        public float HitTestAlphaClip { get => hitTestAlphaClip; set => hitTestAlphaClip = value; }
 
         private ImageType imageType;
         public ImageType ImageType { get => imageType; set => imageType = value; }
@@ -451,6 +458,7 @@ namespace piconavx.ui.graphics.ui
                 return;
 
             material.Texture = texture;
+            material.HitTestAlphaClip = hitTestAlphaClip;
             material.UseHitTest(Canvas, id);
             Tessellate();
             Tessellator.Quad.Flush();

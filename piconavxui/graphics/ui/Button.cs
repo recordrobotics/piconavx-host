@@ -14,6 +14,7 @@ namespace piconavx.ui.graphics.ui
             background = new Image(canvas);
             canvas.AddComponent(background);
             background.ZIndex = ZIndex; // background
+            background.HitTestAlphaClip = 0.9f;
             background.Color = new Rgba32(56, 56, 56, 255);
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;

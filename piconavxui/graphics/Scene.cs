@@ -76,6 +76,10 @@ namespace piconavx.ui.graphics
             cameraController.Pitch = 25;
 
             Canvas canvas = AddController(AddResource(new Canvas()));
+            AddController(new InputCanvasDebugController()
+            {
+                TargetBoundsOutline = true
+            });
 
             Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));
             canvas.AddComponent(sidepanel);

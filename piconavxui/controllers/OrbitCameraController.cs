@@ -1,4 +1,5 @@
 ﻿using piconavx.ui.graphics;
+using piconavx.ui.graphics.ui;
 using Silk.NET.Input;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace piconavx.ui.controllers
 
         private void Scene_MouseDown(MouseButton button)
         {
-            if (button == MouseButton.Left && Window.Current.Input != null)
+            if (button == MouseButton.Left && Window.Current.Input != null && (Canvas.InputCanvas == null || Canvas.InputCanvas.Target == null) )
             {
                 foreach (var mouse in Window.Current.Input.Mice)
                 {

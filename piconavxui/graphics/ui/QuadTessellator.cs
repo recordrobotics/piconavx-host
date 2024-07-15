@@ -62,6 +62,14 @@ namespace piconavx.ui.graphics.ui
             _vertexData = null;
         }
 
+        public void DrawRectangleOutline(RectangleF bounds, Rgba32 color, float thickness)
+        {
+            DrawQuad(new RectangleF(bounds.X, bounds.Y, thickness, bounds.Height), color);
+            DrawQuad(new RectangleF(bounds.X + thickness, bounds.Y, bounds.Width - thickness - thickness, thickness), color);
+            DrawQuad(new RectangleF(bounds.Right - thickness, bounds.Y, thickness, bounds.Height), color);
+            DrawQuad(new RectangleF(bounds.X + thickness, bounds.Bottom - thickness, bounds.Width - thickness - thickness, thickness), color);
+        }
+
         public void DrawQuad(ref UIVertex topLeft, ref UIVertex topRight, ref UIVertex bottomLeft, ref UIVertex bottomRight)
         {
             if (_vertexData == null) // lazy resource creation only when this tessellator is used

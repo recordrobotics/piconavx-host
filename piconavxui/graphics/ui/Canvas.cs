@@ -15,12 +15,20 @@ namespace piconavx.ui.graphics.ui
         private List<UIController> components;
         private Framebuffer raycastFrameBuffer;
 
+        public static Canvas? InputCanvas { get; set; } = null;
+
         public IReadOnlyList<UIController> Components { get { return components.AsReadOnly(); } }
 
         public Matrix4x4 Matrix { get; private set; }
 
+        private UIController? target = null;
+        public UIController? Target { get => target; }
+
         public Canvas()
         {
+            if (InputCanvas == null)
+                InputCanvas = this;
+
             components = new List<UIController>();
             raycastFrameBuffer = new Framebuffer(
                 (uint)Window.Current.Internal.FramebufferSize.X,
@@ -56,7 +64,7 @@ namespace piconavx.ui.graphics.ui
             opaqueMatches.Clear();
             transparentMatches.Clear();
 
-            // Compile a list of all components whos bounding box contains the target point (sorted top to bottom)
+            // Compile a list of all components whose bounding box contains the target point (sorted top to bottom)
             for (int i = components.Count - 1; i >= 0; i--)
             {
                 var component = components[i];
@@ -78,7 +86,7 @@ namespace piconavx.ui.graphics.ui
 
             // Since the highest component is transparent, perform a draw call to determine which component is hit
             raycastFrameBuffer.Bind();
-            //Window.GL.Viewport((int)point.X, (int)point.Y, 1, 1);
+            Window.GL.Viewport(new Size((int)raycastFrameBuffer.Width, (int)raycastFrameBuffer.Height));
             Window.GL.ClearColor(Color.FromArgb(0, 0, 0, 0));
             Window.GL.Clear((uint)ClearBufferMask.ColorBufferBit);
             Window.GL.Disable(EnableCap.DepthTest);
@@ -107,33 +115,26 @@ namespace piconavx.ui.graphics.ui
 
         public override void Subscribe()
         {
-            Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.AfterGeneral, Scene_Update);
             Scene.Render += new PrioritizedAction<RenderPriority, double, RenderProperties>(RenderPriority.UI, Scene_Render);
             Scene.ViewportChange += new PrioritizedAction<GenericPriority, Silk.NET.Maths.Rectangle<int>>(GenericPriority.Highest, Scene_ViewportChange);
             Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float, float, float>(GenericPriority.Highest, Scene_MouseMove);
+            Scene.MouseDown += new PrioritizedAction<GenericPriority, Silk.NET.Input.MouseButton>(GenericPriority.Highest, Scene_MouseDown);
         }
 
         public override void Unsubscribe()
         {
-            Scene.Update -= Scene_Update;
             Scene.Render -= Scene_Render;
             Scene.ViewportChange -= Scene_ViewportChange;
         }
 
-        private float mx;
-        private float my;
         private void Scene_MouseMove(float x, float y, float dx, float dy)
         {
-            mx = x;
-            my = y;
+            target = RaycastAt(new Vector2(x, y));
         }
 
-        UIController? target;
-
-        private void Scene_Update(double deltaTime)
+        private void Scene_MouseDown(Silk.NET.Input.MouseButton button)
         {
-            target = RaycastAt(new Vector2(mx, my));
-            
+            target = RaycastAt(Window.Current.Input!.Mice[0].Position);
         }
 
         private void Scene_Render(double deltaTime, RenderProperties properties)
@@ -146,13 +147,6 @@ namespace piconavx.ui.graphics.ui
             {
                 if (component.IsRenderable)
                     component.Render(deltaTime, properties);
-            }
-
-            if (target != null)
-            {
-                UIMaterial.ColorMaterial.Use(properties);
-                Tessellator.Quad.DrawQuad(target.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 50));
-                Tessellator.Quad.Flush();
             }
         }
 
