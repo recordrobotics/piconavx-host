@@ -13,11 +13,15 @@ namespace piconavx.ui.graphics.ui
     {
         private AHRSPosUpdate lastUpdate;
         private Client? client;
+        private Texture stopIcon;
+        private Texture recordIcon;
         public Client? Client { get; set; }
 
         public ClientDetails(Canvas canvas) : base(canvas)
         {
             Gap = 3;
+            stopIcon = Scene.AddResource(new Texture("assets/textures/stop.png"));
+            recordIcon = Scene.AddResource(new Texture("assets/textures/record.png"));
         }
 
         public override void Subscribe()
@@ -112,11 +116,13 @@ namespace piconavx.ui.graphics.ui
                 {
                     client?.SetDataType(HostSetDataType.Feed);
                 });
+                startRecordingButton.Icon = recordIcon;
+                startRecordingButton.IsPrimary = true;
                 Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
 
                 stopRecordingButton = new Button("Stop Recording", Canvas);
                 stopRecordingButton.IsIconButton = true;
-                stopRecordingButton.Padding = new Insets(16);
+                stopRecordingButton.Padding = new Insets(12);
                 Canvas.AddComponent(stopRecordingButton);
                 recordingRow.Components.Add(stopRecordingButton);
                 stopRecordingButton.ZIndex = ZIndex;
@@ -125,6 +131,7 @@ namespace piconavx.ui.graphics.ui
                 {
                     client?.SetDataType(HostSetDataType.AHRSPos);
                 });
+                stopRecordingButton.Icon = stopIcon;
                 Scene.InvokeLater(stopRecordingButton.Subscribe, DeferralMode.NextFrame);
             }
         }

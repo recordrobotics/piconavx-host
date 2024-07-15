@@ -38,10 +38,10 @@ namespace piconavx.ui.controllers
         public void Start()
         {
             serverTask = server.Start();
-/*            Scene.InvokeLater(() =>
+            Scene.InvokeLater(() =>
             {
                 server.ConnectSimulatedClient("Demo Client");
-            }, DeferralMode.WhenAvailable);*/
+            }, DeferralMode.WhenAvailable);
         }
 
         public void Shutdown()

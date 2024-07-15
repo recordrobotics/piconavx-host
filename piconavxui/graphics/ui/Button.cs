@@ -13,6 +13,10 @@ namespace piconavx.ui.graphics.ui
         public readonly Rgba32 BACKGROUND_DISABLED = Rgba32.ParseHex("#242424");
         public readonly Rgba32 BACKGROUND_HOVER = Rgba32.ParseHex("#424242");
         public readonly Rgba32 BACKGROUND_ACTIVE = Rgba32.ParseHex("#4d4d4d");
+        public readonly Rgba32 BACKGROUND_PRIMARY = Rgba32.ParseHex("#2e65c9");
+        public readonly Rgba32 BACKGROUND_PRIMARY_DISABLED = Rgba32.ParseHex("#0e2247");
+        public readonly Rgba32 BACKGROUND_PRIMARY_HOVER = Rgba32.ParseHex("#3b76e3");
+        public readonly Rgba32 BACKGROUND_PRIMARY_ACTIVE = Rgba32.ParseHex("#2a5dbd");
         public readonly Rgba32 COLOR = Rgba32.ParseHex("#fff");
         public readonly Rgba32 COLOR_DISABLED = Rgba32.ParseHex("#b3b3b3");
 
@@ -42,8 +46,7 @@ namespace piconavx.ui.graphics.ui
             icon.ZIndex = ContentZIndex;
             icon.RaycastTransparency = RaycastTransparency.Hidden;
             icon.Color = COLOR;
-            icon.Texture = Texture.UVTest;
-            icon.Bounds = new RectangleF(0, 0, 20, 20);
+            icon.Bounds = new RectangleF(0, 0, 0, 20);
             iconAnchor = new AnchorLayout(icon, this);
             iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
             iconAnchor.Insets = new Insets(padding.Left, padding.Top, padding.Right, padding.Top); // padding.Top for bottom to keep symmetry
@@ -56,7 +59,7 @@ namespace piconavx.ui.graphics.ui
             this.text.Color = new FSColor(COLOR.ToVector4());
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
-            textAnchor.Insets = new Insets(padding.Left + 33, padding.Top, padding.Right, padding.Bottom);
+            textAnchor.Insets = new Insets(padding.Left, padding.Top, padding.Right, padding.Bottom);
             textAnchor.AllowResize = false; // instead of stretching, center it
 
             bounds = GetAutoSizeBounds();
@@ -68,6 +71,8 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout backgroundAnchor;
         private AnchorLayout iconAnchor;
         private AnchorLayout textAnchor;
+
+        public bool IsPrimary { get; set; }
 
         public string Text { get => this.text.Text; set => this.text.Text = value; }
 
@@ -92,6 +97,16 @@ namespace piconavx.ui.graphics.ui
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
 
+        private SizeF iconSize = new SizeF(30, 30);
+        public SizeF IconSize
+        {
+            get => iconSize; set
+            {
+                iconSize = value;
+                icon.Bounds = (Icon == null && !isIconButton) ? new RectangleF(0, 0, 0, iconSize.Height) : new RectangleF(0, 0, iconSize.Width, iconSize.Height);
+            }
+        }
+
         private Insets padding = new Insets(20, 16, 20, 13);
         public Insets Padding { get => padding; set => padding = value; }
 
@@ -100,7 +115,15 @@ namespace piconavx.ui.graphics.ui
         public override bool MouseDown { get => background.MouseDown; set => background.MouseDown = value; }
         public override bool MouseOver { get => background.MouseOver; set => background.MouseOver = value; }
 
-        public Texture? Icon { get => icon.Texture; set => icon.Texture = value; }
+        public Texture? Icon
+        {
+            get => icon.Texture; set
+            {
+                icon.Texture = value;
+                icon.Bounds = (value == null && !isIconButton) ? new RectangleF(0, 0, 0, iconSize.Height) : new RectangleF(0, 0, iconSize.Width, iconSize.Height);
+                textAnchor.Insets = new Insets(padding.Left + (value == null ? 0 : iconSize.Width + 13), padding.Top, padding.Right, padding.Bottom);
+            }
+        }
 
         private bool isIconButton = false;
         public bool IsIconButton
@@ -109,6 +132,7 @@ namespace piconavx.ui.graphics.ui
             {
                 isIconButton = value;
                 iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
+                icon.Bounds = (Icon == null && !isIconButton) ? new RectangleF(0, 0, 0, iconSize.Height) : new RectangleF(0, 0, iconSize.Width, iconSize.Height);
                 if (isIconButton)
                 {
                     Canvas.RemoveComponent(text);
@@ -133,7 +157,7 @@ namespace piconavx.ui.graphics.ui
             else
             {
                 var textSize = text.GetAutoSizeBounds();
-                return new RectangleF(bounds.X, bounds.Y, textSize.Width + padding.Horizontal + 33, textSize.Height + padding.Vertical);
+                return new RectangleF(bounds.X, bounds.Y, textSize.Width + padding.Horizontal + (Icon == null ? 0 : iconSize.Width + 13), textSize.Height + padding.Vertical);
             }
         }
 
@@ -174,7 +198,7 @@ namespace piconavx.ui.graphics.ui
                 bounds = GetAutoSizeBounds();
             }
 
-            background.Color = isDisabled ? BACKGROUND_DISABLED : MouseDown ? BACKGROUND_ACTIVE : MouseOver ? BACKGROUND_HOVER : BACKGROUND;
+            background.Color = isDisabled ? (IsPrimary ? BACKGROUND_PRIMARY_DISABLED : BACKGROUND_DISABLED) : MouseDown ? (IsPrimary ? BACKGROUND_PRIMARY_ACTIVE : BACKGROUND_ACTIVE) : MouseOver ? (IsPrimary ? BACKGROUND_PRIMARY_HOVER : BACKGROUND_HOVER) : (IsPrimary ? BACKGROUND_PRIMARY : BACKGROUND);
             icon.Color = isDisabled ? COLOR_DISABLED : COLOR;
             text.Color = new FSColor((isDisabled ? COLOR_DISABLED : COLOR).ToVector4());
         }
