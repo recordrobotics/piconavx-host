@@ -86,6 +86,7 @@ namespace piconavx.ui.graphics
 
             ClientDetails dataPanel = AddController(new ClientDetails(canvas));
             canvas.AddComponent(dataPanel);
+            dataPanel.ZIndex = sidepanel.ContentZIndex;
             AnchorLayout dataPanelLayout = AddController(new AnchorLayout(dataPanel, sidepanel));
             dataPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
             dataPanelLayout.Insets = new Insets(50, 130, 50, 0);

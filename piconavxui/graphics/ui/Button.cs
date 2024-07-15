@@ -69,6 +69,7 @@ namespace piconavx.ui.graphics.ui
             {
                 zIndex = value;
                 background.ZIndex = zIndex;
+                icon.ZIndex = ContentZIndex;
                 text.ZIndex = ContentZIndex;
                 Canvas.InvalidateHierarchy();
             }

@@ -53,6 +53,7 @@ namespace piconavx.ui.graphics.ui
             Label label = new Label(textDelegate, Canvas);
             Canvas.AddComponent(label);
             flowLayout.Components.Add(label);
+            label.ZIndex = ZIndex;
             Scene.InvokeLater(label.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
@@ -112,6 +113,7 @@ namespace piconavx.ui.graphics.ui
                     }
                     Canvas.AddComponent(recordButton);
                     flowLayout.Components.Add(recordButton);
+                    recordButton.ZIndex = ZIndex;
                     Scene.InvokeLater(recordButton.Subscribe, DeferralMode.NextFrame);
                 }
             }
