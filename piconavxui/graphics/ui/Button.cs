@@ -26,7 +26,11 @@ namespace piconavx.ui.graphics.ui
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;
             background.Size = new Size(15, 15);
-            background.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, NotifyClick);
+            background.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
+            {
+                if (!Disabled) // Disabled handling
+                    NotifyClick();
+            });
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
@@ -153,6 +157,14 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Unsubscribe();
             iconAnchor.Unsubscribe();
             textAnchor.Unsubscribe();
+        }
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            Canvas.RemoveComponent(background);
+            Canvas.RemoveComponent(icon);
+            Canvas.RemoveComponent(text);
         }
 
         private void Scene_Update(double deltaTime)

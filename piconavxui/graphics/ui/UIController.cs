@@ -41,5 +41,6 @@ namespace piconavx.ui.graphics.ui
                 action.Action.Invoke();
             }
         }
+        public virtual void OnRemove() { }
     }
 }

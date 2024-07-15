@@ -37,11 +37,11 @@ namespace piconavx.ui.controllers
 
         public void Start()
         {
-            //serverTask = server.Start();
-            Scene.InvokeLater(() =>
+            serverTask = server.Start();
+/*            Scene.InvokeLater(() =>
             {
                 server.ConnectSimulatedClient("Demo Client");
-            }, DeferralMode.WhenAvailable);
+            }, DeferralMode.WhenAvailable);*/
         }
 
         public void Shutdown()

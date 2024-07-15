@@ -44,6 +44,7 @@ namespace piconavx.ui.graphics.ui
 
         public void RemoveComponent(UIController component)
         {
+            component.OnRemove();
             components.Remove(component);
         }
 

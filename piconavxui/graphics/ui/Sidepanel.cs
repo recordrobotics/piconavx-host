@@ -84,5 +84,12 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Unsubscribe();
             headerAnchor.Unsubscribe();
         }
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            Canvas.RemoveComponent(background);
+            Canvas.RemoveComponent(header);
+        }
     }
 }

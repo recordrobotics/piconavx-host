@@ -46,5 +46,16 @@ namespace piconavx.ui.graphics.ui
             }
             flowLayout.Unsubscribe();
         }
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            foreach (var component in Components)
+            {
+                Scene.InvokeLater(component.Unsubscribe, DeferralMode.NextEvent); // Destroy as soon as possible
+                Canvas.RemoveComponent(component);
+            }
+            Components.Clear();
+        }
     }
 }

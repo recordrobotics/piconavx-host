@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -42,6 +43,9 @@ namespace piconavx.ui.graphics.ui
             Scene.InvokeLater(label.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
+        private Button? startRecordingButton;
+        private Button? stopRecordingButton;
+
         public void InvalidateComponents()
         {
             foreach (var component in Components)
@@ -50,6 +54,7 @@ namespace piconavx.ui.graphics.ui
                 Canvas.RemoveComponent(component);
             }
 
+            startRecordingButton = stopRecordingButton = null;
             Components.Clear();
 
             if (Client != null)
@@ -98,7 +103,7 @@ namespace piconavx.ui.graphics.ui
                 recordingRow.Padding = new Insets(0, 6, 0, 6);
                 Scene.InvokeLater(recordingRow.Subscribe, DeferralMode.NextFrame);
 
-                Button startRecordingButton = new Button("Start Recording", Canvas);
+                startRecordingButton = new Button("Start Recording", Canvas);
                 Canvas.AddComponent(startRecordingButton);
                 recordingRow.Components.Add(startRecordingButton);
                 startRecordingButton.ZIndex = ZIndex;
@@ -109,7 +114,7 @@ namespace piconavx.ui.graphics.ui
                 });
                 Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
 
-                Button stopRecordingButton = new Button("Stop Recording", Canvas);
+                stopRecordingButton = new Button("Stop Recording", Canvas);
                 stopRecordingButton.IsIconButton = true;
                 stopRecordingButton.Padding = new Insets(16);
                 Canvas.AddComponent(stopRecordingButton);
@@ -130,7 +135,7 @@ namespace piconavx.ui.graphics.ui
 
         private void Server_ClientUpdate(Client client, AHRSPosUpdate update)
         {
-            if(client == this.client)
+            if (client == this.client)
             {
                 lastUpdate = update;
             }
@@ -166,6 +171,11 @@ namespace piconavx.ui.graphics.ui
                     client?.RequestHealth();
                 }
             }
+
+            if (startRecordingButton != null)
+                startRecordingButton.Disabled = client?.DataType == HostSetDataType.Feed;
+            if (stopRecordingButton != null)
+                stopRecordingButton.Disabled = client?.DataType != HostSetDataType.Feed;
         }
     }
 }
