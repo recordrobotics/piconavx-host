@@ -69,7 +69,7 @@ namespace piconavx.ui.controllers
             }
             else if (Anchor.HasFlag(Anchor.Right))
             {
-                bounds.X = container.Width - Insets.Right - bounds.Width;
+                bounds.X = container.Right - Insets.Right - bounds.Width;
             }
 
             if (Anchor.HasFlag(Anchor.Top) && Anchor.HasFlag(Anchor.Bottom)) // vertical stretch
@@ -90,7 +90,7 @@ namespace piconavx.ui.controllers
             }
             else if (Anchor.HasFlag(Anchor.Bottom))
             {
-                bounds.Y = container.Height - Insets.Bottom - bounds.Height;
+                bounds.Y = container.Bottom - Insets.Bottom - bounds.Height;
             }
 
             Component.Bounds = bounds;
