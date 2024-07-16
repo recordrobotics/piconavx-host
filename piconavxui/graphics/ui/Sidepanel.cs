@@ -16,7 +16,6 @@ namespace piconavx.ui.graphics.ui
         {
             Header = header;
             background = new Image(canvas);
-            canvas.AddComponent(background);
             background.ZIndex = ZIndex; // background
             background.Color = new Rgba32(10, 10, 10, 200);
 
@@ -25,7 +24,6 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Insets = new Insets(0);
 
             this.header = new Label(Header, canvas);
-            canvas.AddComponent(this.header);
             this.header.FontSize = 18;
             this.header.ZIndex = ContentZIndex;
             this.header.Color = FSColor.White;
@@ -83,6 +81,13 @@ namespace piconavx.ui.graphics.ui
             thisAnchor.Unsubscribe();
             backgroundAnchor.Unsubscribe();
             headerAnchor.Unsubscribe();
+        }
+
+        public override void OnAdd()
+        {
+            base.OnAdd();
+            Canvas.AddComponent(background);
+            Canvas.AddComponent(header);
         }
 
         public override void OnRemove()

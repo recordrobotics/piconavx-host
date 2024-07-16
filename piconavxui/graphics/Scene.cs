@@ -78,28 +78,34 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
+                ShowBounds = true,
+                ShowNonRenderableBounds = true,
             });
 
-            Sidepanel sidepanel = AddController(new Sidepanel("Client Details", canvas));
-            canvas.AddComponent(sidepanel);
+            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas));
+            clientPreviewPage.ZIndex = 0;
+            AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
+            clientPreviewPageLayout.Anchor = Anchor.All;
+            clientPreviewPageLayout.Insets = new Insets(0);
+            //clientPreviewPage.Show();
 
-            ClientDetails dataPanel = AddController(new ClientDetails(canvas));
-            canvas.AddComponent(dataPanel);
-            dataPanel.ZIndex = sidepanel.ContentZIndex;
-            AnchorLayout dataPanelLayout = AddController(new AnchorLayout(dataPanel, sidepanel));
-            dataPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
-            dataPanelLayout.Insets = new Insets(50, 130, 50, 0);
+            ClientListPage clientListPage = AddController(new ClientListPage(canvas));
+            clientListPage.ZIndex = 10;
+            AnchorLayout clientListPageLayout = AddController(new AnchorLayout(clientListPage));
+            clientListPageLayout.Anchor = Anchor.All;
+            clientListPageLayout.Insets = new Insets(0);
+            clientListPage.Show();
 
             UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
-                dataPanel.Client = client;
+                clientPreviewPage.Client = client;
                 livePreview.Client = client;
                 feedPreview.Client = client;
             });
 
             UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
-                dataPanel.Client = null;
+                clientPreviewPage.Client = null;
                 feedPreview.Client = null;
                 livePreview.Client = null;
             });

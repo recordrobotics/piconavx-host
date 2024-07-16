@@ -56,7 +56,7 @@ namespace piconavx.ui.controllers
                 var feed = UIServer.GetClientFeed(client);
                 if (feed != null)
                 {
-                    for (int i = 0; i < Target.Transforms.Length; i++)
+                    for (int i = 0; i < Math.Min(feed.Count, Target.Transforms.Length); i++)
                     {
                         if (Target.Transforms[i] == null)
                             Target.Transforms[i] = new Transform();

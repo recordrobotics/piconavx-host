@@ -38,6 +38,7 @@ namespace piconavx.ui.graphics.ui
 
         public void AddComponent(UIController component)
         {
+            component.OnAdd();
             components.Add(component);
             InvalidateHierarchy();
         }

@@ -23,7 +23,6 @@ namespace piconavx.ui.graphics.ui
         public Button(string text, Canvas canvas) : base(canvas)
         {
             background = new Image(canvas);
-            canvas.AddComponent(background);
             background.ZIndex = ZIndex; // background
             background.HitTestAlphaClip = 0.9f;
             background.Color = BACKGROUND;
@@ -42,7 +41,6 @@ namespace piconavx.ui.graphics.ui
             RaycastTransparency = RaycastTransparency.Transparent;
 
             icon = new Image(canvas);
-            canvas.AddComponent(icon);
             icon.ZIndex = ContentZIndex;
             icon.RaycastTransparency = RaycastTransparency.Hidden;
             icon.Color = COLOR;
@@ -53,7 +51,6 @@ namespace piconavx.ui.graphics.ui
             iconAnchor.AllowResize = false;
 
             this.text = new Label(text, canvas);
-            canvas.AddComponent(this.text);
             this.text.FontSize = 10;
             this.text.ZIndex = ContentZIndex;
             this.text.Color = new FSColor(COLOR.ToVector4());
@@ -181,6 +178,15 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Unsubscribe();
             iconAnchor.Unsubscribe();
             textAnchor.Unsubscribe();
+        }
+
+        public override void OnAdd()
+        {
+            base.OnAdd();
+            Canvas.AddComponent(background);
+            Canvas.AddComponent(icon);
+            if(!IsIconButton)
+                Canvas.AddComponent(text);
         }
 
         public override void OnRemove()

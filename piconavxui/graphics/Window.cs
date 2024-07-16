@@ -76,7 +76,6 @@ namespace piconavx.ui.graphics
 
             fontSystem = new FontSystem(new FontSystemSettings
             {
-                FontLoader = new SixLaborsFontLoader(),
                 FontResolutionFactor = 2,
                 KernelWidth = 2,
                 KernelHeight = 2
