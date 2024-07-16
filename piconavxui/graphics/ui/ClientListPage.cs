@@ -24,7 +24,7 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout controlPanelLayout;
 
         public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#0F0F0F");
-        public readonly Rgba32 TEXT = Rgba32.ParseHex("#FFF");
+        public readonly Rgba32 HEADER = Rgba32.ParseHex("#FFF");
 
         public ClientListPage(Canvas canvas) : base(canvas)
         {
@@ -35,14 +35,15 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Insets = new Insets(0);
 
             headerPanel = new Panel(canvas);
-            headerPanel.Bounds = new RectangleF(0, 0, 0, 93);
+            headerPanel.Bounds = new RectangleF(0, 0, 0, 140);
             headerPanelLayout = new AnchorLayout(headerPanel, this);
             headerPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
-            headerPanelLayout.Insets = new Insets(35, 0, 17, 0);
+            headerPanelLayout.Insets = new Insets(53, 0, 51, 0);
 
             header = new Label("Connected Clients", canvas);
             header.FontSize = 27;
-            header.Color = new FontStashSharp.FSColor(TEXT.ToVector4());
+            header.Font = FontFace.InterSemiBold;
+            header.Color = new FontStashSharp.FSColor(HEADER.ToVector4());
             headerLayout = new AnchorLayout(header, headerPanel);
             headerLayout.Anchor = Anchor.TopLeft | Anchor.Bottom;
             headerLayout.AllowResize = false;

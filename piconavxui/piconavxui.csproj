@@ -19,7 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\fonts\Inter-Regular.ttf" />
+    <None Remove="assets\fonts\Inter-SemiBold.ttf" />
     <None Remove="assets\fonts\Roboto-Regular.ttf" />
+    <None Remove="assets\fonts\Roboto-SemiBold.ttf" />
     <None Remove="assets\models\navxmicro.obj" />
     <None Remove="assets\models\reference.obj" />
     <None Remove="assets\models\sphere.obj" />
@@ -43,7 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="assets\fonts\Roboto-Regular.ttf" />
+    <EmbeddedResource Include="assets\fonts\Inter-Regular.ttf" />
+    <EmbeddedResource Include="assets\fonts\Inter-SemiBold.ttf" />
     <EmbeddedResource Include="assets\models\navxmicro.obj" />
     <EmbeddedResource Include="assets\models\reference.obj" />
     <EmbeddedResource Include="assets\models\sphere.obj">

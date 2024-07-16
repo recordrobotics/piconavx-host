@@ -31,6 +31,9 @@ namespace piconavx.ui.graphics.ui
             get => fontSize; set => fontSize = value;
         }
 
+        private FontFace font = FontFace.InterRegular;
+        public FontFace Font { get => font; set => font = value; }
+
         private bool autoSize = true;
         public bool AutoSize { get => autoSize; set => autoSize = value; }
 
@@ -58,16 +61,18 @@ namespace piconavx.ui.graphics.ui
 
         public RectangleF GetAutoSizeBounds()
         {
-            var font = Window.FontSystem.GetFont(fontSize);
-            Vector2 size = font.MeasureString(text, new Vector2(Window.FontSystem.FontResolutionFactor, Window.FontSystem.FontResolutionFactor));
+            var fontSystem = Window.FontSystems[this.font];
+            var font = fontSystem.GetFont(fontSize);
+            Vector2 size = font.MeasureString(text, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             return new RectangleF(bounds.X, bounds.Y, size.X, size.Y);
         }
 
         public override void Render(double deltaTime, RenderProperties properties)
         {
-            var font = Window.FontSystem.GetFont(fontSize);
+            var fontSystem = Window.FontSystems[this.font];
+            var font = fontSystem.GetFont(fontSize);
             Window.FontRenderer.Begin();
-            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, default, new Vector2(Window.FontSystem.FontResolutionFactor, Window.FontSystem.FontResolutionFactor));
+            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, default, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();
         }
 

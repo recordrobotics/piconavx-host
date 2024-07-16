@@ -13,12 +13,12 @@ namespace piconavx.ui.graphics
         private IKeyboard? primaryKeyboard;
         private IInputContext? input;
         private static GL? gl;
-        private static FontSystem? fontSystem;
+        private static Dictionary<FontFace, FontSystem> fontSystems = new Dictionary<FontFace, FontSystem>();
         private static Renderer? fontRenderer;
         private Vector2 prevMousePos;
 
         public static GL GL { get => gl!; }
-        public static FontSystem FontSystem { get => fontSystem!; }
+        public static IReadOnlyDictionary<FontFace, FontSystem> FontSystems { get => fontSystems.AsReadOnly(); }
         public static Renderer FontRenderer { get => fontRenderer!; }
 
         private static Window? currentWindow;
@@ -67,6 +67,18 @@ namespace piconavx.ui.graphics
             Scene.NotifyViewportChange(new Silk.NET.Maths.Rectangle<int>(0, 0, newSize));
         }
 
+        private void AddFont(FontFace font, string path)
+        {
+            var fontSystem = new FontSystem(new FontSystemSettings
+            {
+                FontResolutionFactor = 2,
+                KernelWidth = 2,
+                KernelHeight = 2
+            });
+            fontSystem.AddFont(EmbeddedResource.ReadAllBytes(path));
+            fontSystems.Add(font, fontSystem);
+        }
+
         private void Window_Load()
         {
             currentWindow = this;
@@ -74,13 +86,8 @@ namespace piconavx.ui.graphics
 
             fontRenderer = new Renderer();
 
-            fontSystem = new FontSystem(new FontSystemSettings
-            {
-                FontResolutionFactor = 2,
-                KernelWidth = 2,
-                KernelHeight = 2
-            });
-            fontSystem.AddFont(EmbeddedResource.ReadAllBytes("assets/fonts/Roboto-Regular.ttf"));
+            AddFont(FontFace.InterRegular, "assets/fonts/Inter-Regular.ttf");
+            AddFont(FontFace.InterSemiBold, "assets/fonts/Inter-SemiBold.ttf");
 
             Scene.CreateStaticResources();
 
@@ -148,5 +155,11 @@ namespace piconavx.ui.graphics
             Scene.DestroyResources();
             fontRenderer?.Dispose();
         }
+    }
+
+    public enum FontFace
+    {
+        InterRegular,
+        InterSemiBold
     }
 }
