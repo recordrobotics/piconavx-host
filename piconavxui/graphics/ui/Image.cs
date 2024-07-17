@@ -662,8 +662,15 @@ namespace piconavx.ui.graphics.ui
                 UIMaterial.DefaultMaterial.Use(properties);
             }
 
-            Tessellate(Tessellator.QuadExt);
-            Tessellator.QuadExt.Flush();
+            if (mask != null)
+            {
+                Tessellate(Tessellator.QuadExt);
+                Tessellator.QuadExt.Flush();
+            } else
+            {
+                Tessellate(Tessellator.Quad);
+                Tessellator.Quad.Flush();
+            }
         }
 
         public override void HitTest(byte id)
@@ -686,8 +693,16 @@ namespace piconavx.ui.graphics.ui
                 return;
             }
 
-            Tessellate(Tessellator.Quad);
-            Tessellator.Quad.Flush();
+            if (mask != null)
+            {
+                Tessellate(Tessellator.QuadExt);
+                Tessellator.QuadExt.Flush();
+            }
+            else
+            {
+                Tessellate(Tessellator.Quad);
+                Tessellator.Quad.Flush();
+            }
         }
 
         public override void Subscribe()
