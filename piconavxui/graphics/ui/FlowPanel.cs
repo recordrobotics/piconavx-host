@@ -17,8 +17,10 @@ namespace piconavx.ui.graphics.ui
         public AlignItems AlignItems { get => flowLayout.AlignItems; set => flowLayout.AlignItems = value; }
 
         public bool Reversed { get => flowLayout.Reversed; set => flowLayout.Reversed = value; }
+        public bool Wrap { get => flowLayout.Wrap; set => flowLayout.Wrap = value; }
+        public bool Stretch { get => flowLayout.Stretch; set => flowLayout.Stretch = value; }
 
-        public bool AutoSize { get => flowLayout.AutoSizeContainer; set => flowLayout.AutoSizeContainer = value; }
+        public FlowLayout.AutoSize AutoSize { get => flowLayout.AutoSizeContainer; set => flowLayout.AutoSizeContainer = value; }
         public float Gap { get => flowLayout.Gap; set => flowLayout.Gap = value; }
         public Insets Padding { get => flowLayout.Padding; set => flowLayout.Padding = value; }
 

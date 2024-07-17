@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
-    public class QuadTessellator : Tessellator
+    public class QuadTessellator<T> : Tessellator where T : unmanaged, ITessellatorVertex<T>
     {
-        private const int MAX_ELEMENTS = 128;
+        private const int MAX_ELEMENTS = 512;
         private const int MAX_VERTICES = MAX_ELEMENTS * 4;
         private const int MAX_INDICES = MAX_ELEMENTS * 6;
 
-        private BufferObject<UIVertex>? _vertexBuffer;
+        private BufferObject<T>? _vertexBuffer;
         private BufferObject<short>? _indexBuffer;
-        private VertexArrayObject<UIVertex, short>? _vao;
-        private UIVertex[]? _vertexData;
+        private VertexArrayObject<T, short>? _vao;
+        private T[]? _vertexData;
         private static short[]? indexData;
         private int _vertexIndex = 0;
 
@@ -41,17 +41,15 @@ namespace piconavx.ui.graphics.ui
         public override void CreateResources()
         {
             indexData ??= GenerateIndexArray();
-            _vertexData = new UIVertex[MAX_VERTICES];
+            _vertexData = new T[MAX_VERTICES];
 
-            _vertexBuffer = new BufferObject<UIVertex>(MAX_VERTICES, BufferTargetARB.ArrayBuffer, true);
+            _vertexBuffer = new BufferObject<T>(MAX_VERTICES, BufferTargetARB.ArrayBuffer, true);
             _indexBuffer = new BufferObject<short>(indexData, BufferTargetARB.ElementArrayBuffer, false);
 
-            _vao = new VertexArrayObject<UIVertex, short>(_vertexBuffer, _indexBuffer);
+            _vao = new VertexArrayObject<T, short>(_vertexBuffer, _indexBuffer);
             _vao.Bind();
 
-            _vao.VertexAttributePointer(0, 2, VertexAttribPointerType.Float, 1, false, 0);
-            _vao.VertexAttributePointer(1, 4, VertexAttribPointerType.UnsignedByte, 1, true, 2 * sizeof(float));
-            _vao.VertexAttributePointer(2, 2, VertexAttribPointerType.Float, 1, false, 2 * sizeof(float) + 4 * sizeof(byte));
+            T.SetUpVertexAttributePointers(_vao);
         }
 
         public override void Dispose()
@@ -70,10 +68,13 @@ namespace piconavx.ui.graphics.ui
             DrawQuad(new RectangleF(bounds.X + thickness, bounds.Bottom - thickness, bounds.Width - thickness - thickness, thickness), color);
         }
 
-        public void DrawQuad(ref UIVertex topLeft, ref UIVertex topRight, ref UIVertex bottomLeft, ref UIVertex bottomRight)
+        public void DrawQuad(ref T topLeft, ref T topRight, ref T bottomLeft, ref T bottomRight)
         {
             if (_vertexData == null) // lazy resource creation only when this tessellator is used
                 CreateResources();
+
+            if (_vertexIndex + 4 >= MAX_VERTICES)
+                Flush(); // force flush after reaching limit
 
             _vertexData![_vertexIndex++] = topLeft;
             _vertexData[_vertexIndex++] = topRight;
@@ -83,33 +84,33 @@ namespace piconavx.ui.graphics.ui
 
         public void DrawQuad(RectangleF bounds, Rgba32 colorTopLeft, Rgba32 colorTopRight, Rgba32 colorBottomLeft, Rgba32 colorBottomRight)
         {
-            UIVertex topLeft = new UIVertex()
-            {
-                Position = new Vector2(bounds.Left, bounds.Top),
-                Color = colorTopLeft,
-                TexCoords = new Vector2(0, 0)
-            };
+            T topLeft = T.Create(
+                new Vector2(bounds.Left, bounds.Top),
+                colorTopLeft,
+                new Vector2(0, 0),
+                new Vector2(0, 0)
+                );
 
-            UIVertex topRight = new UIVertex()
-            {
-                Position = new Vector2(bounds.Right, bounds.Top),
-                Color = colorTopRight,
-                TexCoords = new Vector2(1, 0)
-            };
+            T topRight = T.Create(
+                new Vector2(bounds.Right, bounds.Top),
+                colorTopRight,
+                new Vector2(1, 0),
+                new Vector2(1, 0)
+                );
 
-            UIVertex bottomLeft = new UIVertex()
-            {
-                Position = new Vector2(bounds.Left, bounds.Bottom),
-                Color = colorBottomLeft,
-                TexCoords = new Vector2(0, 1)
-            };
+            T bottomLeft = T.Create(
+                new Vector2(bounds.Left, bounds.Bottom),
+                colorBottomLeft,
+                new Vector2(0, 1),
+                new Vector2(0, 1)
+                );
 
-            UIVertex bottomRight = new UIVertex()
-            {
-                Position = new Vector2(bounds.Right, bounds.Bottom),
-                Color = colorBottomRight,
-                TexCoords = new Vector2(1, 1)
-            };
+            T bottomRight = T.Create(
+                new Vector2(bounds.Right, bounds.Bottom),
+                colorBottomRight,
+                new Vector2(1, 1),
+                new Vector2(1, 1)
+                );
 
             DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
         }

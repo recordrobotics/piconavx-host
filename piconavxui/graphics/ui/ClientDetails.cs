@@ -117,7 +117,7 @@ namespace piconavx.ui.graphics.ui
                     client?.SetDataType(HostSetDataType.Feed);
                 });
                 startRecordingButton.Icon = recordIcon;
-                startRecordingButton.IsPrimary = true;
+                startRecordingButton.Color = Button.ButtonColor.Primary;
                 Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
 
                 stopRecordingButton = new Button("Stop Recording", Canvas);

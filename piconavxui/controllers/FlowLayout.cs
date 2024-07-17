@@ -1,11 +1,25 @@
 ﻿using piconavx.ui.graphics;
 using piconavx.ui.graphics.ui;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace piconavx.ui.controllers
 {
     public class FlowLayout : Controller
     {
+        [Flags]
+        public enum AutoSize
+        {
+            None = 0,
+            X = 1 << 0,
+            Y = 1 << 1,
+            Both = X | Y
+        }
+
+        private static List<FlowLayout> instances = new List<FlowLayout>();
+        public static IReadOnlyList<FlowLayout> Instances { get { return instances.AsReadOnly(); } }
+
         public UIController Container { get; }
 
         public List<UIController> Components { get; }
@@ -14,10 +28,15 @@ namespace piconavx.ui.controllers
         public AlignItems AlignItems { get; set; }
 
         public bool Reversed { get; set; } = false;
+        public bool Wrap { get; set; } = false;
+        public bool Stretch { get; set; } = false;
 
-        public bool AutoSizeContainer { get; set; } = true;
+        public AutoSize AutoSizeContainer { get; set; } = AutoSize.Both;
         public float Gap { get; set; } = 0;
         public Insets Padding { get; set; } = new Insets(0);
+
+        private RectangleF contentBounds = default;
+        public RectangleF ContentBounds => contentBounds;
 
         public FlowLayout(UIController container)
         {
@@ -25,6 +44,12 @@ namespace piconavx.ui.controllers
             Components = new List<UIController>();
             Direction = FlowDirection.Vertical;
             AlignItems = AlignItems.Start;
+            instances.Add(this);
+        }
+
+        ~FlowLayout()
+        {
+            instances.Remove(this);
         }
 
         public RectangleF GetAutoSizeBounds()
@@ -42,7 +67,11 @@ namespace piconavx.ui.controllers
                             height = MathF.Max(height, component.Bounds.Height);
                         }
 
-                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width + Gap * (Components.Count - 1) + Padding.Horizontal, height + Padding.Vertical);
+                        return new RectangleF(
+                            Container.Bounds.X, 
+                            Container.Bounds.Y,
+                            AutoSizeContainer.HasFlag(AutoSize.X) ? (width + Gap * (Components.Count - 1) + Padding.Horizontal) : Container.Bounds.Width,
+                            AutoSizeContainer.HasFlag(AutoSize.Y) ? (height + Padding.Vertical) : Container.Bounds.Height);
                     }
                 case FlowDirection.Vertical:
                     {
@@ -55,7 +84,11 @@ namespace piconavx.ui.controllers
                             height += component.Bounds.Height;
                         }
 
-                        return new RectangleF(Container.Bounds.X, Container.Bounds.Y, width + Padding.Horizontal, height + Gap * (Components.Count - 1) + Padding.Vertical);
+                        return new RectangleF(
+                            Container.Bounds.X, 
+                            Container.Bounds.Y,
+                            AutoSizeContainer.HasFlag(AutoSize.X) ? (width + Padding.Horizontal) : Container.Bounds.Width,
+                            AutoSizeContainer.HasFlag(AutoSize.Y) ? (height + Gap * (Components.Count - 1) + Padding.Vertical) : Container.Bounds.Height);
                     }
             }
 
@@ -74,10 +107,13 @@ namespace piconavx.ui.controllers
 
         private void Scene_Update(double deltaTime)
         {
-            if (AutoSizeContainer)
+            if (AutoSizeContainer != AutoSize.None)
                 Container.Bounds = GetAutoSizeBounds();
 
             float accum = 0;
+            float accumAlt = 0;
+            RectangleF contentBounds = default;
+
             for (int i = 0; i < Components.Count; i++)
             {
                 var component = Components[Reversed ? (Components.Count - i - 1) : i];
@@ -86,7 +122,17 @@ namespace piconavx.ui.controllers
                 {
                     case FlowDirection.Horizontal:
                         {
-                            float y = Container.Bounds.Y + Padding.Top;
+                            float x = Container.Bounds.X + Padding.Left + accum;
+
+                            // Overflow
+                            if (Wrap && contentBounds != default && x + component.Bounds.Width > Container.Bounds.Right)
+                            {
+                                accumAlt = contentBounds.Bottom - Container.Bounds.Top + Gap;
+                                accum = 0;
+                                x = Container.Bounds.X + Padding.Left + accum;
+                            }
+
+                            float y = Container.Bounds.Y + Padding.Top + accumAlt;
 
                             switch (AlignItems)
                             {
@@ -98,13 +144,23 @@ namespace piconavx.ui.controllers
                                     break;
                             }
 
-                            component.Bounds = new RectangleF(Container.Bounds.X + Padding.Left + accum, y, component.Bounds.Width, component.Bounds.Height);
+                            component.Bounds = new RectangleF(x, y, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Width;
                             break;
                         }
                     case FlowDirection.Vertical:
                         {
-                            float x = Container.Bounds.X + Padding.Left;
+                            float y = Container.Bounds.Y + Padding.Top + accum;
+
+                            // Overflow
+                            if (Wrap && contentBounds != default && y + component.Bounds.Height > Container.Bounds.Bottom)
+                            {
+                                accumAlt = contentBounds.Right - Container.Bounds.Left + Gap;
+                                accum = 0;
+                                y = Container.Bounds.Y + Padding.Top + accum;
+                            }
+
+                            float x = Container.Bounds.X + Padding.Left + accumAlt;
 
                             switch (AlignItems)
                             {
@@ -116,14 +172,59 @@ namespace piconavx.ui.controllers
                                     break;
                             }
 
-                            component.Bounds = new RectangleF(x, Container.Bounds.Y + Padding.Top + accum, component.Bounds.Width, component.Bounds.Height);
+                            component.Bounds = new RectangleF(x, y, component.Bounds.Width, component.Bounds.Height);
                             accum += component.Bounds.Height;
                             break;
                         }
                 }
 
-                accum += Gap;
+                if (contentBounds == default)
+                    contentBounds = component.Bounds;
+
+                if (component.Bounds.Left < contentBounds.Left)
+                {
+                    float right = contentBounds.Right;
+                    contentBounds.X = component.Bounds.Left;
+                    contentBounds.Width += right - contentBounds.Right;
+                }
+
+                if (component.Bounds.Right > contentBounds.Right)
+                {
+                    contentBounds.Width += component.Bounds.Right - contentBounds.Right;
+                }
+
+                if (component.Bounds.Top < contentBounds.Top)
+                {
+                    float bottom = contentBounds.Bottom;
+                    contentBounds.Y = component.Bounds.Top;
+                    contentBounds.Height += bottom - contentBounds.Bottom;
+                }
+
+                if (component.Bounds.Bottom > contentBounds.Bottom)
+                {
+                    var dif = component.Bounds.Bottom - contentBounds.Bottom;
+                    contentBounds.Height += dif;
+                }
+
+                if (!Stretch)
+                {
+                    accum += Gap;
+                } else if (i < Components.Count - 1)
+                {
+                    var nextComponent = Components[Reversed ? (Components.Count - i) : (i + 1)];
+                    switch (Direction)
+                    {
+                        case FlowDirection.Horizontal:
+                            accum += Container.Bounds.Width - component.Bounds.Width - nextComponent.Bounds.Width;
+                            break;
+                        case FlowDirection.Vertical:
+                            accum += Container.Bounds.Height - component.Bounds.Height - nextComponent.Bounds.Height;
+                            break;
+                    }
+                }
             }
+
+            this.contentBounds = contentBounds;
         }
     }
 

@@ -1,6 +1,4 @@
 ﻿using piconavx.ui.controllers;
-using System.Drawing;
-using static Silk.NET.Core.Native.WinString;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -32,22 +30,9 @@ namespace piconavx.ui.graphics.ui
             UpdateZIndex();
         }
 
-        private int zIndex = 0;
-        public override int ZIndex
+        protected override void UpdateZIndex()
         {
-            get => zIndex; set
-            {
-                zIndex = value;
-                UpdateZIndex();
-            }
-        }
-
-        private RectangleF bounds = new RectangleF(0, 0, 0, 0);
-        public override RectangleF Bounds { get => bounds; set => bounds = value; }
-
-        private void UpdateZIndex()
-        {
-            sidepanel.ZIndex = zIndex;
+            sidepanel.ZIndex = ZIndex;
             dataPanel.ZIndex = sidepanel.ContentZIndex;
         }
 

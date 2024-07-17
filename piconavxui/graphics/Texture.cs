@@ -15,6 +15,7 @@ namespace piconavx.ui.graphics
         public static Texture Black;
         public static Texture UVTest;
         public static Texture RoundedRect;
+        public static Texture Pill;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 

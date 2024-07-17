@@ -72,8 +72,8 @@ namespace piconavx.ui.graphics
             var fontSystem = new FontSystem(new FontSystemSettings
             {
                 FontResolutionFactor = 2,
-                KernelWidth = 2,
-                KernelHeight = 2
+                KernelWidth = 1,
+                KernelHeight = 1
             });
             fontSystem.AddFont(EmbeddedResource.ReadAllBytes(path));
             fontSystems.Add(font, fontSystem);
@@ -87,7 +87,9 @@ namespace piconavx.ui.graphics
             fontRenderer = new Renderer();
 
             AddFont(FontFace.InterRegular, "assets/fonts/Inter-Regular.ttf");
+            AddFont(FontFace.InterLight, "assets/fonts/Inter-Light.ttf");
             AddFont(FontFace.InterSemiBold, "assets/fonts/Inter-SemiBold.ttf");
+            AddFont(FontFace.InterBold, "assets/fonts/Inter-Bold.ttf");
 
             Scene.CreateStaticResources();
 
@@ -160,6 +162,8 @@ namespace piconavx.ui.graphics
     public enum FontFace
     {
         InterRegular,
-        InterSemiBold
+        InterLight,
+        InterSemiBold,
+        InterBold
     }
 }

@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
-    public class Sidepanel : UIController
+    public class Sidepanel : Panel
     {
         public Sidepanel(string header, Canvas canvas) : base(canvas)
         {
             Header = header;
             background = new Image(canvas);
-            background.ZIndex = ZIndex; // background
             background.Color = new Rgba32(10, 10, 10, 200);
 
             backgroundAnchor = new AnchorLayout(background, this);
@@ -25,7 +24,6 @@ namespace piconavx.ui.graphics.ui
 
             this.header = new Label(Header, canvas);
             this.header.FontSize = 18;
-            this.header.ZIndex = ContentZIndex;
             this.header.Color = FSColor.White;
             headerAnchor = new AnchorLayout(this.header, this);
             headerAnchor.Anchor = Anchor.TopLeft | Anchor.Right;
@@ -35,7 +33,9 @@ namespace piconavx.ui.graphics.ui
             thisAnchor = new AnchorLayout(this);
             thisAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
             thisAnchor.Insets = new Insets(0);
-            bounds = new RectangleF(0, 0, 800, 0);
+            Bounds = new RectangleF(0, 0, 800, 0);
+
+            UpdateZIndex();
         }
 
         private AnchorLayout thisAnchor;
@@ -46,24 +46,13 @@ namespace piconavx.ui.graphics.ui
 
         public string Header { get; set; }
 
-        private int zIndex = 0;
-        public override int ZIndex
+        protected override void UpdateZIndex()
         {
-            get => zIndex; set
-            {
-                zIndex = value;
-                background.ZIndex = zIndex;
-                header.ZIndex = ContentZIndex;
-                Canvas.InvalidateHierarchy();
-            }
+            background.ZIndex = ZIndex;
+            header.ZIndex = ContentZIndex;
         }
 
-        public int ContentZIndex => zIndex + 1;
-
-        private RectangleF bounds;
-        public override RectangleF Bounds { get => bounds; set => bounds = value; }
-
-        public override bool IsRenderable => false;
+        public int ContentZIndex => ZIndex + 1;
 
         public override void Subscribe()
         {

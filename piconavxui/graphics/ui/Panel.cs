@@ -10,6 +10,7 @@ namespace piconavx.ui.graphics.ui
             get => zIndex; set
             {
                 zIndex = value;
+                UpdateZIndex();
                 Canvas.InvalidateHierarchy();
             }
         }
@@ -30,5 +31,7 @@ namespace piconavx.ui.graphics.ui
         public override void Unsubscribe()
         {
         }
+
+        protected virtual void UpdateZIndex() { }
     }
 }

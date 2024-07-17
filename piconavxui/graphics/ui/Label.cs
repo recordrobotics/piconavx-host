@@ -40,6 +40,9 @@ namespace piconavx.ui.graphics.ui
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
 
+        private Vector2 renderOffset;
+        public Vector2 RenderOffset { get => renderOffset; set => renderOffset = value; }
+
         private FSColor color;
         public FSColor Color
         {
@@ -72,7 +75,7 @@ namespace piconavx.ui.graphics.ui
             var fontSystem = Window.FontSystems[this.font];
             var font = fontSystem.GetFont(fontSize);
             Window.FontRenderer.Begin();
-            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, default, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();
         }
 

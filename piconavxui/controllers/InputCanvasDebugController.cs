@@ -2,6 +2,7 @@
 using piconavx.ui.graphics.ui;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,10 @@ namespace piconavx.ui.controllers
         /// </summary>
         public bool TargetBoundsOutline { get; set; } = false;
         /// <summary>
+        /// Draws a thin cyan outline around the <see cref="FlowLayout.ContentBounds"/> of every <see cref="FlowLayout"/> in <see cref="FlowLayout.Instances"/>
+        /// </summary>
+        public bool FlowLayoutContentBoundsOutline { get; set; } = false;
+        /// <summary>
         /// Calculates the input raycast (<see cref="Canvas.RaycastAt(System.Numerics.Vector2)"/>) every frame for easier debugging in graphics debuggers
         /// </summary>
         public bool DebugRaycastGraphics { get; set; } = false;
@@ -37,7 +42,7 @@ namespace piconavx.ui.controllers
         /// <summary>
         /// When true, performs highlighting on all components, even if <see cref="UIController.IsRenderable"/> = false
         /// </summary>
-        public bool HighlightNonRenderable {  get; set; } = false;
+        public bool HighlightNonRenderable { get; set; } = false;
 
         public override void Subscribe()
         {
@@ -84,7 +89,7 @@ namespace piconavx.ui.controllers
                             Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 255, 50));
                         }
 
-                        if(component.MouseDown && HighlightMouseDown && (HighlightNonRenderable || component.IsRenderable))
+                        if (component.MouseDown && HighlightMouseDown && (HighlightNonRenderable || component.IsRenderable))
                         {
                             Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 0, 50));
                         }
@@ -97,6 +102,14 @@ namespace piconavx.ui.controllers
                     if (TargetBoundsOutline)
                     {
                         Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
+                    }
+                }
+
+                if (FlowLayoutContentBoundsOutline)
+                {
+                    foreach (var flowLayout in FlowLayout.Instances)
+                    {
+                        Tessellator.Quad.DrawRectangleOutline(flowLayout.ContentBounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 255, 255, 255), 1);
                     }
                 }
 

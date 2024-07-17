@@ -6,24 +6,14 @@ using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
-    public abstract class Page : UIController
+    public abstract class Page : Panel
     {
         protected Page(Canvas canvas) : base(canvas)
         {
         }
 
-        public override bool IsRenderable => false;
-
         public abstract void Show();
         public abstract void Hide();
-
-        // Empty Subscribe/Unsubscribe since Show/Hide are used instead
-        public override void Subscribe()
-        {
-        }
-        public override void Unsubscribe()
-        {
-        }
 
         protected void SubscribeLater<T>(T controller) where T : Controller
         {

@@ -25,7 +25,13 @@ namespace piconavx.ui.graphics
             Texture.UVTest = AddResource(new Texture("assets/textures/uvtest.png"));
             Texture.RoundedRect = AddResource(new Texture("assets/textures/roundrect.png")
             {
-                Border = new Insets(12)
+                Border = new Insets(12),
+                WrapMode = TextureWrapMode.Clamp
+            });
+            Texture.Pill = AddResource(new Texture("assets/textures/pill.png")
+            {
+                Border = new Insets(32),
+                WrapMode = TextureWrapMode.Clamp
             });
         }
 
@@ -78,8 +84,9 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-                ShowBounds = true,
+                /*ShowBounds = true,
                 ShowNonRenderableBounds = true,
+                FlowLayoutContentBoundsOutline = true,*/
             });
 
             ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas));
