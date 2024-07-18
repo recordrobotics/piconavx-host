@@ -85,6 +85,7 @@ namespace piconavx.ui.graphics.ui
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
             controlPanel.Components.Add(startButton);
+            startButton.SetTooltip("Run host server");
 
             settingsIcon = new Texture("assets/textures/settings.png");
 
@@ -93,6 +94,7 @@ namespace piconavx.ui.graphics.ui
             settingsButton.IsIconButton = true;
             settingsButton.Icon = settingsIcon;
             controlPanel.Components.Add(settingsButton);
+            settingsButton.SetTooltip("Open settings");
 
             clientList = new FlowPanel(canvas);
             clientList.AutoSize = FlowLayout.AutoSize.None;

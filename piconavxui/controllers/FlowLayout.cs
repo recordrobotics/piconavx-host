@@ -30,6 +30,7 @@ namespace piconavx.ui.controllers
         public bool Reversed { get; set; } = false;
         public bool Wrap { get; set; } = false;
         public bool Stretch { get; set; } = false;
+        public bool Visible { get; set; } = false;
 
         public AutoSize AutoSizeContainer { get; set; } = AutoSize.Both;
         public float Gap { get; set; } = 0;

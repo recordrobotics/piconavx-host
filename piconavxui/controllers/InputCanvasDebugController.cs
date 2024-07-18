@@ -109,7 +109,10 @@ namespace piconavx.ui.controllers
                 {
                     foreach (var flowLayout in FlowLayout.Instances)
                     {
-                        Tessellator.Quad.DrawRectangleOutline(flowLayout.ContentBounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 255, 255, 255), 1);
+                        if (flowLayout.Visible)
+                        {
+                            Tessellator.Quad.DrawRectangleOutline(flowLayout.ContentBounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 255, 255, 255), 1);
+                        }
                     }
                 }
 

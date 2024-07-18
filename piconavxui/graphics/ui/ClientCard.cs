@@ -40,6 +40,7 @@ namespace piconavx.ui.graphics.ui
 
         private Label idLabel;
         private Badge idBadge;
+        private Tooltip idBadgeTooltip;
 
         private FlowPanel addressRow;
         private FlowPanel versionRow;
@@ -219,6 +220,8 @@ namespace piconavx.ui.graphics.ui
 
             idBadge = new Badge("High Bandwidth", canvas);
             row1.Components.Add(idBadge);
+            idBadgeTooltip = new Tooltip("This client is currently in high bandwidth mode.", "High Bandwidth mode groups data packets together\ninto one to reduce the processing overhead.", idBadge, canvas);
+            idBadgeTooltip.Anchor = PopupAnchor.Right;
 
             addressRow = new FlowPanel(canvas);
             versionRow = new FlowPanel(canvas);
@@ -321,6 +324,7 @@ namespace piconavx.ui.graphics.ui
             thumbnailShadowAnchor.Subscribe();
             row1Anchor.Subscribe();
             row2Anchor.Subscribe();
+            idBadgeTooltip.Subscribe();
         }
 
         public override void Unsubscribe()
@@ -336,6 +340,7 @@ namespace piconavx.ui.graphics.ui
             thumbnailShadowAnchor.Unsubscribe();
             row1Anchor.Unsubscribe();
             row2Anchor.Unsubscribe();
+            idBadgeTooltip.Unsubscribe();
         }
 
         public override void OnAdd()

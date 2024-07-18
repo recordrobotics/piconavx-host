@@ -25,7 +25,7 @@ namespace piconavx.ui.graphics.ui
             this.text = new Label(text, canvas);
             this.text.FontSize = 13;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = new FSColor(Color.Color.ToVector4());
+            this.text.Color = new FSColor(Color.Text.ToVector4());
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
             textAnchor.Insets = padding;
@@ -134,7 +134,7 @@ namespace piconavx.ui.graphics.ui
             }
 
             background.Color = Color.Background;
-            text.Color = new FSColor(Color.Color.ToVector4());
+            text.Color = new FSColor(Color.Text.ToVector4());
         }
     }
 }

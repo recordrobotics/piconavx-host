@@ -24,8 +24,9 @@ namespace piconavx.ui.graphics.ui
             public Rgba32 BackgroundHover { get; }
             public Rgba32 BackgroundActive { get; }
 
-            public Rgba32 Color { get; }
-            public Rgba32 ColorDisabled { get; }
+            public Rgba32 Text { get; }
+            public Rgba32 TextSecondary { get; }
+            public Rgba32 TextDisabled { get; }
 
             public static readonly ButtonColor Neutral = new Neutral();
             public static readonly ButtonColor Primary = new Primary();
@@ -39,8 +40,9 @@ namespace piconavx.ui.graphics.ui
             public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#242424");
             public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#424242");
             public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#4d4d4d");
-            public readonly Rgba32 Color => Rgba32.ParseHex("#fff");
-            public readonly Rgba32 ColorDisabled => Rgba32.ParseHex("#b3b3b3");
+            public readonly Rgba32 Text => Rgba32.ParseHex("#fff");
+            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#BCBCBC");
+            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#b3b3b3");
         }
 
         public struct Primary : ButtonColor
@@ -49,8 +51,9 @@ namespace piconavx.ui.graphics.ui
             public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#0e2247");
             public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#3b76e3");
             public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#2a5dbd");
-            public readonly Rgba32 Color => Rgba32.ParseHex("#fff");
-            public readonly Rgba32 ColorDisabled => Rgba32.ParseHex("#b3b3b3");
+            public readonly Rgba32 Text => Rgba32.ParseHex("#fff");
+            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#BCBCBC");
+            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#b3b3b3");
         }
 
         public struct Success : ButtonColor
@@ -59,8 +62,9 @@ namespace piconavx.ui.graphics.ui
             public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#151c16");
             public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#152b17");
             public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#1b381d");
-            public readonly Rgba32 Color => Rgba32.ParseHex("#c3f7be");
-            public readonly Rgba32 ColorDisabled => Rgba32.ParseHex("#72916e");
+            public readonly Rgba32 Text => Rgba32.ParseHex("#c3f7be");
+            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#7eab79");
+            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#72916e");
         }
 
         public Button(string text, Canvas canvas) : base(canvas)
@@ -86,7 +90,7 @@ namespace piconavx.ui.graphics.ui
             icon = new Image(canvas);
             icon.ZIndex = ContentZIndex;
             icon.RaycastTransparency = RaycastTransparency.Hidden;
-            icon.Color = Color.Color;
+            icon.Color = Color.Text;
             icon.Bounds = new RectangleF(0, 0, 0, 20);
             iconAnchor = new AnchorLayout(icon, this);
             iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
@@ -96,7 +100,7 @@ namespace piconavx.ui.graphics.ui
             this.text = new Label(text, canvas);
             this.text.FontSize = 10;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = new FSColor(Color.Color.ToVector4());
+            this.text.Color = new FSColor(Color.Text.ToVector4());
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
             textAnchor.Insets = new Insets(padding.Left + (Icon == null ? 0 : iconSize.Width + iconGap), padding.Top, padding.Right, padding.Bottom);
@@ -111,6 +115,9 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout backgroundAnchor;
         private AnchorLayout iconAnchor;
         private AnchorLayout textAnchor;
+        private Tooltip? tooltip;
+
+        public Tooltip? Tooltip => tooltip;
 
         public ButtonColor Color { get; set; } = ButtonColor.Neutral;
 
@@ -234,6 +241,25 @@ namespace piconavx.ui.graphics.ui
             return bounds;
         }
 
+        public void SetTooltip(string tooltip)
+        {
+            this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Anchor = PopupAnchor.Bottom;
+        }
+
+        public void SetTooltip(string tooltip, PopupAnchor anchor)
+        {
+            this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Anchor = anchor;
+        }
+
+        public void SetTooltip(string tooltip, PopupAnchor anchor, Vector2 offset)
+        {
+            this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Anchor = anchor;
+            this.tooltip.Offset = offset;
+        }
+
         public override void Subscribe()
         {
             Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
@@ -243,6 +269,7 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Subscribe();
             iconAnchor.Subscribe();
             textAnchor.Subscribe();
+            tooltip?.Subscribe();
         }
 
         public override void Unsubscribe()
@@ -254,6 +281,7 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Unsubscribe();
             iconAnchor.Unsubscribe();
             textAnchor.Unsubscribe();
+            tooltip?.Unsubscribe();
         }
 
         public override void OnAdd()
@@ -281,8 +309,8 @@ namespace piconavx.ui.graphics.ui
             }
 
             background.Color = isDisabled ? Color.BackgroundDisabled : MouseDown ? Color.BackgroundActive : MouseOver ? Color.BackgroundHover : Color.Background;
-            icon.Color = isDisabled ? Color.ColorDisabled : Color.Color;
-            text.Color = new FSColor((isDisabled ? Color.ColorDisabled : Color.Color).ToVector4());
+            icon.Color = isDisabled ? Color.TextDisabled : Color.Text;
+            text.Color = new FSColor((isDisabled ? Color.TextDisabled : Color.Text).ToVector4());
         }
     }
 }
