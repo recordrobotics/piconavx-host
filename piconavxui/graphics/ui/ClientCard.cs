@@ -2,6 +2,7 @@
 using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
+using System.Numerics;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -66,6 +67,9 @@ namespace piconavx.ui.graphics.ui
         private Image temperatureIcon;
         private Label temperatureLabel;
 
+        public override bool MouseOver { get => background.MouseOver || addressRow.MouseOver || row3.MouseOver || row4.MouseOver || row5.MouseOver || idBadge.MouseOver; set => _ = value; }
+        public override bool MouseDown { get => background.MouseDown || addressRow.MouseDown || row3.MouseDown || row4.MouseDown || row5.MouseDown || idBadge.MouseDown; set => _ = value; }
+
         public string Id { get => idLabel.Text; set => idLabel.Text = value; }
         public string Address { get => addressLabel.Text; set => addressLabel.Text = value; }
         public string Port { get => portLabel.Text; set => portLabel.Text = value; }
@@ -93,6 +97,7 @@ namespace piconavx.ui.graphics.ui
 
         public ClientCard(string id, bool highBandwidth, string address, string port, string version, string status, string memory, string temperature, Canvas canvas) : base(canvas)
         {
+            SupportsInputEvents = true;
             this.highBandwidth = highBandwidth;
 
             AutoSize = FlowLayout.AutoSize.Y;
@@ -136,6 +141,7 @@ namespace piconavx.ui.graphics.ui
             temperatureTexture ??= Scene.AddResource(new Texture("assets/textures/temperature.png"));
 
             background = new Image(canvas);
+            background.Transform = Transform;
             background.HitTestAlphaClip = 0.9f;
             background.RaycastTransparency = RaycastTransparency.Transparent;
             background.Color = BACKGROUND;
@@ -147,6 +153,7 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Insets = new Insets(0);
 
             shadow = new Image(canvas);
+            shadow.Transform = Transform;
             shadow.RaycastTransparency = RaycastTransparency.Hidden;
             shadow.Color = new Rgba32(0, 0, 0, 128);
             shadow.Texture = cardShadowTexture;
@@ -157,6 +164,7 @@ namespace piconavx.ui.graphics.ui
             shadowAnchor.Insets = new Insets(-shadow.Size.Width + background.Size.Width, 8 - shadow.Size.Height + background.Size.Height, -shadow.Size.Width + background.Size.Width, -8 - shadow.Size.Height + background.Size.Height);
 
             thumbnail = new Image(canvas);
+            thumbnail.Transform = Transform;
             thumbnail.RaycastTransparency = RaycastTransparency.Hidden;
             thumbnail.Color = new Rgba32(255, 255, 255, 255);
             thumbnail.Texture = cardMaskTexture;
@@ -170,6 +178,7 @@ namespace piconavx.ui.graphics.ui
             thumbnailAnchor.Insets = new Insets(0);
 
             thumbnailShadow = new Image(canvas);
+            thumbnailShadow.Transform = Transform;
             thumbnailShadow.RaycastTransparency = RaycastTransparency.Hidden;
             thumbnailShadow.Color = new Rgba32(0, 0, 0, 230);
             thumbnailShadow.Texture = cardShadowTexture;
@@ -184,6 +193,11 @@ namespace piconavx.ui.graphics.ui
             row3 = new FlowPanel(canvas);
             row4 = new FlowPanel(canvas);
             row5 = new FlowPanel(canvas);
+            row1.Transform = Transform;
+            row2.Transform = Transform;
+            row3.Transform = Transform;
+            row4.Transform = Transform;
+            row5.Transform = Transform;
             Components.Add(row1);
             Components.Add(row2);
             Components.Add(row3);
@@ -217,6 +231,7 @@ namespace piconavx.ui.graphics.ui
             row3.Padding = new Insets(0, 7.5f, 0, 0);
 
             idLabel = new Label(id, canvas);
+            idLabel.Transform = Transform;
             idLabel.FontSize = 20;
             idLabel.Color = new FSColor(HEADER.ToVector4());
             idLabel.Font = FontFace.InterBold;
@@ -224,12 +239,15 @@ namespace piconavx.ui.graphics.ui
             row1.Components.Add(idLabel);
 
             idBadge = new Badge("High Bandwidth", canvas);
+            idBadge.Transform = Transform;
             row1.Components.Add(idBadge);
             idBadgeTooltip = new Tooltip("This client is currently in high bandwidth mode.", "High Bandwidth mode groups data packets together\ninto one to reduce the processing overhead.", idBadge, canvas);
             idBadgeTooltip.Anchor = PopupAnchor.Right;
 
             addressRow = new FlowPanel(canvas);
+            addressRow.Transform = Transform;
             versionRow = new FlowPanel(canvas);
+            versionRow.Transform = Transform;
             addressRow.Direction = FlowDirection.Horizontal;
             versionRow.Direction = FlowDirection.Horizontal;
             addressRow.AlignItems = AlignItems.Middle;
@@ -264,56 +282,67 @@ namespace piconavx.ui.graphics.ui
             };
 
             addressLabel = new Label(address, canvas);
+            addressLabel.Transform = Transform;
             addressLabel.FontSize = 14;
             addressLabel.Color = new FSColor(TEXT.ToVector4());
             addressRow.Components.Add(addressLabel);
             addressSeparatorLabel = new Label(":", canvas);
+            addressSeparatorLabel.Transform = Transform;
             addressSeparatorLabel.FontSize = 14;
             addressSeparatorLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
             addressRow.Components.Add(addressSeparatorLabel);
             portLabel = new Label(port, canvas);
+            portLabel.Transform = Transform;
             portLabel.FontSize = 14;
             portLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
             addressRow.Components.Add(portLabel);
 
             versionPrefixLabel = new Label("v", canvas);
+            versionPrefixLabel.Transform = Transform;
             versionPrefixLabel.FontSize = 14;
             versionPrefixLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
             versionRow.Components.Add(versionPrefixLabel);
             versionLabel = new Label(version, canvas);
+            versionLabel.Transform = Transform;
             versionLabel.FontSize = 14;
             versionLabel.Color = new FSColor(TEXT.ToVector4());
             versionRow.Components.Add(versionLabel);
 
             statusIcon = new Image(canvas);
+            statusIcon.Transform = Transform;
             statusIcon.Bounds = new RectangleF(0, 0, 36, 36);
             statusIcon.Texture = calibrateTexture;
             statusIcon.Color = TEXT_SECONDARY;
             statusIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row3.Components.Add(statusIcon);
             statusLabel = new Label(status, canvas);
+            statusLabel.Transform = Transform;
             statusLabel.FontSize = 14;
             statusLabel.Color = new FSColor(TEXT.ToVector4());
             row3.Components.Add(statusLabel);
 
             memoryIcon = new Image(canvas);
+            memoryIcon.Transform = Transform;
             memoryIcon.Bounds = new RectangleF(0, 0, 36, 36);
             memoryIcon.Texture = memoryTexture;
             memoryIcon.Color = TEXT_SECONDARY;
             memoryIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row4.Components.Add(memoryIcon);
             memoryLabel = new Label(memory, canvas);
+            memoryLabel.Transform = Transform;
             memoryLabel.FontSize = 14;
             memoryLabel.Color = new FSColor(TEXT.ToVector4());
             row4.Components.Add(memoryLabel);
 
             temperatureIcon = new Image(canvas);
+            temperatureIcon.Transform = Transform;
             temperatureIcon.Bounds = new RectangleF(0, 0, 36, 36);
             temperatureIcon.Texture = temperatureTexture;
             temperatureIcon.Color = TEXT_SECONDARY;
             temperatureIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row5.Components.Add(temperatureIcon);
             temperatureLabel = new Label(temperature, canvas);
+            temperatureLabel.Transform = Transform;
             temperatureLabel.FontSize = 14;
             temperatureLabel.Color = new FSColor(TEXT.ToVector4());
             row5.Components.Add(temperatureLabel);
@@ -371,6 +400,8 @@ namespace piconavx.ui.graphics.ui
             row3Tooltip.Subscribe();
             row4Tooltip.Subscribe();
             row5Tooltip.Subscribe();
+
+            Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.AfterGeneral, Scene_Update);
         }
 
         public override void Unsubscribe()
@@ -391,6 +422,8 @@ namespace piconavx.ui.graphics.ui
             row3Tooltip.Unsubscribe();
             row4Tooltip.Unsubscribe();
             row5Tooltip.Unsubscribe();
+
+            Scene.Update -= Scene_Update;
         }
 
         public override void OnAdd()
@@ -423,6 +456,17 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(memoryLabel);
             Canvas.AddComponent(temperatureIcon);
             Canvas.AddComponent(temperatureLabel);
+        }
+
+        private Transition<float> scaleTransition = new(1, 0.05);
+
+        private void Scene_Update(double delta)
+        {
+            scaleTransition.Value = MouseDown ? 0.95f : MouseOver ? 1.05f : 1f;
+            scaleTransition.Step(delta);
+
+            Transform.Origin = new Vector3(Bounds.Left + Bounds.Width / 2, Bounds.Top + Bounds.Height / 2, 0);
+            Transform.Scale = new Vector3(scaleTransition.Value);
         }
     }
 }

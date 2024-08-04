@@ -64,7 +64,7 @@ namespace piconavx.ui.graphics.font
             _shader.Dispose();
         }
 
-        public void Begin()
+        public void Begin(Matrix4x4 transformMatrix)
         {
             Window.GL.Disable(EnableCap.DepthTest);
             Window.GL.Enable(EnableCap.Blend);
@@ -74,7 +74,8 @@ namespace piconavx.ui.graphics.font
             _shader.SetUniform("TextureSampler", 0);
 
             var transform = Matrix4x4.CreateOrthographicOffCenter(0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y, 0, 0, -1);
-            _shader.SetUniform("MatrixTransform", transform);
+            _shader.SetUniform("uMatrix", transform);
+            _shader.SetUniform("tMatrix", transformMatrix);
 
             _vao.Bind();
             _indexBuffer.Bind();

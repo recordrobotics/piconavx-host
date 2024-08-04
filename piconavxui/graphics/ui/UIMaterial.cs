@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,20 +34,27 @@ namespace piconavx.ui.graphics.ui
 
         public override void Use(RenderProperties properties)
         {
+            Use(properties, null);
+        }
+
+        public virtual void Use(RenderProperties properties, Transform? transform)
+        {
             Window.GL.Disable(EnableCap.DepthTest);
             Window.GL.Enable(EnableCap.Blend);
             Window.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             Shader.Use();
             Shader.SetUniform("uMatrix", properties.Canvas!.Matrix);
+            Shader.SetUniform("tMatrix", transform?.Matrix ?? Matrix4x4.Identity);
         }
 
-        public virtual void UseHitTest(Canvas canvas, byte id)
+        public virtual void UseHitTest(Canvas canvas, byte id, Transform? transform)
         {
             if (HitTestShader != null)
             {
                 HitTestShader.Use();
                 HitTestShader.SetUniform("uMatrix", canvas.Matrix);
+                HitTestShader.SetUniform("tMatrix", transform?.Matrix ?? Matrix4x4.Identity);
                 HitTestShader.SetUniform("uHitID", (uint)id);
             }
         }

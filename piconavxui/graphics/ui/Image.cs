@@ -1,6 +1,5 @@
 ﻿using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 
@@ -19,14 +18,19 @@ namespace piconavx.ui.graphics.ui
 
             public override void Use(RenderProperties properties)
             {
-                base.Use(properties);
+                Use(properties, null);
+            }
+
+            public override void Use(RenderProperties properties, Transform? transform)
+            {
+                base.Use(properties, transform);
                 (Texture ?? Texture.White).Bind(TextureUnit.Texture0);
                 Shader.SetUniform("TextureSampler", 0);
             }
 
-            public override void UseHitTest(Canvas canvas, byte id)
+            public override void UseHitTest(Canvas canvas, byte id, Transform? transform)
             {
-                base.UseHitTest(canvas, id);
+                base.UseHitTest(canvas, id, transform);
                 (Texture ?? Texture.White).Bind(TextureUnit.Texture0);
                 if (HitTestShader != null)
                 {
@@ -48,16 +52,21 @@ namespace piconavx.ui.graphics.ui
 
             public override void Use(RenderProperties properties)
             {
-                base.Use(properties);
+                Use(properties, null);
+            }
+
+            public override void Use(RenderProperties properties, Transform? transform)
+            {
+                base.Use(properties, transform);
                 (Texture ?? Texture.White).Bind(TextureUnit.Texture0);
                 (Mask ?? Texture.White).Bind(TextureUnit.Texture1);
                 Shader.SetUniform("TextureSampler", 0);
                 Shader.SetUniform("MaskTextureSampler", 1);
             }
 
-            public override void UseHitTest(Canvas canvas, byte id)
+            public override void UseHitTest(Canvas canvas, byte id, Transform? transform)
             {
-                base.UseHitTest(canvas, id);
+                base.UseHitTest(canvas, id, transform);
                 (Texture ?? Texture.White).Bind(TextureUnit.Texture0);
                 (Mask ?? Texture.White).Bind(TextureUnit.Texture1);
                 if (HitTestShader != null)
@@ -649,24 +658,25 @@ namespace piconavx.ui.graphics.ui
             if (material != null && mask == null)
             {
                 material.Texture = texture;
-                material.Use(properties);
+                material.Use(properties, Transform);
             }
             else if (maskedMaterial != null && mask != null)
             {
                 maskedMaterial.Texture = texture;
                 maskedMaterial.Mask = mask;
-                maskedMaterial.Use(properties);
+                maskedMaterial.Use(properties, Transform);
             }
             else
             {
-                UIMaterial.DefaultMaterial.Use(properties);
+                UIMaterial.DefaultMaterial.Use(properties, Transform);
             }
 
             if (mask != null)
             {
                 Tessellate(Tessellator.QuadExt);
                 Tessellator.QuadExt.Flush();
-            } else
+            }
+            else
             {
                 Tessellate(Tessellator.Quad);
                 Tessellator.Quad.Flush();
@@ -679,14 +689,14 @@ namespace piconavx.ui.graphics.ui
             {
                 material.Texture = texture;
                 material.HitTestAlphaClip = hitTestAlphaClip;
-                material.UseHitTest(Canvas, id);
+                material.UseHitTest(Canvas, id, Transform);
             }
             else if (maskedMaterial != null && mask != null)
             {
                 maskedMaterial.Texture = texture;
                 maskedMaterial.Mask = mask;
                 maskedMaterial.HitTestAlphaClip = hitTestAlphaClip;
-                maskedMaterial.UseHitTest(Canvas, id);
+                maskedMaterial.UseHitTest(Canvas, id, Transform);
             }
             else
             {

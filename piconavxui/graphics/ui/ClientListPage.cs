@@ -1,5 +1,6 @@
 ﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace piconavx.ui.graphics.ui
@@ -118,6 +119,7 @@ namespace piconavx.ui.graphics.ui
             clientList.AutoSize = FlowLayout.AutoSize.Y;
             clientList.Direction = FlowDirection.Horizontal;
             clientList.JustifyContent = AlignItems.Middle;
+            clientList.Padding = new Insets(0, 10, 0, 0);
             clientList.Gap = 120;
             clientList.Wrap = true;
 
@@ -195,18 +197,23 @@ namespace piconavx.ui.graphics.ui
 
             var component = new ClientCard("Robot", true, "192.168.1.64", "58271", "3.1.0", "Calibrated", "109kB / 187kB (58.43%)", "27.04 °C | 34.40 °C", Canvas);
             clientList.Components.Add(component);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => Debug.WriteLine("Clicked " + card.Id)))(component));
             Canvas.AddComponent(component);
             component = new ClientCard("Speaker Note 1", false, "192.168.1.78", "52612", "3.1.0", "Initializing", "43kB / 187kB (27.32%)", "23.10 °C | ---- °C", Canvas);
             clientList.Components.Add(component);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => Debug.WriteLine("Clicked " + card.Id)))(component));
             Canvas.AddComponent(component);
             component = new ClientCard("Speaker Note 2", false, "192.168.1.45", "54151", "3.1.0", "Calibrated", "119kB / 187kB (61.28%)", "29.12 °C | 32.30 °C", Canvas);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => Debug.WriteLine("Clicked " + card.Id)))(component));
             clientList.Components.Add(component);
             Canvas.AddComponent(component);
             component = new ClientCard("Speaker Note 3", false, "192.168.1.89", "55133", "3.1.0", "Calibrating", "107kB / 187kB (56.03%)", "25.20 °C | 36.31 °C", Canvas);
             clientList.Components.Add(component);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => Debug.WriteLine("Clicked " + card.Id)))(component));
             Canvas.AddComponent(component);
             component = new ClientCard("Preloaded Note", true, "192.168.1.73", "51892", "3.1.0", "Calibrated", "112kB / 187kB (59.30%)", "26.12 °C | 33.07 °C", Canvas);
             clientList.Components.Add(component);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => Debug.WriteLine("Clicked " + card.Id)))(component));
             Canvas.AddComponent(component);
 
             UpdateZIndex();

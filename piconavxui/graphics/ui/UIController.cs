@@ -20,6 +20,9 @@ namespace piconavx.ui.graphics.ui
         public virtual bool SecondaryInputVisible { get => _secondaryInputVisible; set => _secondaryInputVisible = value; }
         public virtual bool IsRenderable { get => true; }
 
+        private Transform _transform = new Transform();
+        public virtual Transform Transform { get => _transform; set => _transform = value; }
+
         public virtual bool MouseOver { get; set; } = false;
         public virtual bool MouseDown { get; set; } = false;
 

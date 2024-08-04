@@ -10,6 +10,7 @@ namespace piconavx.ui.graphics.ui
         public Badge(string text, Canvas canvas) : base(canvas)
         {
             background = new Image(canvas);
+            background.Transform = Transform;
             background.ZIndex = ZIndex; // background
             background.HitTestAlphaClip = 0.9f;
             background.Color = Color.Background;
@@ -19,10 +20,12 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
+            background.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, NotifyClick);
 
             RaycastTransparency = RaycastTransparency.Transparent;
 
             this.text = new Label(text, canvas);
+            this.text.Transform = Transform;
             this.text.FontSize = 13;
             this.text.ZIndex = ContentZIndex;
             this.text.Color = new FSColor(Color.Text.ToVector4());
@@ -132,6 +135,9 @@ namespace piconavx.ui.graphics.ui
                 bounds = GetAutoSizeBounds();
                 background.Size = new Size((int)(bounds.Height/2f), (int)(bounds.Height / 2f));
             }
+
+            background.Transform = Transform;
+            text.Transform = Transform;
 
             background.Color = Color.Background;
             text.Color = new FSColor(Color.Text.ToVector4());

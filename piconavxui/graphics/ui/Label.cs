@@ -74,7 +74,7 @@ namespace piconavx.ui.graphics.ui
         {
             var fontSystem = Window.FontSystems[this.font];
             var font = fontSystem.GetFont(fontSize);
-            Window.FontRenderer.Begin();
+            Window.FontRenderer.Begin(Transform.Matrix);
             font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();
         }

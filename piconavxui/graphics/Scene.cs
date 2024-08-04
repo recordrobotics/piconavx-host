@@ -86,7 +86,11 @@ namespace piconavx.ui.graphics
             {
 /*                ShowBounds = true,
                 ShowNonRenderableBounds = true,
-                FlowLayoutContentBoundsOutline = true,*/
+                FlowLayoutContentBoundsOutline = true,
+                HighlightMouseOver = true,
+                HighlightMouseDown = true,
+                HighlightNonRenderable = true,
+                TargetBoundsOutline = true,*/
             });
 
             ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas));

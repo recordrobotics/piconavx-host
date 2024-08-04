@@ -13,8 +13,10 @@ namespace piconavx.ui.graphics
 
         public Vector3 Scale { get; set; } = new Vector3(1, 1, 1);
 
+        public Vector3 Origin { get; set; } = new Vector3(0, 0, 0);
+
         public Quaternion Rotation { get; set; } = Quaternion.Identity;
 
-        public Matrix4x4 Matrix => Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Position);
+        public Matrix4x4 Matrix => Matrix4x4.CreateTranslation(-Origin) * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Origin) * Matrix4x4.CreateTranslation(Position);
     }
 }

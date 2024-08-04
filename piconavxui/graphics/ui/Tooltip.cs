@@ -20,6 +20,7 @@ namespace piconavx.ui.graphics.ui
             });
 
             popupLayout = new PopupLayout(this, target);
+            popupLayout.UseTransform = true;
             popupLayout.Anchor = PopupAnchor.Left;
             popupLayout.Offset = new Vector2(10, 0);
 
