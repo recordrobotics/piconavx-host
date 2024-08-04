@@ -59,8 +59,8 @@ namespace piconavx.ui.graphics.ui
             return Matrix4x4.CreateOrthographicOffCenter(0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y, 0, 0, -1);
         }
 
-        private List<(int, UIController)> opaqueMatches = new List<(int, UIController)>();
-        private List<(int, UIController)> transparentMatches = new List<(int, UIController)>();
+        private List<(int index, UIController controller)> opaqueMatches = new List<(int index, UIController controller)>();
+        private List<(int index, UIController controller)> transparentMatches = new List<(int index, UIController controller)>();
         public UIController? RaycastAt(Vector2 point)
         {
             opaqueMatches.Clear();
@@ -83,8 +83,8 @@ namespace piconavx.ui.graphics.ui
             if (opaqueMatches.Count == 0 && transparentMatches.Count == 0)
                 return null;
             // There is an opaque component on top of the highest transparent component
-            else if (opaqueMatches.Count > 0 && (transparentMatches.Count == 0 || opaqueMatches[0].Item1 > transparentMatches[0].Item1))
-                return opaqueMatches[0].Item2;
+            else if (opaqueMatches.Count > 0 && (transparentMatches.Count == 0 || opaqueMatches[0].index > transparentMatches[0].index))
+                return opaqueMatches[0].controller;
 
             // Since the highest component is transparent, perform a draw call to determine which component is hit
             raycastFrameBuffer.Bind();
@@ -98,21 +98,21 @@ namespace piconavx.ui.graphics.ui
 
             for (int i = transparentMatches.Count - 1; i >= 0; i--) // Reversed to draw from bottom to top
             {
-                transparentMatches[i].Item2.HitTest((byte)(i + 1)); // 0 is no hit
+                transparentMatches[i].controller.HitTest((byte)(i + 1)); // 0 is no hit
             }
 
             byte hitId = Window.GL.ReadPixels<byte>((int)point.X, (int)(raycastFrameBuffer.Height - point.Y), 1, 1, PixelFormat.RedInteger, PixelType.UnsignedByte);
 
             if (hitId == 0) // No transparent components were hit, return top opaque component instead
-                return opaqueMatches.Count > 0 ? opaqueMatches[0].Item2 : null;
+                return opaqueMatches.Count > 0 ? opaqueMatches[0].controller : null;
 
             var transparentHit = transparentMatches[hitId - 1];
 
             // Check if the top opaque component is on top of the transparent hit
-            if (opaqueMatches.Count > 0 && opaqueMatches[0].Item1 > transparentHit.Item1)
-                return opaqueMatches[0].Item2;
+            if (opaqueMatches.Count > 0 && opaqueMatches[0].index > transparentHit.index)
+                return opaqueMatches[0].controller;
             else
-                return transparentHit.Item2;
+                return transparentHit.controller;
         }
 
         public override void Subscribe()

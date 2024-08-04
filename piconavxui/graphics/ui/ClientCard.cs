@@ -38,6 +38,11 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout row1Anchor;
         private AnchorLayout row2Anchor;
 
+        private Tooltip addressRowTooltip;
+        private Tooltip row3Tooltip;
+        private Tooltip row4Tooltip;
+        private Tooltip row5Tooltip;
+
         private Label idLabel;
         private Badge idBadge;
         private Tooltip idBadgeTooltip;
@@ -232,6 +237,32 @@ namespace piconavx.ui.graphics.ui
             row2.Components.Add(addressRow);
             row2.Components.Add(versionRow);
 
+            addressRow.SupportsInputEvents = true;
+            addressRow.RaycastTransparency = RaycastTransparency.Opaque;
+            row3.SupportsInputEvents = true;
+            row3.RaycastTransparency = RaycastTransparency.Opaque;
+            row4.SupportsInputEvents = true;
+            row4.RaycastTransparency = RaycastTransparency.Opaque;
+            row5.SupportsInputEvents = true;
+            row5.RaycastTransparency = RaycastTransparency.Opaque;
+
+            addressRowTooltip = new Tooltip("Client IP address", string.Empty, addressRow, canvas)
+            {
+                Anchor = PopupAnchor.Right
+            };
+            row3Tooltip = new Tooltip("Sensor status", string.Empty, row3, canvas)
+            {
+                Anchor = PopupAnchor.Right
+            };
+            row4Tooltip = new Tooltip("Sensor memory usage", string.Empty, row4, canvas)
+            {
+                Anchor = PopupAnchor.Right
+            };
+            row5Tooltip = new Tooltip("Sensor temperatures (core | sensor)", string.Empty, row5, canvas)
+            {
+                Anchor = PopupAnchor.Right
+            };
+
             addressLabel = new Label(address, canvas);
             addressLabel.FontSize = 14;
             addressLabel.Color = new FSColor(TEXT.ToVector4());
@@ -293,9 +324,20 @@ namespace piconavx.ui.graphics.ui
         protected override void UpdateZIndex()
         {
             background.ZIndex = ZIndex + 1;
+
             shadow.ZIndex = ZIndex;
+
             thumbnail.ZIndex = ZIndex + 3;
             thumbnailShadow.ZIndex = ZIndex + 2;
+
+            row1.ZIndex = ZIndex + 2;
+            row2.ZIndex = ZIndex + 2;
+            row3.ZIndex = ZIndex + 2;
+            row4.ZIndex = ZIndex + 2;
+            row5.ZIndex = ZIndex + 2;
+            addressRow.ZIndex = ZIndex + 2;
+            versionRow.ZIndex = ZIndex + 2;
+
             idLabel.ZIndex = ZIndex + 3;
             idBadge.ZIndex = ZIndex + 3;
             addressLabel.ZIndex = ZIndex + 3;
@@ -325,6 +367,10 @@ namespace piconavx.ui.graphics.ui
             row1Anchor.Subscribe();
             row2Anchor.Subscribe();
             idBadgeTooltip.Subscribe();
+            addressRowTooltip.Subscribe();
+            row3Tooltip.Subscribe();
+            row4Tooltip.Subscribe();
+            row5Tooltip.Subscribe();
         }
 
         public override void Unsubscribe()
@@ -341,6 +387,10 @@ namespace piconavx.ui.graphics.ui
             row1Anchor.Unsubscribe();
             row2Anchor.Unsubscribe();
             idBadgeTooltip.Unsubscribe();
+            addressRowTooltip.Unsubscribe();
+            row3Tooltip.Unsubscribe();
+            row4Tooltip.Unsubscribe();
+            row5Tooltip.Unsubscribe();
         }
 
         public override void OnAdd()

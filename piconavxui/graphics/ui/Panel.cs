@@ -17,7 +17,10 @@ namespace piconavx.ui.graphics.ui
 
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set => bounds = value; }
-        public override bool IsRenderable => false;
+        public override bool IsRenderable => supportsInputEvents;
+
+        public bool SupportsInputEvents { get => supportsInputEvents; set => supportsInputEvents = value; }
+        private bool supportsInputEvents = false;
 
         public Panel(Canvas canvas) : base(canvas)
         {
