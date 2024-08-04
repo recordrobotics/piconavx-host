@@ -193,6 +193,10 @@ namespace piconavx.ui.graphics.ui
                 scrollHor.Color = scrollHor.MouseDown ? SCROLL_THUMB_ACTIVE : scrollHor.MouseOver ? SCROLL_THUMB_HOVER : SCROLL_THUMB;
 
                 prevHorDown = scrollHor.MouseDown;
+            } else
+            {
+                prevHorDown = false;
+                offsetX = 0;
             }
 
             if (verVisible)
@@ -227,6 +231,7 @@ namespace piconavx.ui.graphics.ui
             else
             {
                 prevVerDown = false;
+                offsetY = 0;
             }
 
             scrollY = 0;
