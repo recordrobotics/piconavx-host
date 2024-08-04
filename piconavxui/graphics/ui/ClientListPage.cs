@@ -117,6 +117,7 @@ namespace piconavx.ui.graphics.ui
             clientList = new FlowPanel(canvas);
             clientList.AutoSize = FlowLayout.AutoSize.Y;
             clientList.Direction = FlowDirection.Horizontal;
+            clientList.JustifyContent = AlignItems.Middle;
             clientList.Gap = 120;
             clientList.Wrap = true;
 

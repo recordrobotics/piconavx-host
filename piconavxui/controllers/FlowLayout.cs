@@ -26,6 +26,7 @@ namespace piconavx.ui.controllers
 
         public FlowDirection Direction { get; set; }
         public AlignItems AlignItems { get; set; }
+        public AlignItems JustifyContent { get; set; }
 
         public bool Reversed { get; set; } = false;
         public bool Wrap { get; set; } = false;
@@ -45,6 +46,7 @@ namespace piconavx.ui.controllers
             Components = new List<UIController>();
             Direction = FlowDirection.Vertical;
             AlignItems = AlignItems.Start;
+            JustifyContent = AlignItems.Start;
             instances.Add(this);
         }
 
@@ -55,44 +57,6 @@ namespace piconavx.ui.controllers
 
         public RectangleF GetAutoSizeBounds()
         {
-            /*switch (Direction)
-            {
-                case FlowDirection.Horizontal:
-                    {
-                        float width = 0;
-                        float height = 0;
-
-                        foreach (var component in Components)
-                        {
-                            width += component.Bounds.Width;
-                            height = MathF.Max(height, component.Bounds.Height);
-                        }
-
-                        return new RectangleF(
-                            Container.Bounds.X, 
-                            Container.Bounds.Y,
-                            AutoSizeContainer.HasFlag(AutoSize.X) ? (width + Gap * (Components.Count - 1) + Padding.Horizontal) : Container.Bounds.Width,
-                            AutoSizeContainer.HasFlag(AutoSize.Y) ? (height + Padding.Vertical) : Container.Bounds.Height);
-                    }
-                case FlowDirection.Vertical:
-                    {
-                        float width = 0;
-                        float height = 0;
-
-                        foreach (var component in Components)
-                        {
-                            width = MathF.Max(width, component.Bounds.Width);
-                            height += component.Bounds.Height;
-                        }
-
-                        return new RectangleF(
-                            Container.Bounds.X, 
-                            Container.Bounds.Y,
-                            AutoSizeContainer.HasFlag(AutoSize.X) ? (width + Padding.Horizontal) : Container.Bounds.Width,
-                            AutoSizeContainer.HasFlag(AutoSize.Y) ? (height + Gap * (Components.Count - 1) + Padding.Vertical) : Container.Bounds.Height);
-                    }
-            }*/
-
             float accum = 0;
             float accumAlt = 0;
             RectangleF contentBounds = default;
@@ -291,7 +255,8 @@ namespace piconavx.ui.controllers
                 if (!Stretch)
                 {
                     accum += Gap;
-                } else if (i < Components.Count - 1)
+                }
+                else if (i < Components.Count - 1)
                 {
                     var nextComponent = Components[Reversed ? (Components.Count - i) : (i + 1)];
                     switch (Direction)
@@ -304,6 +269,64 @@ namespace piconavx.ui.controllers
                             break;
                     }
                 }
+            }
+
+            switch (JustifyContent)
+            {
+                case AlignItems.Middle:
+                    {
+                        switch (Direction)
+                        {
+                            case FlowDirection.Horizontal:
+                                {
+                                    RectangleF newContentBounds = new RectangleF(Container.Bounds.Left + Container.Bounds.Width / 2 - contentBounds.Width / 2, contentBounds.Y, contentBounds.Width, contentBounds.Height);
+                                    foreach (var component in Components)
+                                    {
+                                        component.Bounds = new(component.Bounds.Left - contentBounds.Left + newContentBounds.Left, component.Bounds.Y, component.Bounds.Width, component.Bounds.Height);
+                                    }
+                                    contentBounds = newContentBounds;
+                                }
+                                break;
+                            case FlowDirection.Vertical:
+                                {
+                                    RectangleF newContentBounds = new RectangleF(contentBounds.X, Container.Bounds.Top + Container.Bounds.Height / 2 - contentBounds.Height / 2, contentBounds.Width, contentBounds.Height);
+                                    foreach (var component in Components)
+                                    {
+                                        component.Bounds = new(component.Bounds.X, component.Bounds.Top - contentBounds.Top + newContentBounds.Top, component.Bounds.Width, component.Bounds.Height);
+                                    }
+                                    contentBounds = newContentBounds;
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case AlignItems.End:
+                    {
+                        switch (Direction)
+                        {
+                            case FlowDirection.Horizontal:
+                                {
+                                    RectangleF newContentBounds = new RectangleF(Container.Bounds.Right - contentBounds.Width, contentBounds.Y, contentBounds.Width, contentBounds.Height);
+                                    foreach (var component in Components)
+                                    {
+                                        component.Bounds = new(component.Bounds.Left - contentBounds.Left + newContentBounds.Left, component.Bounds.Y, component.Bounds.Width, component.Bounds.Height);
+                                    }
+                                    contentBounds = newContentBounds;
+                                }
+                                break;
+                            case FlowDirection.Vertical:
+                                {
+                                    RectangleF newContentBounds = new RectangleF(contentBounds.X, Container.Bounds.Bottom - contentBounds.Height, contentBounds.Width, contentBounds.Height);
+                                    foreach (var component in Components)
+                                    {
+                                        component.Bounds = new(component.Bounds.X, component.Bounds.Top - contentBounds.Top + newContentBounds.Top, component.Bounds.Width, component.Bounds.Height);
+                                    }
+                                    contentBounds = newContentBounds;
+                                }
+                                break;
+                        }
+                    }
+                    break;
             }
 
             this.contentBounds = contentBounds;

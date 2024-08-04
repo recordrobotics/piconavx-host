@@ -15,6 +15,7 @@ namespace piconavx.ui.graphics.ui
 
         public FlowDirection Direction { get => flowLayout.Direction; set => flowLayout.Direction = value; }
         public AlignItems AlignItems { get => flowLayout.AlignItems; set => flowLayout.AlignItems = value; }
+        public AlignItems JustifyContent { get => flowLayout.JustifyContent; set => flowLayout.JustifyContent = value; }
 
         public bool Reversed { get => flowLayout.Reversed; set => flowLayout.Reversed = value; }
         public bool Wrap { get => flowLayout.Wrap; set => flowLayout.Wrap = value; }
