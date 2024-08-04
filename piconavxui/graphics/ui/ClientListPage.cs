@@ -17,6 +17,9 @@ namespace piconavx.ui.graphics.ui
         private Panel headerPanel;
         private AnchorLayout headerPanelLayout;
 
+        private Image headerBackground;
+        private AnchorLayout headerBackgroundLayout;
+
         private Label header;
         private AnchorLayout headerLayout;
 
@@ -32,6 +35,9 @@ namespace piconavx.ui.graphics.ui
 
         private FlowPanel clientList;
         private AnchorLayout clientListLayout;
+
+        private Image bottomBar;
+        private AnchorLayout bottomBarLayout;
 
         private Label statusLabel;
         private AnchorLayout statusLabelLayout;
@@ -53,6 +59,12 @@ namespace piconavx.ui.graphics.ui
             headerPanelLayout = new AnchorLayout(headerPanel, this);
             headerPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
             headerPanelLayout.Insets = new Insets(53, 0, 51, 0);
+
+            headerBackground = new Image(canvas);
+            headerBackground.Color = BACKGROUND;
+            headerBackgroundLayout = new AnchorLayout(headerBackground, headerPanel);
+            headerBackgroundLayout.Anchor = Anchor.All;
+            headerBackgroundLayout.Insets = new Insets(0);
 
             header = new Label("Connected Clients", canvas);
             header.FontSize = 24.5f;
@@ -105,6 +117,13 @@ namespace piconavx.ui.graphics.ui
             clientListLayout.Anchor = Anchor.All;
             clientListLayout.Insets = new Insets(52.5f, 140, 52.5f, 52.5f);
 
+            bottomBar = new Image(canvas);
+            bottomBar.Color = BACKGROUND;
+            bottomBar.Bounds = new RectangleF(0, 0, 0, 60);
+            bottomBarLayout = new AnchorLayout(bottomBar, this);
+            bottomBarLayout.Anchor = Anchor.Left | Anchor.Right | Anchor.Bottom;
+            bottomBarLayout.Insets = new Insets(0);
+
             statusLabel = new Label("Server running on 192.168.1.140:65432", canvas);
             statusLabel.FontSize = 13;
             statusLabel.Font = FontFace.InterLight;
@@ -120,11 +139,13 @@ namespace piconavx.ui.graphics.ui
         protected override void UpdateZIndex()
         {
             background.ZIndex = ZIndex;
-            header.ZIndex = ZIndex + 1;
-            controlPanel.ZIndex = ZIndex + 1;
-            startButton.ZIndex = ZIndex + 1;
-            settingsButton.ZIndex = ZIndex + 1;
-            statusLabel.ZIndex = ZIndex + 1;
+            headerBackground.ZIndex = ZIndex + 8;
+            header.ZIndex = ZIndex + 9;
+            controlPanel.ZIndex = ZIndex + 9;
+            startButton.ZIndex = ZIndex + 9;
+            settingsButton.ZIndex = ZIndex + 9;
+            bottomBar.ZIndex = ZIndex + 6;
+            statusLabel.ZIndex = ZIndex + 7;
 
             foreach (var component in clientList.Components)
             {
@@ -138,18 +159,22 @@ namespace piconavx.ui.graphics.ui
                 background, backgroundAnchor,
                 headerPanel, headerPanelLayout,
                 header, headerLayout,
+                headerBackground, headerBackgroundLayout,
                 controlPanel, controlPanelLayout,
                 clientList, clientListLayout,
+                bottomBar, bottomBarLayout,
                 statusLabel, statusLabelLayout
                 );
 
             Canvas.AddComponent(background);
             Canvas.AddComponent(headerPanel);
+            Canvas.AddComponent(headerBackground);
             Canvas.AddComponent(header);
             Canvas.AddComponent(controlPanel);
             Canvas.AddComponent(startButton);
             Canvas.AddComponent(settingsButton);
             Canvas.AddComponent(clientList);
+            Canvas.AddComponent(bottomBar);
             Canvas.AddComponent(statusLabel);
 
             var component = new ClientCard("Robot", true, "192.168.1.64", "58271", "3.1.0", "Calibrated", "109kB / 187kB (58.43%)", "27.04 °C | 34.40 °C", Canvas);
@@ -175,16 +200,20 @@ namespace piconavx.ui.graphics.ui
         {
             Canvas.RemoveComponent(background);
             Canvas.RemoveComponent(headerPanel);
+            Canvas.RemoveComponent(headerBackground);
             Canvas.RemoveComponent(header);
             Canvas.RemoveComponent(controlPanel);
             Canvas.RemoveComponent(clientList);
+            Canvas.RemoveComponent(bottomBar);
             Canvas.RemoveComponent(statusLabel);
             UnsubscribeLater(
                 background, backgroundAnchor,
                 headerPanel, headerPanelLayout,
+                headerBackground, headerBackgroundLayout,
                 header, headerLayout,
                 controlPanel, controlPanelLayout,
                 clientList, clientListLayout,
+                bottomBar, bottomBarLayout,
                 statusLabel, statusLabelLayout
                 );
         }

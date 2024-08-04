@@ -33,7 +33,6 @@ namespace piconavx.ui.graphics
         public Window(WindowOptions options)
         {
             window = Silk.NET.Windowing.Window.Create(options);
-
             window.Load += Window_Load;
             window.Closing += Window_Closing;
             window.Update += Window_Update;
@@ -81,6 +80,8 @@ namespace piconavx.ui.graphics
 
         private void Window_Load()
         {
+            window.Center();
+
             currentWindow = this;
             gl = GL.GetApi(window);
 

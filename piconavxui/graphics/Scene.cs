@@ -37,7 +37,7 @@ namespace piconavx.ui.graphics
 
         public static void CreateTestScene()
         {
-            Model reference = AddController(AddResource(new Model("assets/models/reference.obj")));
+            /*Model reference = AddController(AddResource(new Model("assets/models/reference.obj")));
             reference.RenderPriority = RenderPriority.DrawTransparent;
             reference.SetMaterial("grid", AddResource(new GridMaterial()));
             reference.SetMaterial("xaxis", AddResource(new LitMaterial()
@@ -74,12 +74,12 @@ namespace piconavx.ui.graphics
 
             Light light = AddController(new Light(new Vector3(0.2f), new Vector3(0.5f), lightModel.Transform));
 
-            Camera camera = AddController(new Camera(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY));
 
             OrbitCameraController cameraController = AddController(new OrbitCameraController(camera));
             cameraController.Distance = 6;
             cameraController.Yaw = 45;
-            cameraController.Pitch = 25;
+            cameraController.Pitch = 25;*/
+            Camera camera = AddController(new Camera(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY));
 
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
@@ -102,7 +102,7 @@ namespace piconavx.ui.graphics
             clientListPageLayout.Anchor = Anchor.All;
             clientListPageLayout.Insets = new Insets(0);
             clientListPage.Show();
-
+/*
             UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
             {
                 clientPreviewPage.Client = client;
@@ -115,7 +115,7 @@ namespace piconavx.ui.graphics
                 clientPreviewPage.Client = null;
                 feedPreview.Client = null;
                 livePreview.Client = null;
-            });
+            });*/
         }
 
         public static void CreateUIServer(int port)
