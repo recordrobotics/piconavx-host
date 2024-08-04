@@ -1,16 +1,13 @@
 ﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
     public class ClientListPage : Page
     {
+        private static Texture? cardShadowTexture;
+
         private Image background;
         private AnchorLayout backgroundAnchor;
 
@@ -33,6 +30,9 @@ namespace piconavx.ui.graphics.ui
         private Button settingsButton;
         private Texture settingsIcon;
 
+        private ScrollPanel clientListContainer;
+        private AnchorLayout clientListContainerLayout;
+
         private FlowPanel clientList;
         private AnchorLayout clientListLayout;
 
@@ -48,6 +48,12 @@ namespace piconavx.ui.graphics.ui
 
         public ClientListPage(Canvas canvas) : base(canvas)
         {
+            cardShadowTexture ??= Scene.AddResource(new Texture("assets/textures/cardshadow.png")
+            {
+                Border = new Insets(32),
+                WrapMode = TextureWrapMode.Clamp
+            });
+
             background = new Image(canvas);
             background.Color = BACKGROUND;
             backgroundAnchor = new AnchorLayout(background, this);
@@ -58,7 +64,7 @@ namespace piconavx.ui.graphics.ui
             headerPanel.Bounds = new RectangleF(0, 0, 0, 140);
             headerPanelLayout = new AnchorLayout(headerPanel, this);
             headerPanelLayout.Anchor = Anchor.TopLeft | Anchor.Right;
-            headerPanelLayout.Insets = new Insets(53, 0, 51, 0);
+            headerPanelLayout.Insets = new Insets(0);
 
             headerBackground = new Image(canvas);
             headerBackground.Color = BACKGROUND;
@@ -73,7 +79,7 @@ namespace piconavx.ui.graphics.ui
             headerLayout = new AnchorLayout(header, headerPanel);
             headerLayout.Anchor = Anchor.TopLeft | Anchor.Bottom;
             headerLayout.AllowResize = false;
-            headerLayout.Insets = new Insets(0);
+            headerLayout.Insets = new Insets(53, 0, 0, 0);
 
             controlPanel = new FlowPanel(canvas);
             controlPanel.Direction = FlowDirection.Horizontal;
@@ -82,7 +88,7 @@ namespace piconavx.ui.graphics.ui
             controlPanelLayout = new AnchorLayout(controlPanel, headerPanel);
             controlPanelLayout.Anchor = Anchor.Top | Anchor.Right | Anchor.Bottom;
             controlPanelLayout.AllowResize = false;
-            controlPanelLayout.Insets = new Insets(0);
+            controlPanelLayout.Insets = new Insets(0, 0, 51, 0);
 
             playIcon = new Texture("assets/textures/play.png");
             stopIcon = new Texture("assets/textures/stop.png");
@@ -109,13 +115,19 @@ namespace piconavx.ui.graphics.ui
             settingsButton.SetTooltip("Open settings");
 
             clientList = new FlowPanel(canvas);
-            clientList.AutoSize = FlowLayout.AutoSize.None;
+            clientList.AutoSize = FlowLayout.AutoSize.Y;
             clientList.Direction = FlowDirection.Horizontal;
             clientList.Gap = 120;
             clientList.Wrap = true;
-            clientListLayout = new AnchorLayout(clientList, this);
-            clientListLayout.Anchor = Anchor.All;
-            clientListLayout.Insets = new Insets(52.5f, 140, 52.5f, 52.5f);
+
+            clientListContainer = new ScrollPanel(canvas, clientList);
+            clientListContainerLayout = new AnchorLayout(clientListContainer, this);
+            clientListContainerLayout.Anchor = Anchor.All;
+            clientListContainerLayout.Insets = new Insets(52.5f, 140, 52.5f, 60f);
+
+            clientListLayout = new AnchorLayout(clientList, clientListContainer.VirtualWorkingRectangle);
+            clientListLayout.Anchor = Anchor.Left | Anchor.Right;
+            clientListLayout.Insets = new Insets(0);
 
             bottomBar = new Image(canvas);
             bottomBar.Color = BACKGROUND;
@@ -146,6 +158,7 @@ namespace piconavx.ui.graphics.ui
             settingsButton.ZIndex = ZIndex + 9;
             bottomBar.ZIndex = ZIndex + 6;
             statusLabel.ZIndex = ZIndex + 7;
+            clientListContainer.ZIndex = ZIndex + 1;
 
             foreach (var component in clientList.Components)
             {
@@ -161,6 +174,7 @@ namespace piconavx.ui.graphics.ui
                 header, headerLayout,
                 headerBackground, headerBackgroundLayout,
                 controlPanel, controlPanelLayout,
+                clientListContainer, clientListContainerLayout,
                 clientList, clientListLayout,
                 bottomBar, bottomBarLayout,
                 statusLabel, statusLabelLayout
@@ -173,6 +187,7 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(controlPanel);
             Canvas.AddComponent(startButton);
             Canvas.AddComponent(settingsButton);
+            Canvas.AddComponent(clientListContainer);
             Canvas.AddComponent(clientList);
             Canvas.AddComponent(bottomBar);
             Canvas.AddComponent(statusLabel);
@@ -204,6 +219,7 @@ namespace piconavx.ui.graphics.ui
             Canvas.RemoveComponent(header);
             Canvas.RemoveComponent(controlPanel);
             Canvas.RemoveComponent(clientList);
+            Canvas.RemoveComponent(clientListContainer);
             Canvas.RemoveComponent(bottomBar);
             Canvas.RemoveComponent(statusLabel);
             UnsubscribeLater(
@@ -212,6 +228,7 @@ namespace piconavx.ui.graphics.ui
                 headerBackground, headerBackgroundLayout,
                 header, headerLayout,
                 controlPanel, controlPanelLayout,
+                clientListContainer, clientListContainerLayout,
                 clientList, clientListLayout,
                 bottomBar, bottomBarLayout,
                 statusLabel, statusLabelLayout

@@ -55,7 +55,7 @@ namespace piconavx.ui.controllers
 
         public RectangleF GetAutoSizeBounds()
         {
-            switch (Direction)
+            /*switch (Direction)
             {
                 case FlowDirection.Horizontal:
                     {
@@ -91,9 +91,90 @@ namespace piconavx.ui.controllers
                             AutoSizeContainer.HasFlag(AutoSize.X) ? (width + Padding.Horizontal) : Container.Bounds.Width,
                             AutoSizeContainer.HasFlag(AutoSize.Y) ? (height + Gap * (Components.Count - 1) + Padding.Vertical) : Container.Bounds.Height);
                     }
+            }*/
+
+            float accum = 0;
+            float accumAlt = 0;
+            RectangleF contentBounds = default;
+
+            for (int i = 0; i < Components.Count; i++)
+            {
+                var component = Components[Reversed ? (Components.Count - i - 1) : i];
+                RectangleF componentBounds = component.Bounds;
+                switch (Direction)
+                {
+                    case FlowDirection.Horizontal:
+                        {
+                            bool wrap = Wrap && !AutoSizeContainer.HasFlag(AutoSize.X);
+                            float x = Container.Bounds.X + Padding.Left + accum;
+
+                            // Overflow
+                            if (wrap && contentBounds != default && x + componentBounds.Width > Container.Bounds.Right)
+                            {
+                                accumAlt = contentBounds.Bottom - Container.Bounds.Top + Gap;
+                                accum = 0;
+                                x = Container.Bounds.X + Padding.Left + accum;
+                            }
+
+                            float y = Container.Bounds.Y + Padding.Top + accumAlt;
+
+                            componentBounds = new RectangleF(x, y, componentBounds.Width, componentBounds.Height);
+                            accum += componentBounds.Width;
+                            break;
+                        }
+                    case FlowDirection.Vertical:
+                        {
+                            bool wrap = Wrap && !AutoSizeContainer.HasFlag(AutoSize.Y);
+                            float y = Container.Bounds.Y + Padding.Top + accum;
+
+                            // Overflow
+                            if (wrap && contentBounds != default && y + componentBounds.Height > Container.Bounds.Bottom)
+                            {
+                                accumAlt = contentBounds.Right - Container.Bounds.Left + Gap;
+                                accum = 0;
+                                y = Container.Bounds.Y + Padding.Top + accum;
+                            }
+
+                            float x = Container.Bounds.X + Padding.Left + accumAlt;
+
+                            componentBounds = new RectangleF(x, y, componentBounds.Width, componentBounds.Height);
+                            accum += componentBounds.Height;
+                            break;
+                        }
+                }
+
+                if (contentBounds == default)
+                    contentBounds = componentBounds;
+
+                if (componentBounds.Left < contentBounds.Left)
+                {
+                    float right = contentBounds.Right;
+                    contentBounds.X = componentBounds.Left;
+                    contentBounds.Width += right - contentBounds.Right;
+                }
+
+                if (componentBounds.Right > contentBounds.Right)
+                {
+                    contentBounds.Width += componentBounds.Right - contentBounds.Right;
+                }
+
+                if (componentBounds.Top < contentBounds.Top)
+                {
+                    float bottom = contentBounds.Bottom;
+                    contentBounds.Y = componentBounds.Top;
+                    contentBounds.Height += bottom - contentBounds.Bottom;
+                }
+
+                if (componentBounds.Bottom > contentBounds.Bottom)
+                {
+                    var dif = componentBounds.Bottom - contentBounds.Bottom;
+                    contentBounds.Height += dif;
+                }
+
+                accum += Gap;
             }
 
-            return Container.Bounds;
+            return new RectangleF(Container.Bounds.X, Container.Bounds.Y, AutoSizeContainer.HasFlag(AutoSize.X) ? (contentBounds.Width + Padding.Horizontal) : Container.Bounds.Width, AutoSizeContainer.HasFlag(AutoSize.Y) ? (contentBounds.Height + Padding.Vertical) : Container.Bounds.Height);
         }
 
         public override void Subscribe()

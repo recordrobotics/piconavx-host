@@ -63,7 +63,7 @@ namespace piconavx.ui.controllers
             {
                 if (Canvas.InputCanvas != null)
                 {
-                    Canvas.InputCanvas.RaycastAt(Window.Current.Input!.Mice[0].Position);
+                    Canvas.InputCanvas.RaycastAt(Window.Current.Input!.Mice[0].Position, Canvas.RaycastMode.Primary);
                 }
             }
         }

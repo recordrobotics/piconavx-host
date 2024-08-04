@@ -84,11 +84,9 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-                /*ShowBounds = true,
+/*                ShowBounds = true,
                 ShowNonRenderableBounds = true,
-                FlowLayoutContentBoundsOutline = true,
-                HighlightMouseOver = true,
-                HighlightNonRenderable = true*/
+                FlowLayoutContentBoundsOutline = true,*/
             });
 
             ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas));
@@ -104,20 +102,20 @@ namespace piconavx.ui.graphics
             clientListPageLayout.Anchor = Anchor.All;
             clientListPageLayout.Insets = new Insets(0);
             clientListPage.Show();
-/*
-            UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
-            {
-                clientPreviewPage.Client = client;
-                livePreview.Client = client;
-                feedPreview.Client = client;
-            });
+            /*
+                        UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
+                        {
+                            clientPreviewPage.Client = client;
+                            livePreview.Client = client;
+                            feedPreview.Client = client;
+                        });
 
-            UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
-            {
-                clientPreviewPage.Client = null;
-                feedPreview.Client = null;
-                livePreview.Client = null;
-            });*/
+                        UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
+                        {
+                            clientPreviewPage.Client = null;
+                            feedPreview.Client = null;
+                            livePreview.Client = null;
+                        });*/
         }
 
         public static void CreateUIServer(int port)
@@ -258,8 +256,8 @@ namespace piconavx.ui.graphics
             inEvent = false;
         }
 
-        private static ConcurrentQueue<Action> deferredDelegates_nextEvent = new ConcurrentQueue<Action>();
-        private static ConcurrentQueue<Action> deferredDelegates_nextFrame = new ConcurrentQueue<Action>();
+        private static ConcurrentQueue<(Action action, int ttl)> deferredDelegates_nextEvent = new ConcurrentQueue<(Action action, int ttl)>();
+        private static ConcurrentQueue<(Action action, int ttl)> deferredDelegates_nextFrame = new ConcurrentQueue<(Action action, int ttl)>();
         private static ConcurrentQueue<Action> deferredDelegates_whenAvailable = new ConcurrentQueue<Action>();
 
         public static void ExecuteDeferredDelegates(DeferralMode deferralMode)
@@ -269,18 +267,46 @@ namespace piconavx.ui.graphics
                 case DeferralMode.NextEvent:
                     {
                         // Loop to process all delegates for this engine state-related deferral mode
-                        while (deferredDelegates_nextEvent.TryDequeue(out var action))
+                        List<(Action action, int ttl)> delayed = [];
+
+                        while (deferredDelegates_nextEvent.TryDequeue(out var tuple))
                         {
-                            action.Invoke();
+                            if (tuple.ttl > 0)
+                            {
+                                delayed.Add((tuple.action, tuple.ttl - 1));
+                            }
+                            else
+                            {
+                                tuple.action.Invoke();
+                            }
+                        }
+
+                        foreach (var tuple in delayed)
+                        {
+                            deferredDelegates_nextEvent.Enqueue(tuple);
                         }
                         break;
                     }
                 case DeferralMode.NextFrame:
                     {
                         // Loop to process all delegates for this engine state-related deferral mode
-                        while (deferredDelegates_nextFrame.TryDequeue(out var action))
+                        List<(Action action, int ttl)> delayed = [];
+
+                        while (deferredDelegates_nextFrame.TryDequeue(out var tuple))
                         {
-                            action.Invoke();
+                            if (tuple.ttl > 0)
+                            {
+                                delayed.Add((tuple.action, tuple.ttl - 1));
+                            }
+                            else
+                            {
+                                tuple.action.Invoke();
+                            }
+                        }
+
+                        foreach (var tuple in delayed)
+                        {
+                            deferredDelegates_nextFrame.Enqueue(tuple);
                         }
                         break;
                     }
@@ -298,15 +324,22 @@ namespace piconavx.ui.graphics
 
         public static void InvokeLater(Action action, DeferralMode deferralMode)
         {
+            InvokeLater(action, deferralMode, 0);
+        }
+
+        public static void InvokeLater(Action action, DeferralMode deferralMode, int ttl)
+        {
             switch (deferralMode)
             {
                 case DeferralMode.NextEvent:
-                    deferredDelegates_nextEvent.Enqueue(action);
+                    deferredDelegates_nextEvent.Enqueue((action, ttl));
                     break;
                 case DeferralMode.NextFrame:
-                    deferredDelegates_nextFrame.Enqueue(action);
+                    deferredDelegates_nextFrame.Enqueue((action, ttl));
                     break;
                 case DeferralMode.WhenAvailable:
+                    if (ttl != 0)
+                        throw new ArgumentException("Deferring with mode 'WhenAvailable' does not support time to live.", nameof(ttl));
                     deferredDelegates_whenAvailable.Enqueue(action);
                     break;
             }

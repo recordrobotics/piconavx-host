@@ -59,9 +59,15 @@ namespace piconavx.ui.graphics.ui
             return Matrix4x4.CreateOrthographicOffCenter(0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y, 0, 0, -1);
         }
 
+        public enum RaycastMode
+        {
+            Primary,
+            Secondary
+        }
+
         private List<(int index, UIController controller)> opaqueMatches = new List<(int index, UIController controller)>();
         private List<(int index, UIController controller)> transparentMatches = new List<(int index, UIController controller)>();
-        public UIController? RaycastAt(Vector2 point)
+        public UIController? RaycastAt(Vector2 point, RaycastMode mode)
         {
             opaqueMatches.Clear();
             transparentMatches.Clear();
@@ -70,7 +76,7 @@ namespace piconavx.ui.graphics.ui
             for (int i = components.Count - 1; i >= 0; i--)
             {
                 var component = components[i];
-                if (component.RaycastTransparency != RaycastTransparency.Hidden && component.IsRenderable && component.Bounds.Contains(point.X, point.Y))
+                if (component.RaycastTransparency != RaycastTransparency.Hidden && component.IsRenderable && (mode == RaycastMode.Primary || component.SecondaryInputVisible) && component.Bounds.Contains(point.X, point.Y))
                 {
                     if (component.RaycastTransparency == RaycastTransparency.Transparent && transparentMatches.Count < 255) // 0 can't be used as element index since that is the clear value
                         transparentMatches.Add((i, component));
@@ -122,6 +128,7 @@ namespace piconavx.ui.graphics.ui
             Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float, float, float>(GenericPriority.Highest, Scene_MouseMove);
             Scene.MouseDown += new PrioritizedAction<GenericPriority, Silk.NET.Input.MouseButton>(GenericPriority.Highest, Scene_MouseDown);
             Scene.MouseUp += new PrioritizedAction<GenericPriority, Silk.NET.Input.MouseButton>(GenericPriority.Highest, Scene_MouseUp);
+            Scene.MouseScroll += new PrioritizedAction<GenericPriority, Silk.NET.Input.ScrollWheel>(GenericPriority.Highest, Scene_MouseScroll);
         }
 
         public override void Unsubscribe()
@@ -130,9 +137,15 @@ namespace piconavx.ui.graphics.ui
             Scene.ViewportChange -= Scene_ViewportChange;
         }
 
+        public void InvalidateInput()
+        {
+            var mouse = Window.Current.Input!.Mice[0];
+            Scene_MouseMove(mouse.Position.X, mouse.Position.Y, 0, 0);
+        }
+
         private void Scene_MouseMove(float x, float y, float dx, float dy)
         {
-            target = RaycastAt(new Vector2(x, y));
+            target = RaycastAt(new Vector2(x, y), RaycastMode.Primary);
             foreach(var component in components)
             {
                 if(component.IsRenderable)
@@ -142,7 +155,7 @@ namespace piconavx.ui.graphics.ui
 
         private void Scene_MouseDown(Silk.NET.Input.MouseButton button)
         {
-            target = RaycastAt(Window.Current.Input!.Mice[0].Position);
+            target = RaycastAt(Window.Current.Input!.Mice[0].Position, RaycastMode.Primary);
             if (button == Silk.NET.Input.MouseButton.Left)
             {
                 foreach (var component in components)
@@ -169,6 +182,18 @@ namespace piconavx.ui.graphics.ui
                         component.MouseDown = false;
                     }
                 }
+            }
+        }
+
+        private void Scene_MouseScroll(Silk.NET.Input.ScrollWheel scrollWheel)
+        {
+            target = RaycastAt(Window.Current.Input!.Mice[0].Position, RaycastMode.Secondary);
+            Vector2 scroll = new(scrollWheel.X, scrollWheel.Y);
+
+            foreach (var component in components)
+            {
+                if (component.IsRenderable && component.SecondaryInputVisible && component == target)
+                    component.NotifyScroll(scroll);
             }
         }
 

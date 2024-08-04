@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,12 +16,15 @@ namespace piconavx.ui.graphics.ui
 
         private RaycastTransparency _raycastTransparency = RaycastTransparency.Opaque;
         public virtual RaycastTransparency RaycastTransparency { get => _raycastTransparency; set => _raycastTransparency = value; }
+        private bool _secondaryInputVisible = false;
+        public virtual bool SecondaryInputVisible { get => _secondaryInputVisible; set => _secondaryInputVisible = value; }
         public virtual bool IsRenderable { get => true; }
 
         public virtual bool MouseOver { get; set; } = false;
         public virtual bool MouseDown { get; set; } = false;
 
         public PrioritizedList<PrioritizedAction<GenericPriority>> Click = new();
+        public PrioritizedList<PrioritizedAction<GenericPriority, Vector2>> Scroll = new();
 
         protected UIController(Canvas canvas)
         {
@@ -39,6 +43,13 @@ namespace piconavx.ui.graphics.ui
             foreach (var action in Click)
             {
                 action.Action.Invoke();
+            }
+        }
+        public void NotifyScroll(Vector2 scroll)
+        {
+            foreach (var action in Scroll)
+            {
+                action.Action.Invoke(scroll);
             }
         }
         public virtual void OnAdd() { }
