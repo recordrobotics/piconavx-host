@@ -8,8 +8,12 @@ namespace piconavx.ui.graphics.ui
 {
     public abstract class Page : Panel
     {
-        protected Page(Canvas canvas) : base(canvas)
+        private Navigator _navigator;
+        public Navigator Navigator { get { return _navigator; } }
+
+        protected Page(Canvas canvas, Navigator navigator) : base(canvas)
         {
+            _navigator = navigator;
         }
 
         public abstract void Show();

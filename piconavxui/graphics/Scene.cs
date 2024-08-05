@@ -37,48 +37,6 @@ namespace piconavx.ui.graphics
 
         public static void CreateTestScene()
         {
-            /*Model reference = AddController(AddResource(new Model("assets/models/reference.obj")));
-            reference.RenderPriority = RenderPriority.DrawTransparent;
-            reference.SetMaterial("grid", AddResource(new GridMaterial()));
-            reference.SetMaterial("xaxis", AddResource(new LitMaterial()
-            {
-                EmissionColor = new Vector3(0.9f, 0.1f, 0.1f),
-                DiffuseColor = new Vector3(0, 0, 0),
-                SpecularColor = new Vector3(0, 0, 0)
-            }));
-            reference.SetMaterial("yaxis", AddResource(new LitMaterial()
-            {
-                EmissionColor = new Vector3(0.1f, 0.9f, 0.1f),
-                DiffuseColor = new Vector3(0, 0, 0),
-                SpecularColor = new Vector3(0, 0, 0)
-            }));
-            reference.SetMaterial("zaxis", AddResource(new LitMaterial()
-            {
-                EmissionColor = new Vector3(0.1f, 0.1f, 0.9f),
-                DiffuseColor = new Vector3(0, 0, 0),
-                SpecularColor = new Vector3(0, 0, 0)
-            }));
-
-            Model sensor = AddController(AddResource(new Model("assets/models/navxmicro.obj")));
-            sensor.Material = AddResource(new SensorMaterial());
-            LiveClientPreviewController livePreview = AddController(new LiveClientPreviewController(sensor.Transform));
-
-            Model feedSensor = AddController(sensor.Clone());
-            feedSensor.Material = AddResource(new SensorFeedMaterial());
-            FeedClientPreviewController feedPreview = AddController(new FeedClientPreviewController(feedSensor));
-
-            Model lightModel = AddController(AddResource(new Model("assets/models/sphere.obj")));
-            lightModel.Transform.Position = new Vector3(1.2f, 1.0f, 2.0f);
-            lightModel.Transform.Scale = new Vector3(0.2f);
-            lightModel.Material = AddResource(new LightMaterial());
-
-            Light light = AddController(new Light(new Vector3(0.2f), new Vector3(0.5f), lightModel.Transform));
-
-
-            OrbitCameraController cameraController = AddController(new OrbitCameraController(camera));
-            cameraController.Distance = 6;
-            cameraController.Yaw = 45;
-            cameraController.Pitch = 25;*/
             Camera camera = AddController(new Camera(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY));
 
             Canvas canvas = AddController(AddResource(new Canvas()));
@@ -93,18 +51,28 @@ namespace piconavx.ui.graphics
                 TargetBoundsOutline = true,*/
             });
 
-            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas));
+            Navigator navigator = new();
+
+            SettingsPage settingsPage = AddController(new SettingsPage(canvas, navigator));
+            settingsPage.ZIndex = 20;
+            AnchorLayout settingsPageLayout = AddController(new AnchorLayout(settingsPage));
+            settingsPageLayout.Anchor = Anchor.All;
+            settingsPageLayout.Insets = new Insets(0);
+
+            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator));
             clientPreviewPage.ZIndex = 0;
             AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
             clientPreviewPageLayout.Anchor = Anchor.All;
             clientPreviewPageLayout.Insets = new Insets(0);
 
-            ClientListPage clientListPage = AddController(new ClientListPage(canvas, clientPreviewPage));
+            ClientListPage clientListPage = AddController(new ClientListPage(canvas, navigator, clientPreviewPage, settingsPage));
             clientListPage.ZIndex = 10;
             AnchorLayout clientListPageLayout = AddController(new AnchorLayout(clientListPage));
             clientListPageLayout.Anchor = Anchor.All;
             clientListPageLayout.Insets = new Insets(0);
-            clientListPage.Show();
+
+            navigator.Push(clientListPage);
+
             /*
                         UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
                         {

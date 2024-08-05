@@ -42,6 +42,7 @@
     <None Remove="assets\shaders\uivertex.glsl" />
     <None Remove="assets\shaders\vertex.glsl" />
     <None Remove="assets\shaders\vertexinst.glsl" />
+    <None Remove="assets\textures\back.png" />
     <None Remove="assets\textures\brand.jpg" />
     <None Remove="assets\textures\calibrate.png" />
     <None Remove="assets\textures\card.png" />
@@ -95,6 +96,7 @@
     <EmbeddedResource Include="assets\shaders\vertex.glsl">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="assets\textures\back.png" />
     <EmbeddedResource Include="assets\textures\brand.jpg" />
     <EmbeddedResource Include="assets\textures\calibrate.png" />
     <EmbeddedResource Include="assets\textures\card.png" />

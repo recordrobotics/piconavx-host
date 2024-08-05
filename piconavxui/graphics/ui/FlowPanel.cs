@@ -65,7 +65,6 @@ namespace piconavx.ui.graphics.ui
                 Scene.InvokeLater(component.Unsubscribe, DeferralMode.NextEvent); // Destroy as soon as possible
                 Canvas.RemoveComponent(component);
             }
-            Components.Clear();
         }
     }
 }

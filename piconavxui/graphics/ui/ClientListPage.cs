@@ -43,14 +43,16 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout statusLabelLayout;
 
         private ClientPreviewPage clientPreviewPage;
+        private SettingsPage settingsPage;
 
         public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#0F0F0F");
         public readonly Rgba32 HEADER = Rgba32.ParseHex("#FFF");
         public readonly Rgba32 TEXT_SECONDARY = Rgba32.ParseHex("#6C6C6C");
 
-        public ClientListPage(Canvas canvas, ClientPreviewPage clientPreviewPage) : base(canvas)
+        public ClientListPage(Canvas canvas, Navigator navigator, ClientPreviewPage clientPreviewPage, SettingsPage settingsPage) : base(canvas, navigator)
         {
             this.clientPreviewPage = clientPreviewPage;
+            this.settingsPage = settingsPage;
 
             cardShadowTexture ??= Scene.AddResource(new Texture("assets/textures/cardshadow.png")
             {
@@ -115,6 +117,7 @@ namespace piconavx.ui.graphics.ui
             settingsButton.Padding = new Insets(16);
             settingsButton.IsIconButton = true;
             settingsButton.Icon = settingsIcon;
+            settingsButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () => Navigator.Push(settingsPage));
             controlPanel.Components.Add(settingsButton);
             settingsButton.SetTooltip("Open settings");
 
@@ -198,6 +201,7 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(bottomBar);
             Canvas.AddComponent(statusLabel);
 
+            clientList.Components.Clear();
             var component = new ClientCard("Robot", true, "192.168.1.64", "58271", "3.1.0", "Calibrated", "109kB / 187kB (58.43%)", "27.04 °C | 34.40 °C", Canvas);
             clientList.Components.Add(component);
             component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
@@ -225,8 +229,7 @@ namespace piconavx.ui.graphics.ui
         private void OnCardClick(ClientCard card)
         {
             clientPreviewPage.Client = new Client(card.Id, null, null, null);
-            Scene.InvokeLater(Hide, DeferralMode.NextFrame);
-            Scene.InvokeLater(clientPreviewPage.Show, DeferralMode.NextFrame);
+            Navigator.Push(clientPreviewPage);
         }
 
         public override void Hide()

@@ -1,12 +1,5 @@
 ﻿using Silk.NET.OpenGL;
-using Silk.NET.SDL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Silk.NET.Assimp;
 using AssimpMesh = Silk.NET.Assimp.Mesh;
 using AssimpMaterial = Silk.NET.Assimp.Material;
@@ -96,7 +89,7 @@ namespace piconavx.ui.graphics
                 renderPriority = value;
                 if (Scene.InEvent) // If set from inside an event, defer until finished
                     Scene.InvokeLater(Resubscribe, DeferralMode.NextEvent);
-                else
+                else if(isSubscribed)
                     Resubscribe();
             }
         }
@@ -278,13 +271,16 @@ namespace piconavx.ui.graphics
             return indices.ToArray();
         }
 
+        bool isSubscribed = false;
         public override void Subscribe()
         {
+            isSubscribed = true;
             Scene.Render += new PrioritizedAction<RenderPriority, double, RenderProperties>(renderPriority, Render);
         }
 
         public override void Unsubscribe()
         {
+            isSubscribed = false;
             Scene.Render -= Render;
         }
 
