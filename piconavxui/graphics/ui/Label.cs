@@ -80,7 +80,7 @@ namespace piconavx.ui.graphics.ui
             UIMaterial.ColorMaterial.Use(properties);
             foreach (var glyph in glyphs)
             {
-                Tessellator.Quad.DrawQuad(glyph.Bounds.AsFloat(), new Rgba32(255, 0, 255, 255));
+                Tessellator.Quad.DrawQuad(glyph.Bounds.AsFloat().Transform(Transform.Matrix), new Rgba32(255, 0, 255, 255));
             }
             Tessellator.Quad.Flush();
 
