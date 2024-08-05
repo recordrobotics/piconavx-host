@@ -14,7 +14,7 @@ namespace piconavx.ui
         {
             var options = WindowOptions.Default;
             var dpi = Window.GetSystemDpiScale();
-            options.Size = new Vector2D<int>((int)(1280 / dpi.X), (int)(720 / dpi.Y));
+            options.Size = new Vector2D<int>((int)(1920 * dpi.X), (int)(1080 * dpi.Y));
             options.Title = "piconavx ui";
             options.VSync = false;
             options.Samples = 8;
