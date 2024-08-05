@@ -43,6 +43,9 @@ namespace piconavx
 
         private async Task<Exception?> ReadClient(Client client, CancellationToken cancellationToken)
         {
+            if (client.IsVirtual)
+                throw new InvalidOperationException("Can't perform read operations on a virtual client.");
+
             Exception? exc = null;
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -264,9 +267,7 @@ namespace piconavx
 
         public Client ConnectSimulatedClient(string? id)
         {
-#pragma warning disable CS8625
-            Client client = new Client(id, null, null, null);
-#pragma warning restore CS8625
+            Client client = Client.CreateVirtual(id);
             client.Connected = true;
             Clients.Add(client);
             FireClientConnected(this, new ClientConnectedEventArgs(client));

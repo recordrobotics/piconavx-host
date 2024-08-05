@@ -14,8 +14,11 @@ namespace piconavx
         public bool HighBandwidthMode { get; set; } = false;
         public string? Id { get; set; }
         public TcpClient? Tcp { get; }
-        public StreamReader Reader { get; }
-        public StreamWriter Writer { get; }
+        private StreamReader? _reader;
+        public StreamReader Reader { get => _reader!; }
+        private StreamWriter? _writer;
+        public StreamWriter Writer { get => _writer!; }
+        public bool IsVirtual { get; }
         public ConcurrentQueue<ClientCommand> CommandQueue { get; }
 
         public HealthUpdate Health { get; set; }
@@ -31,9 +34,25 @@ namespace piconavx
         {
             Id = id;
             Tcp = tcp;
-            Reader = reader;
-            Writer = writer;
+            _reader = reader;
+            _writer = writer;
+            IsVirtual = false;
             CommandQueue = new ConcurrentQueue<ClientCommand>();
+        }
+
+        private Client(string? id) // create a virtual client
+        {
+            Id = id;
+            Tcp = null;
+            _reader = null;
+            _writer = null;
+            IsVirtual = true;
+            CommandQueue = new ConcurrentQueue<ClientCommand>();
+        }
+
+        public static Client CreateVirtual(string? id)
+        {
+            return new Client(id);
         }
 
         public void SetDataType(HostSetDataType dataType)

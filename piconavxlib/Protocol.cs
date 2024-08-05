@@ -38,6 +38,9 @@
 
         public static async Task<bool> IdentifyClient(Client client, CancellationToken cancellationToken)
         {
+            if (client.IsVirtual)
+                throw new InvalidOperationException("Can't identify a virtual client. Instead, set the id directly.");
+
             await client.Writer.WriteLineAsync(HOST_INTRODUCTION); // Introduce ourselves
             await client.Writer.FlushAsync(cancellationToken);
             string? response = await client.Reader.ReadLineAsync(cancellationToken);

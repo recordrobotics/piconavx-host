@@ -228,7 +228,7 @@ namespace piconavx.ui.graphics.ui
 
         private void OnCardClick(ClientCard card)
         {
-            clientPreviewPage.Client = new Client(card.Id, null, null, null);
+            clientPreviewPage.Client = Client.CreateVirtual(card.Id);
             Navigator.Push(clientPreviewPage);
         }
 
