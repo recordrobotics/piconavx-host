@@ -20,7 +20,14 @@ namespace piconavx.ui.graphics.ui
         public virtual bool SecondaryInputVisible { get => _secondaryInputVisible; set => _secondaryInputVisible = value; }
         public virtual bool IsRenderable { get => true; }
 
-        private Transform _transform = new Transform();
+        public static Vector2 GlobalScale { get => new(Transform.GlobalScale.X, Transform.GlobalScale.Y); set => Transform.GlobalScale = new(value, 1); }
+
+        static UIController()
+        {
+            GlobalScale = new Vector2(1f / 1.5f);
+        }
+
+        private Transform _transform;
         public virtual Transform Transform { get => _transform; set => _transform = value; }
 
         public virtual bool MouseOver { get; set; } = false;
@@ -32,6 +39,10 @@ namespace piconavx.ui.graphics.ui
         protected UIController(Canvas canvas)
         {
             Canvas = canvas;
+            _transform = new Transform()
+            {
+                UseGlobalScale = true
+            };
         }
 
         public int CompareTo(UIController? other)

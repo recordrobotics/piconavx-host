@@ -31,7 +31,7 @@ namespace piconavx.ui.controllers
             Component = component;
             Container = container;
             RectangleF cont = Container?.Bounds ??
-                new RectangleF(0, 0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y);
+                new RectangleF(0, 0, Window.Current.FramebufferSize.X, Window.Current.FramebufferSize.Y);
             Insets = new Insets(component.Bounds.Left - cont.Left, component.Bounds.Top - cont.Top, cont.Right - component.Bounds.Right, cont.Bottom - component.Bounds.Bottom);
         }
 
@@ -49,7 +49,7 @@ namespace piconavx.ui.controllers
         {
             RectangleF bounds = Component.Bounds;
             RectangleF container = Container?.Bounds ??
-                new RectangleF(0, 0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y);
+                new RectangleF(0, 0, Window.Current.FramebufferSize.X, Window.Current.FramebufferSize.Y);
 
             if (Anchor.HasFlag(Anchor.Left) && Anchor.HasFlag(Anchor.Right)) // horizontal stretch
             {

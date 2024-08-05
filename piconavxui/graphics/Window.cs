@@ -1,9 +1,17 @@
 ﻿using FontStashSharp;
 using piconavx.ui.graphics.font;
+using piconavx.ui.graphics.ui;
 using Silk.NET.Input;
+using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
+using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.Intrinsics.Arm;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.HiDpi;
 
 namespace piconavx.ui.graphics
 {
@@ -28,6 +36,8 @@ namespace piconavx.ui.graphics
         public IInputContext? Input { get => input; }
         public IWindow Internal { get=> window; }
 
+        public Vector2D<int> FramebufferSize { get => new((int)(window.FramebufferSize.X / UIController.GlobalScale.X), (int)(window.FramebufferSize.Y / UIController.GlobalScale.Y)); }
+
         public event Action? Load;
 
         public Window(WindowOptions options)
@@ -38,6 +48,7 @@ namespace piconavx.ui.graphics
             window.Update += Window_Update;
             window.Render += Window_Render;
             window.FramebufferResize += Window_FramebufferResize;
+            window.Move += Window_Move;
 
             currentWindow = this;
         }
@@ -59,11 +70,61 @@ namespace piconavx.ui.graphics
             Scene.NotifyRender(deltaTime, properties);
         }
 
-        private void Window_FramebufferResize(Silk.NET.Maths.Vector2D<int> newSize)
+        public static Vector2 GetSystemDpiScale()
+        {
+            if (OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+            {
+                var monitor = PInvoke.MonitorFromWindow(HWND.Null, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY);
+                PInvoke.GetDpiForMonitor(monitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, out uint dpiX, out uint dpiY);
+                float dpiScaleX = dpiX / 96.0f;
+                float dpiScaleY = dpiY / 96.0f;
+                return new Vector2(dpiScaleX / 1.5f, dpiScaleY / 1.5f);
+            }
+
+            return Vector2.One;
+        }
+
+        public Vector2 GetDpiScale()
+        {
+            if (window.Native?.Win32.HasValue ?? false)
+            {
+                var hwnd = new HWND(window.Native.Win32.Value.Hwnd);
+
+                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 14393))
+                {
+                    uint dpi = PInvoke.GetDpiForWindow(hwnd);
+                    float dpiScale = dpi / 96.0f;
+                    return new Vector2(dpiScale / 1.5f);
+                }
+                else if (OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+                {
+                    var monitor = PInvoke.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+                    PInvoke.GetDpiForMonitor(monitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, out uint dpiX, out uint dpiY);
+                    float dpiScaleX = dpiX / 96.0f;
+                    float dpiScaleY = dpiY / 96.0f;
+                    return new Vector2(dpiScaleX / 1.5f, dpiScaleY / 1.5f);
+                }
+            }
+
+            return Vector2.One;
+        }
+
+        private void CheckDpi()
+        {
+            UIController.GlobalScale = GetDpiScale();
+        }
+
+        private void Window_Move(Vector2D<int> newPos)
+        {
+            CheckDpi();
+        }
+
+        private void Window_FramebufferResize(Vector2D<int> newSize)
         {
             currentWindow = this;
+            CheckDpi();
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
-            Scene.NotifyViewportChange(new Silk.NET.Maths.Rectangle<int>(0, 0, newSize));
+            Scene.NotifyViewportChange(new Rectangle<int>(0, 0, newSize));
         }
 
         private void AddFont(FontFace font, string path)

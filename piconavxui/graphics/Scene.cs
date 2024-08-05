@@ -98,9 +98,8 @@ namespace piconavx.ui.graphics
             AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
             clientPreviewPageLayout.Anchor = Anchor.All;
             clientPreviewPageLayout.Insets = new Insets(0);
-            //clientPreviewPage.Show();
 
-            ClientListPage clientListPage = AddController(new ClientListPage(canvas));
+            ClientListPage clientListPage = AddController(new ClientListPage(canvas, clientPreviewPage));
             clientListPage.ZIndex = 10;
             AnchorLayout clientListPageLayout = AddController(new AnchorLayout(clientListPage));
             clientListPageLayout.Anchor = Anchor.All;

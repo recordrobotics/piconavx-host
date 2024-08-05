@@ -63,9 +63,9 @@ namespace piconavx.ui.controllers
         {
             RectangleF bounds = Component.Bounds;
             RectangleF target = Target?.Bounds ??
-                new RectangleF(0, 0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y);
+                new RectangleF(0, 0, Window.Current.FramebufferSize.X, Window.Current.FramebufferSize.Y);
             RectangleF container = Container?.Bounds ??
-                new RectangleF(0, 0, Window.Current.Internal.FramebufferSize.X, Window.Current.Internal.FramebufferSize.Y);
+                new RectangleF(0, 0, Window.Current.FramebufferSize.X, Window.Current.FramebufferSize.Y);
 
             if (Target == null)
             {
@@ -113,12 +113,7 @@ namespace piconavx.ui.controllers
             {
                 if (UseTransform)
                 {
-                    var matrix = Target.Transform.Matrix;
-                    Vector4 topLeft = new Vector4(target.Left, target.Top, 0, 1);
-                    Vector4 bottomRight = new Vector4(target.Right, target.Bottom, 0, 1);
-                    topLeft = Vector4.Transform(topLeft, matrix);
-                    bottomRight = Vector4.Transform(bottomRight, matrix);
-                    target = new RectangleF(topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y);
+                    target = target.Transform(Target.Transform.LocalMatrix);
                 }
 
                 switch (Anchor)

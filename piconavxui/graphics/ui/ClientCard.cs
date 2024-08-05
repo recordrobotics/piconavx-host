@@ -458,6 +458,15 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(temperatureLabel);
         }
 
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            Canvas.RemoveComponent(background);
+            Canvas.RemoveComponent(shadow);
+            Canvas.RemoveComponent(thumbnail);
+            Canvas.RemoveComponent(thumbnailShadow);
+        }
+
         private Transition<float> scaleTransition = new(1, 0.05);
 
         private void Scene_Update(double delta)

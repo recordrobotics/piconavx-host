@@ -25,7 +25,7 @@ namespace piconavx.ui.graphics.ui
             popupLayout.Offset = new Vector2(10, 0);
 
             background = new Image(canvas);
-            background.ZIndex = ZIndex+1; // background
+            background.ZIndex = ZIndex + 1; // background
             background.HitTestAlphaClip = 0.9f;
             background.Color = Color.Background;
             background.Texture = Texture.RoundedRect;

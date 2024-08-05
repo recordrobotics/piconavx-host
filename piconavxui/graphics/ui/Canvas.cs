@@ -76,7 +76,7 @@ namespace piconavx.ui.graphics.ui
             for (int i = components.Count - 1; i >= 0; i--)
             {
                 var component = components[i];
-                if (component.RaycastTransparency != RaycastTransparency.Hidden && component.IsRenderable && (mode == RaycastMode.Primary || component.SecondaryInputVisible) && component.Bounds.Contains(point.X, point.Y))
+                if (component.RaycastTransparency != RaycastTransparency.Hidden && component.IsRenderable && (mode == RaycastMode.Primary || component.SecondaryInputVisible) && component.Bounds.Transform(component.Transform.Matrix).Contains(point.X, point.Y))
                 {
                     if (component.RaycastTransparency == RaycastTransparency.Transparent && transparentMatches.Count < 255) // 0 can't be used as element index since that is the clear value
                         transparentMatches.Add((i, component));

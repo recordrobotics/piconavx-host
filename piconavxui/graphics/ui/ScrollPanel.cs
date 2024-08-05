@@ -173,7 +173,7 @@ namespace piconavx.ui.graphics.ui
 
             if (horVisible)
             {
-                float mouse = (Window.Current.Input?.Mice.FirstOrDefault()?.Position.X) ?? 0;
+                float mouse = (Window.Current.Input?.Mice.FirstOrDefault()?.Position.X / GlobalScale.X) ?? 0;
 
                 if (!prevHorDown && scrollHor.MouseDown)
                 {
@@ -201,7 +201,7 @@ namespace piconavx.ui.graphics.ui
 
             if (verVisible)
             {
-                float mouse = (Window.Current.Input?.Mice.FirstOrDefault()?.Position.Y) ?? 0;
+                float mouse = (Window.Current.Input?.Mice.FirstOrDefault()?.Position.Y / GlobalScale.Y) ?? 0;
 
                 if (!prevVerDown && scrollVer.MouseDown)
                 {
