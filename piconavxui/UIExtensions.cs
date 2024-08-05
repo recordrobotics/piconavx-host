@@ -13,5 +13,10 @@ namespace piconavx.ui
             bottomRight = Vector4.Transform(bottomRight, matrix);
             return new RectangleF(topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y);
         }
+
+        public static RectangleF AsFloat(this Rectangle rect)
+        {
+            return new(rect.X, rect.Y, rect.Width, rect.Height);
+        }
     }
 }

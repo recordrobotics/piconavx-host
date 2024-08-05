@@ -27,6 +27,8 @@ namespace piconavx.ui.graphics.ui
         private Button saveButton;
         private Button cancelButton;
 
+        private InputField inputField;
+
         public SettingsPage(Canvas canvas, Navigator navigator) : base(canvas, navigator)
         {
             background = new Image(canvas);
@@ -83,6 +85,8 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(cancelButton);
             cancelButton.SetTooltip("Discard changes");
 
+            inputField = new InputField(canvas);
+
             UpdateZIndex();
         }
 
@@ -94,6 +98,7 @@ namespace piconavx.ui.graphics.ui
             controlPanel.ZIndex = ZIndex + 9;
             saveButton.ZIndex = ZIndex + 9;
             cancelButton.ZIndex = ZIndex + 9;
+            inputField.ZIndex = ZIndex + 9;
         }
 
         public override void Show()
@@ -103,7 +108,8 @@ namespace piconavx.ui.graphics.ui
                 headerPanel, headerPanelLayout,
                 header, headerLayout,
                 headerBackground, headerBackgroundLayout,
-                controlPanel, controlPanelLayout
+                controlPanel, controlPanelLayout,
+                inputField
                 );
 
             Canvas.AddComponent(background);
@@ -113,6 +119,7 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(controlPanel);
             Canvas.AddComponent(saveButton);
             Canvas.AddComponent(cancelButton);
+            Canvas.AddComponent(inputField);
 
             UpdateZIndex();
         }
@@ -124,12 +131,14 @@ namespace piconavx.ui.graphics.ui
             Canvas.RemoveComponent(headerBackground);
             Canvas.RemoveComponent(header);
             Canvas.RemoveComponent(controlPanel);
+            Canvas.RemoveComponent(inputField);
             UnsubscribeLater(
                 background, backgroundAnchor,
                 headerPanel, headerPanelLayout,
                 headerBackground, headerBackgroundLayout,
                 header, headerLayout,
-                controlPanel, controlPanelLayout
+                controlPanel, controlPanelLayout,
+                inputField
                 );
         }
     }

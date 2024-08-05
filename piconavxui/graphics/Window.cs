@@ -53,8 +53,12 @@ namespace piconavx.ui.graphics
             currentWindow = this;
         }
 
+        private Stopwatch updateSw = Stopwatch.StartNew();
         private void Window_Update(double deltaTime)
         {
+            double fps = 1.0 / updateSw.Elapsed.TotalSeconds;
+            updateSw.Restart();
+
             currentWindow = this;
             Scene.ExecuteDeferredDelegates(DeferralMode.NextFrame);
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
@@ -158,6 +162,13 @@ namespace piconavx.ui.graphics
             input = window.CreateInput();
             primaryKeyboard = input.Keyboards.Count > 0 ? input.Keyboards[0] : null;
 
+            if (primaryKeyboard != null)
+            {
+                primaryKeyboard.KeyDown += PrimaryKeyboard_KeyDown;
+                primaryKeyboard.KeyUp += PrimaryKeyboard_KeyUp;
+                primaryKeyboard.KeyChar += PrimaryKeyboard_KeyChar;
+            }
+
             for (int i = 0; i < input.Mice.Count; i++)
             {
                 input.Mice[i].Cursor.CursorMode = CursorMode.Normal;
@@ -168,6 +179,27 @@ namespace piconavx.ui.graphics
             }
 
             Load?.Invoke();
+        }
+
+        private void PrimaryKeyboard_KeyChar(IKeyboard keyboard, char ch)
+        {
+            currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
+            Scene.NotifyKeyChar(ch);
+        }
+
+        private void PrimaryKeyboard_KeyUp(IKeyboard keyboard, Key key, int keyCode)
+        {
+            currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
+            Scene.NotifyKeyUp(key);
+        }
+
+        private void PrimaryKeyboard_KeyDown(IKeyboard keyboard, Key key, int keyCode)
+        {
+            currentWindow = this;
+            Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
+            Scene.NotifyKeyDown(key);
         }
 
         private void Window_MouseMove(IMouse mouse, Vector2 position)

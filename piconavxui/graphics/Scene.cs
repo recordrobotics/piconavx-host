@@ -139,6 +139,9 @@ namespace piconavx.ui.graphics
         public static bool InEvent { get { return inEvent; } }
 
         public static PrioritizedList<PrioritizedAction<GenericPriority, Rectangle<int>>> ViewportChange = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, char>> KeyChar = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, Key>> KeyUp = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, Key>> KeyDown = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, float, float, float, float>> MouseMove = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, MouseButton>> MouseDown = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, MouseButton>> MouseUp = new();
@@ -153,6 +156,36 @@ namespace piconavx.ui.graphics
             foreach (var action in ViewportChange)
             {
                 action.Action.Invoke(viewport);
+            }
+            inEvent = false;
+        }
+
+        public static void NotifyKeyChar(char key)
+        {
+            inEvent = true;
+            foreach (var action in KeyChar)
+            {
+                action.Action.Invoke(key);
+            }
+            inEvent = false;
+        }
+
+        public static void NotifyKeyDown(Key key)
+        {
+            inEvent = true;
+            foreach (var action in KeyDown)
+            {
+                action.Action.Invoke(key);
+            }
+            inEvent = false;
+        }
+
+        public static void NotifyKeyUp(Key key)
+        {
+            inEvent = true;
+            foreach (var action in KeyUp)
+            {
+                action.Action.Invoke(key);
             }
             inEvent = false;
         }
