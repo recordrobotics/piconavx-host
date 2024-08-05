@@ -65,10 +65,13 @@ namespace piconavx.ui.graphics
         private Insets border = new Insets(0);
         public Insets Border { get => border; set => border = value; }
 
-        public unsafe Texture(string path, TextureType type = TextureType.None)
+        public bool UseMipmaps { get; set; } = true;
+
+        public unsafe Texture(string path, TextureType type = TextureType.None, bool useMipmaps = true)
         {
             Path = path;
             Type = type;
+            UseMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -94,8 +97,9 @@ namespace piconavx.ui.graphics
             SetParameters();
         }
 
-        public unsafe Texture(Span<byte> data, uint width, uint height)
+        public unsafe Texture(Span<byte> data, uint width, uint height, bool useMipmaps = true)
         {
+            UseMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -109,8 +113,9 @@ namespace piconavx.ui.graphics
             Height = (int)height;
         }
 
-        public unsafe Texture(uint width, uint height)
+        public unsafe Texture(uint width, uint height, bool useMipmaps = true)
         {
+            UseMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -184,11 +189,12 @@ namespace piconavx.ui.graphics
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)getWrapMode(wrapModeU));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)getWrapMode(wrapModeV));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)getWrapMode(wrapModeW));
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)getFilterModeMipmap(filterMode));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(UseMipmaps ? getFilterModeMipmap(filterMode) : getFilterMode(filterMode)));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)getFilterMode(filterMode));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 8);
-            Window.GL.GenerateMipmap(TextureTarget.Texture2D);
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, UseMipmaps ? 8 : 0);
+            if(UseMipmaps)
+                Window.GL.GenerateMipmap(TextureTarget.Texture2D);
         }
 
         public void UpdateSettings()

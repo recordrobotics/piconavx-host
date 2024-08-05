@@ -9,7 +9,7 @@ namespace piconavx.ui.graphics.font
         {
         }
 
-        public object CreateTexture(int width, int height) => new Texture((uint)width, (uint)height);
+        public object CreateTexture(int width, int height) => new Texture((uint)width, (uint)height, false);
 
         public Point GetTextureSize(object texture)
         {
