@@ -28,6 +28,7 @@ namespace piconavx.ui.graphics.ui
         private Button cancelButton;
 
         private InputField inputField;
+        private AnchorLayout inputFieldLayout;
 
         public SettingsPage(Canvas canvas, Navigator navigator) : base(canvas, navigator)
         {

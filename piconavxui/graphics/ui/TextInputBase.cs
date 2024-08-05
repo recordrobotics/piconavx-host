@@ -29,7 +29,11 @@ namespace piconavx.ui.graphics.ui
         {
             Scene.Update -= Scene_Update;
             Scene.KeyDown -= Scene_KeyDown;
+            Scene.KeyChar -= Repeater_Char;
         }
+
+        protected abstract void AddChar(char chr, int index);
+        protected abstract void RemoveChars(int index, int length);
 
         private void Scene_Update(double delta)
         {
@@ -38,12 +42,19 @@ namespace piconavx.ui.graphics.ui
 
         private void Repeater_KeyDown(Key key)
         {
-            Debug.Write(key);
+            switch (key)
+            {
+                case Key.Backspace:
+                    {
+                        RemoveChars(0, 1);
+                    }
+                    break;
+            }
         }
 
         private void Repeater_Char(char key)
         {
-            Debug.Write(key);
+            AddChar(key, 0);
         }
 
         private void Scene_KeyDown(Key key)
