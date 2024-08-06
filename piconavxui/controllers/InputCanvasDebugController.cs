@@ -79,19 +79,20 @@ namespace piconavx.ui.controllers
                 {
                     foreach (var component in Canvas.InputCanvas.Components)
                     {
+                        var bounds = component.Bounds.Transform(component.Transform.Matrix);
                         if (ShowBounds && (ShowNonRenderableBounds || component.IsRenderable))
                         {
-                            Tessellator.Quad.DrawRectangleOutline(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 0, 255, 255), 1);
+                            Tessellator.Quad.DrawRectangleOutline(bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 0, 255, 255), 1);
                         }
 
                         if (component.MouseOver && HighlightMouseOver && (HighlightNonRenderable || component.IsRenderable))
                         {
-                            Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 255, 50));
+                            Tessellator.Quad.DrawQuad(bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 255, 50));
                         }
 
                         if (component.MouseDown && HighlightMouseDown && (HighlightNonRenderable || component.IsRenderable))
                         {
-                            Tessellator.Quad.DrawQuad(component.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 0, 50));
+                            Tessellator.Quad.DrawQuad(bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 0, 50));
                         }
                     }
                 }
@@ -101,7 +102,7 @@ namespace piconavx.ui.controllers
                     // Draw outline around target bounds
                     if (TargetBoundsOutline)
                     {
-                        Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
+                        Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds.Transform(Canvas.InputCanvas.Target.Transform.Matrix), new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
                     }
                 }
 
@@ -111,7 +112,7 @@ namespace piconavx.ui.controllers
                     {
                         if (flowLayout.Visible)
                         {
-                            Tessellator.Quad.DrawRectangleOutline(flowLayout.ContentBounds, new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 255, 255, 255), 1);
+                            Tessellator.Quad.DrawRectangleOutline(flowLayout.ContentBounds.Transform(flowLayout.Container.Transform.Matrix), new SixLabors.ImageSharp.PixelFormats.Rgba32(0, 255, 255, 255), 1);
                         }
                     }
                 }

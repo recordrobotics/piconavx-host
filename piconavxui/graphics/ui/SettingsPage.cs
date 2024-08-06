@@ -86,7 +86,12 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(cancelButton);
             cancelButton.SetTooltip("Discard changes");
 
-            inputField = new InputField(canvas);
+            inputField = new InputField("Hello", canvas);
+            inputField.Cursor = inputField.Text.Length;
+            inputField.Bounds = new RectangleF(0, 0, 100, 100);
+            inputFieldLayout = new AnchorLayout(inputField, this);
+            inputFieldLayout.Anchor = Anchor.TopLeft;
+            inputFieldLayout.Insets = new Insets(40, 200, 0, 0);
 
             UpdateZIndex();
         }
@@ -110,7 +115,7 @@ namespace piconavx.ui.graphics.ui
                 header, headerLayout,
                 headerBackground, headerBackgroundLayout,
                 controlPanel, controlPanelLayout,
-                inputField
+                inputField, inputFieldLayout
                 );
 
             Canvas.AddComponent(background);
@@ -139,7 +144,7 @@ namespace piconavx.ui.graphics.ui
                 headerBackground, headerBackgroundLayout,
                 header, headerLayout,
                 controlPanel, controlPanelLayout,
-                inputField
+                inputField, inputFieldLayout
                 );
         }
     }

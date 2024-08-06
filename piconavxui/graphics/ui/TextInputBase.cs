@@ -14,6 +14,8 @@ namespace piconavx.ui.graphics.ui
         private List<Glyph> glyphs = [];
         protected List<Glyph> Glyphs { get => glyphs; set => glyphs = value; }
 
+        public int Cursor { get; set; } = 0;
+
         protected TextInputBase(Canvas canvas) : base(canvas)
         {
         }
@@ -32,6 +34,7 @@ namespace piconavx.ui.graphics.ui
             Scene.KeyChar -= Repeater_Char;
         }
 
+        protected abstract void InvalidateGlyphs();
         protected abstract void AddChar(char chr, int index);
         protected abstract void RemoveChars(int index, int length);
 
@@ -46,7 +49,8 @@ namespace piconavx.ui.graphics.ui
             {
                 case Key.Backspace:
                     {
-                        RemoveChars(0, 1);
+                        if (Cursor > 0)
+                            RemoveChars(--Cursor, 1);
                     }
                     break;
             }
@@ -54,7 +58,7 @@ namespace piconavx.ui.graphics.ui
 
         private void Repeater_Char(char key)
         {
-            AddChar(key, 0);
+            AddChar(key, Cursor++);
         }
 
         private void Scene_KeyDown(Key key)
