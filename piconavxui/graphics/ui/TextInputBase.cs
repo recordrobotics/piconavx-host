@@ -3,6 +3,7 @@ using Silk.NET.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,26 @@ namespace piconavx.ui.graphics.ui
             Scene.Update -= Scene_Update;
             Scene.KeyDown -= Scene_KeyDown;
             Scene.KeyChar -= Repeater_Char;
+        }
+
+        protected Rectangle GetGlyphRectAt(int index)
+        {
+            if (index < glyphs.Count)
+            {
+                return glyphs[index].Bounds;
+            }
+            else if (index < 0 && glyphs.Count > 0)
+            {
+                return new(glyphs[0].Bounds.X - glyphs[0].Bounds.Width, glyphs[0].Bounds.Y, glyphs[0].Bounds.Width, glyphs[0].Bounds.Height);
+            }
+            else if (glyphs.Count > 0)
+            {
+                return new(glyphs[^1].Bounds.Right, glyphs[^1].Bounds.Y, glyphs[^1].Bounds.Width, glyphs[^1].Bounds.Height);
+            }
+            else
+            {
+                return Rectangle.Empty;
+            }
         }
 
         protected abstract void InvalidateGlyphs();

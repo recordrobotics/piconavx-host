@@ -1,12 +1,9 @@
 ﻿using FontStashSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -39,6 +36,9 @@ namespace piconavx.ui.graphics.ui
 
         private bool autoSize = true;
         public bool AutoSize { get => autoSize; set => autoSize = value; }
+
+        private bool autoSizeMultiline = false;
+        public bool AutoSizeMultiline { get => autoSizeMultiline; set => autoSizeMultiline = value; }
 
         private RectangleF bounds;
         public override RectangleF Bounds { get => bounds; set { bounds = value; InvalidateGlyphs(); } }
@@ -74,7 +74,7 @@ namespace piconavx.ui.graphics.ui
             UIMaterial.ColorMaterial.Use(properties);
             foreach (var glyph in Glyphs)
             {
-                Tessellator.Quad.DrawQuad(glyph.Bounds.AsFloat().Transform(Transform.Matrix), new Rgba32(255, 0, 255, 255));
+                //Tessellator.Quad.DrawQuad(glyph.Bounds.AsFloat().Transform(Transform.Matrix), new Rgba32(255, 0, 255, 255));
             }
             Tessellator.Quad.Flush();
 
@@ -84,6 +84,14 @@ namespace piconavx.ui.graphics.ui
             Window.FontRenderer.Begin(Transform.Matrix);
             font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();
+
+            var cursorRect = GetGlyphRectAt(Cursor).AsFloat();
+            cursorRect.Y = Bounds.Y;
+            cursorRect.Width = 1;
+            cursorRect.Height = Bounds.Height;
+            UIMaterial.ColorMaterial.Use(properties);
+            Tessellator.Quad.DrawQuad(cursorRect.Transform(Transform.Matrix), new Rgba32(color.ToVector4()));
+            Tessellator.Quad.Flush();
         }
 
         public override void Subscribe()
@@ -100,9 +108,19 @@ namespace piconavx.ui.graphics.ui
 
         private void Scene_Update(double deltaTime)
         {
-            if (autoSize)
+            if (autoSize || autoSizeMultiline)
             {
-                bounds = GetAutoSizeBounds();
+                var size = GetAutoSizeBounds();
+                Debug.WriteLine(size.Height);
+                if (autoSize)
+                {
+                    bounds = new RectangleF(bounds.X, bounds.Y, size.Width, bounds.Height);
+                }
+
+                if (autoSizeMultiline)
+                {
+                    bounds = new RectangleF(bounds.X, bounds.Y, bounds.Width, size.Height);
+                }
             }
         }
 

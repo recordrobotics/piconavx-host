@@ -89,6 +89,7 @@ namespace piconavx.ui.graphics.ui
             inputField = new InputField("Hello", canvas);
             inputField.Cursor = inputField.Text.Length;
             inputField.Bounds = new RectangleF(0, 0, 100, 100);
+            inputField.FontSize = 20;
             inputFieldLayout = new AnchorLayout(inputField, this);
             inputFieldLayout.Anchor = Anchor.TopLeft;
             inputFieldLayout.Insets = new Insets(40, 200, 0, 0);

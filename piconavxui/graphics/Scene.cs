@@ -42,13 +42,13 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-/*                ShowBounds = true,
+                ShowBounds = true,
                 ShowNonRenderableBounds = true,
                 FlowLayoutContentBoundsOutline = true,
                 HighlightMouseOver = true,
                 HighlightMouseDown = true,
                 HighlightNonRenderable = true,
-                TargetBoundsOutline = true,*/
+                TargetBoundsOutline = true,
             });
 
             Navigator navigator = new();
