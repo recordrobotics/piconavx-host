@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\config\settings.json" />
     <None Remove="assets\fonts\Inter-Bold.ttf" />
     <None Remove="assets\fonts\Inter-Light.ttf" />
     <None Remove="assets\fonts\Inter-Regular.ttf" />
@@ -130,6 +131,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\piconavxlib\piconavxlib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assets\config\settings.json" />
   </ItemGroup>
 
 </Project>
