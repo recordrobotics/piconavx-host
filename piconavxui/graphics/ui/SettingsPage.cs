@@ -1,7 +1,6 @@
 ﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
-using System.Numerics;
 
 namespace piconavx.ui.graphics.ui
 {
