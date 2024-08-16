@@ -5,9 +5,7 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.Intrinsics.Arm;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -17,6 +15,8 @@ namespace piconavx.ui.graphics
 {
     public class Window
     {
+        const int RESIZE_UPDATE_DEPTH = 6;
+
         private IWindow window;
         private IKeyboard? primaryKeyboard;
         private IInputContext? input;
@@ -53,12 +53,8 @@ namespace piconavx.ui.graphics
             currentWindow = this;
         }
 
-        private Stopwatch updateSw = Stopwatch.StartNew();
         private void Window_Update(double deltaTime)
         {
-            double fps = 1.0 / updateSw.Elapsed.TotalSeconds;
-            updateSw.Restart();
-
             currentWindow = this;
             Scene.ExecuteDeferredDelegates(DeferralMode.NextFrame);
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
@@ -129,6 +125,11 @@ namespace piconavx.ui.graphics
             CheckDpi();
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyViewportChange(new Rectangle<int>(0, 0, newSize));
+
+            for (int i = 0; i < RESIZE_UPDATE_DEPTH; i++)
+            {
+                Window_Update(0);
+            }
         }
 
         private void AddFont(FontFace font, string path)
