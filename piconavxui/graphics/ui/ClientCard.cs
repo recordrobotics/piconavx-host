@@ -8,11 +8,6 @@ namespace piconavx.ui.graphics.ui
 {
     public class ClientCard : FlowPanel
     {
-        public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#262626");
-        public readonly Rgba32 HEADER = Rgba32.ParseHex("#fff");
-        public readonly Rgba32 TEXT = Rgba32.ParseHex("#BCBCBC");
-        public readonly Rgba32 TEXT_SECONDARY = Rgba32.ParseHex("#6C6C6C");
-
         private static Texture? cardBackgroundTexture;
         private static Texture? cardMaskTexture;
         private static Texture? cardShadowTexture;
@@ -146,7 +141,7 @@ namespace piconavx.ui.graphics.ui
             background.Transform = Transform;
             background.HitTestAlphaClip = 0.9f;
             background.RaycastTransparency = RaycastTransparency.Transparent;
-            background.Color = BACKGROUND;
+            background.Color = Theme.CardBackground;
             background.Texture = cardBackgroundTexture;
             background.ImageType = ImageType.Sliced;
             background.Size = new Size(40, 40);
@@ -157,7 +152,7 @@ namespace piconavx.ui.graphics.ui
             shadow = new Image(canvas);
             shadow.Transform = Transform;
             shadow.RaycastTransparency = RaycastTransparency.Hidden;
-            shadow.Color = new Rgba32(0, 0, 0, 128);
+            shadow.Color = Theme.CardShadow;
             shadow.Texture = cardShadowTexture;
             shadow.ImageType = ImageType.Sliced;
             shadow.Size = new Size(80, 80);
@@ -168,7 +163,7 @@ namespace piconavx.ui.graphics.ui
             thumbnail = new Image(canvas);
             thumbnail.Transform = Transform;
             thumbnail.RaycastTransparency = RaycastTransparency.Hidden;
-            thumbnail.Color = new Rgba32(255, 255, 255, 255);
+            thumbnail.Color = Theme.CardThumbnail;
             thumbnail.Texture = cardMaskTexture;
             thumbnail.Mask = thumbnailTexture;
             thumbnail.PreserveAspect = true;
@@ -182,7 +177,7 @@ namespace piconavx.ui.graphics.ui
             thumbnailShadow = new Image(canvas);
             thumbnailShadow.Transform = Transform;
             thumbnailShadow.RaycastTransparency = RaycastTransparency.Hidden;
-            thumbnailShadow.Color = new Rgba32(0, 0, 0, 230);
+            thumbnailShadow.Color = Theme.CardThumbnailShadow;
             thumbnailShadow.Texture = cardShadowTexture;
             thumbnailShadow.ImageType = ImageType.Sliced;
             thumbnailShadow.Size = new Size(55, 55);
@@ -235,7 +230,7 @@ namespace piconavx.ui.graphics.ui
             idLabel = new Label(id, canvas);
             idLabel.Transform = Transform;
             idLabel.FontSize = 20;
-            idLabel.Color = new FSColor(HEADER.ToVector4());
+            idLabel.Color = Theme.Header;
             idLabel.Font = FontFace.InterBold;
             idLabel.RenderOffset = new System.Numerics.Vector2(0, 3);
             row1.Components.Add(idLabel);
@@ -286,67 +281,67 @@ namespace piconavx.ui.graphics.ui
             addressLabel = new Label(address, canvas);
             addressLabel.Transform = Transform;
             addressLabel.FontSize = 14;
-            addressLabel.Color = new FSColor(TEXT.ToVector4());
+            addressLabel.Color = Theme.Text;
             addressRow.Components.Add(addressLabel);
             addressSeparatorLabel = new Label(":", canvas);
             addressSeparatorLabel.Transform = Transform;
             addressSeparatorLabel.FontSize = 14;
-            addressSeparatorLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
+            addressSeparatorLabel.Color = Theme.TextSecondary;
             addressRow.Components.Add(addressSeparatorLabel);
             portLabel = new Label(port, canvas);
             portLabel.Transform = Transform;
             portLabel.FontSize = 14;
-            portLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
+            portLabel.Color = Theme.TextSecondary;
             addressRow.Components.Add(portLabel);
 
             versionPrefixLabel = new Label("v", canvas);
             versionPrefixLabel.Transform = Transform;
             versionPrefixLabel.FontSize = 14;
-            versionPrefixLabel.Color = new FSColor(TEXT_SECONDARY.ToVector4());
+            versionPrefixLabel.Color = Theme.TextSecondary;
             versionRow.Components.Add(versionPrefixLabel);
             versionLabel = new Label(version, canvas);
             versionLabel.Transform = Transform;
             versionLabel.FontSize = 14;
-            versionLabel.Color = new FSColor(TEXT.ToVector4());
+            versionLabel.Color = Theme.Text;
             versionRow.Components.Add(versionLabel);
 
             statusIcon = new Image(canvas);
             statusIcon.Transform = Transform;
             statusIcon.Bounds = new RectangleF(0, 0, 36, 36);
             statusIcon.Texture = calibrateTexture;
-            statusIcon.Color = TEXT_SECONDARY;
+            statusIcon.Color = Theme.TextSecondary;
             statusIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row3.Components.Add(statusIcon);
             statusLabel = new Label(status, canvas);
             statusLabel.Transform = Transform;
             statusLabel.FontSize = 14;
-            statusLabel.Color = new FSColor(TEXT.ToVector4());
+            statusLabel.Color = Theme.Text;
             row3.Components.Add(statusLabel);
 
             memoryIcon = new Image(canvas);
             memoryIcon.Transform = Transform;
             memoryIcon.Bounds = new RectangleF(0, 0, 36, 36);
             memoryIcon.Texture = memoryTexture;
-            memoryIcon.Color = TEXT_SECONDARY;
+            memoryIcon.Color = Theme.TextSecondary;
             memoryIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row4.Components.Add(memoryIcon);
             memoryLabel = new Label(memory, canvas);
             memoryLabel.Transform = Transform;
             memoryLabel.FontSize = 14;
-            memoryLabel.Color = new FSColor(TEXT.ToVector4());
+            memoryLabel.Color = Theme.Text;
             row4.Components.Add(memoryLabel);
 
             temperatureIcon = new Image(canvas);
             temperatureIcon.Transform = Transform;
             temperatureIcon.Bounds = new RectangleF(0, 0, 36, 36);
             temperatureIcon.Texture = temperatureTexture;
-            temperatureIcon.Color = TEXT_SECONDARY;
+            temperatureIcon.Color = Theme.TextSecondary;
             temperatureIcon.RaycastTransparency = RaycastTransparency.Hidden;
             row5.Components.Add(temperatureIcon);
             temperatureLabel = new Label(temperature, canvas);
             temperatureLabel.Transform = Transform;
             temperatureLabel.FontSize = 14;
-            temperatureLabel.Color = new FSColor(TEXT.ToVector4());
+            temperatureLabel.Color = Theme.Text;
             row5.Components.Add(temperatureLabel);
 
             UpdateZIndex();

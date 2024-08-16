@@ -41,6 +41,7 @@ namespace piconavx.ui.graphics.ui
         private void AddLabel(Func<string> textDelegate)
         {
             Label label = new Label(textDelegate, Canvas);
+            label.Color = Theme.Text;
             Canvas.AddComponent(label);
             Components.Add(label);
             label.ZIndex = ZIndex;
@@ -117,7 +118,7 @@ namespace piconavx.ui.graphics.ui
                     client?.SetDataType(HostSetDataType.Feed);
                 });
                 startRecordingButton.Icon = recordIcon;
-                startRecordingButton.Color = Button.ButtonColor.Primary;
+                startRecordingButton.Color = Theme.Primary;
                 Scene.InvokeLater(startRecordingButton.Subscribe, DeferralMode.NextFrame);
 
                 stopRecordingButton = new Button("Stop Recording", Canvas);

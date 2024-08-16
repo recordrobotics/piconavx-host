@@ -1,5 +1,4 @@
 ﻿using piconavx.ui.controllers;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 using System.Numerics;
 
@@ -7,10 +6,6 @@ namespace piconavx.ui.graphics.ui
 {
     public class ScrollPanel : Panel
     {
-        public readonly Rgba32 SCROLL_THUMB = Rgba32.ParseHex("#383838");
-        public readonly Rgba32 SCROLL_THUMB_HOVER = Rgba32.ParseHex("#424242");
-        public readonly Rgba32 SCROLL_THUMB_ACTIVE = Rgba32.ParseHex("#4d4d4d");
-
         const float scrollWidth = 20;
 
         public bool Horizontal { get; set; } = false;
@@ -65,7 +60,7 @@ namespace piconavx.ui.graphics.ui
             scrollHor = new Image(canvas);
             scrollHor.HitTestAlphaClip = 0.9f;
             scrollHor.RaycastTransparency = RaycastTransparency.Transparent;
-            scrollHor.Color = SCROLL_THUMB;
+            scrollHor.Color = Theme.ScrollThumb;
             scrollHor.Texture = Texture.Pill;
             scrollHor.ImageType = ImageType.Sliced;
             scrollHor.Size = new Size((int)scrollWidth / 2, (int)scrollWidth / 2);
@@ -77,7 +72,7 @@ namespace piconavx.ui.graphics.ui
             scrollVer = new Image(canvas);
             scrollVer.HitTestAlphaClip = 0.9f;
             scrollVer.RaycastTransparency = RaycastTransparency.Transparent;
-            scrollVer.Color = SCROLL_THUMB;
+            scrollVer.Color = Theme.ScrollThumb;
             scrollVer.Texture = Texture.Pill;
             scrollVer.ImageType = ImageType.Sliced;
             scrollVer.Size = new Size((int)scrollWidth / 2, (int)scrollWidth / 2);
@@ -190,7 +185,7 @@ namespace piconavx.ui.graphics.ui
                 offsetX = MathF.Max(0, MathF.Min(offsetX, MathF.Max(0, Content.Bounds.Width - workingRectangle.Width)));
 
                 scrollHor.Bounds = new RectangleF(workingRectangle.X + (offsetX / Content.Bounds.Width * workingRectangle.Width), scrollHor.Bounds.Y, MathF.Max(workingRectangle.Width / Content.Bounds.Width * workingRectangle.Width, scrollWidth * 2), scrollHor.Bounds.Height);
-                scrollHor.Color = scrollHor.MouseDown ? SCROLL_THUMB_ACTIVE : scrollHor.MouseOver ? SCROLL_THUMB_HOVER : SCROLL_THUMB;
+                scrollHor.Color = scrollHor.MouseDown ? Theme.ScrollThumbActive : scrollHor.MouseOver ? Theme.ScrollThumbHover : Theme.ScrollThumb;
 
                 prevHorDown = scrollHor.MouseDown;
             } else
@@ -224,7 +219,7 @@ namespace piconavx.ui.graphics.ui
                 offsetY = MathF.Max(0, MathF.Min(offsetY, MathF.Max(0, Content.Bounds.Height - workingRectangle.Height)));
 
                 scrollVer.Bounds = new RectangleF(scrollVer.Bounds.X, workingRectangle.Y + (offsetY / Content.Bounds.Height * workingRectangle.Height), scrollVer.Bounds.Width, MathF.Max(workingRectangle.Height / Content.Bounds.Height * workingRectangle.Height, scrollWidth * 2));
-                scrollVer.Color = scrollVer.MouseDown ? SCROLL_THUMB_ACTIVE : scrollVer.MouseOver ? SCROLL_THUMB_HOVER : SCROLL_THUMB;
+                scrollVer.Color = scrollVer.MouseDown ? Theme.ScrollThumbActive : scrollVer.MouseOver ? Theme.ScrollThumbHover : Theme.ScrollThumb;
 
                 prevVerDown = scrollVer.MouseDown;
             }

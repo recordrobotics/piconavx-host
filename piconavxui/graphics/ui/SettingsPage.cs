@@ -1,14 +1,10 @@
 ﻿using piconavx.ui.controllers;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 
 namespace piconavx.ui.graphics.ui
 {
     public class SettingsPage : Page
     {
-        public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#0F0F0F");
-        public readonly Rgba32 HEADER = Rgba32.ParseHex("#FFF");
-
         private Image background;
         private AnchorLayout backgroundAnchor;
 
@@ -33,7 +29,7 @@ namespace piconavx.ui.graphics.ui
         public SettingsPage(Canvas canvas, Navigator navigator) : base(canvas, navigator)
         {
             background = new Image(canvas);
-            background.Color = BACKGROUND;
+            background.Color = Theme.Background;
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
@@ -45,7 +41,7 @@ namespace piconavx.ui.graphics.ui
             headerPanelLayout.Insets = new Insets(0);
 
             headerBackground = new Image(canvas);
-            headerBackground.Color = BACKGROUND;
+            headerBackground.Color = Theme.Background;
             headerBackgroundLayout = new AnchorLayout(headerBackground, headerPanel);
             headerBackgroundLayout.Anchor = Anchor.All;
             headerBackgroundLayout.Insets = new Insets(0);
@@ -53,7 +49,7 @@ namespace piconavx.ui.graphics.ui
             header = new Label("Server Options", canvas);
             header.FontSize = 24.5f;
             header.Font = FontFace.InterSemiBold;
-            header.Color = new FontStashSharp.FSColor(HEADER.ToVector4());
+            header.Color = Theme.Header;
             headerLayout = new AnchorLayout(header, headerPanel);
             headerLayout.Anchor = Anchor.TopLeft | Anchor.Bottom;
             headerLayout.AllowResize = false;
@@ -69,7 +65,7 @@ namespace piconavx.ui.graphics.ui
             controlPanelLayout.Insets = new Insets(0, 0, 51, 0);
 
             saveButton = new Button("Save", canvas);
-            saveButton.Color = Button.ButtonColor.Primary;
+            saveButton.Color = Theme.Primary;
             saveButton.FontSize = 15;
             saveButton.RenderOffset = new System.Numerics.Vector2(0, 2);
             saveButton.AutoSize = Button.AutoSizeMode.TextAndIcon;

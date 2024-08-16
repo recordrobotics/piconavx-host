@@ -1,5 +1,4 @@
 ﻿using FontStashSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 using System.Numerics;
 
@@ -44,8 +43,8 @@ namespace piconavx.ui.graphics.ui
         private Vector2 renderOffset;
         public Vector2 RenderOffset { get => renderOffset; set => renderOffset = value; }
 
-        private FSColor color;
-        public FSColor Color
+        private UIColor color;
+        public UIColor Color
         {
             get => color; set => color = value;
         }
@@ -54,7 +53,7 @@ namespace piconavx.ui.graphics.ui
         {
             RaycastTransparency = RaycastTransparency.Hidden; // don't perform input events on text
             this.text = text;
-            color = FSColor.White;
+            color = SolidUIColor.White;
             bounds = GetAutoSizeBounds();
         }
 

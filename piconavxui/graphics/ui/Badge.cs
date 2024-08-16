@@ -28,7 +28,7 @@ namespace piconavx.ui.graphics.ui
             this.text.Transform = Transform;
             this.text.FontSize = 13;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = new FSColor(Color.Text.ToVector4());
+            this.text.Color = Color.Text;
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
             textAnchor.Insets = padding;
@@ -42,7 +42,7 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout backgroundAnchor;
         private AnchorLayout textAnchor;
 
-        public ButtonColor Color { get; set; } = ButtonColor.Primary;
+        public ButtonColor Color { get; set; } = Theme.Primary;
 
         public string Text { get => this.text.Text; set => this.text.Text = value; }
         public float FontSize { get => this.text.FontSize; set => this.text.FontSize = value; }
@@ -140,7 +140,7 @@ namespace piconavx.ui.graphics.ui
             text.Transform = Transform;
 
             background.Color = Color.Background;
-            text.Color = new FSColor(Color.Text.ToVector4());
+            text.Color = Color.Text;
         }
     }
 }

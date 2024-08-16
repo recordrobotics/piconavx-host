@@ -1,0 +1,44 @@
+{
+  "background": "#0F0F0F",
+  "viewport": "#212121",
+  "sidepanel_background": "#0a0a0ac8",
+  "header": "#FFF",
+  "text": "#BCBCBC",
+  "text_secondary": "#6C6C6C",
+  "text_selection": "#1857BA",
+  "card_background": "#262626",
+  "card_shadow": "#00000080",
+  "card_thumbnail": "#FFF",
+  "card_thumbnail_shadow": "#000000E6",
+  "tooltip_shadow": "#00000080",
+  "scroll_thumb": "#383838",
+  "scroll_thumb_hover": "#424242",
+  "scroll_thumb_active": "#4d4d4d",
+  "neutral": {
+    "background": "#383838",
+    "background_disabled": "#242424",
+    "background_hover": "#424242",
+    "background_active": "#4d4d4d",
+    "text": "#fff",
+    "text_secondary": "#BCBCBC",
+    "text_disabled": "#b3b3b3"
+  },
+  "primary": {
+    "background": "#2e65c9",
+    "background_disabled": "#0e2247",
+    "background_hover": "#3b76e3",
+    "background_active": "#2a5dbd",
+    "text": "#fff",
+    "text_secondary": "#BCBCBC",
+    "text_disabled": "#b3b3b3"
+  },
+  "success": {
+    "background": "#0d1a0e",
+    "background_disabled": "#151c16",
+    "background_hover": "#152b17",
+    "background_active": "#1b381d",
+    "text": "#c3f7be",
+    "text_secondary": "#7eab79",
+    "text_disabled": "#72916e"
+  }
+}

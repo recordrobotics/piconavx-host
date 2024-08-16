@@ -22,7 +22,7 @@ namespace piconavx.ui.graphics.ui
 
             Header = header;
             background = new Image(canvas);
-            background.Color = new Rgba32(10, 10, 10, 200);
+            background.Color = Theme.SidepanelBackground;
 
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
@@ -35,7 +35,7 @@ namespace piconavx.ui.graphics.ui
 
             this.header = new Label(Header, canvas);
             this.header.FontSize = 18;
-            this.header.Color = FSColor.White;
+            this.header.Color = Theme.Header;
             headerAnchor = new AnchorLayout(this.header, virtualHeader);
             headerAnchor.Anchor = Anchor.TopLeft | Anchor.Right | Anchor.Bottom;
             headerAnchor.Insets = new Insets(0);

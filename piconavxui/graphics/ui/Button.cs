@@ -1,8 +1,4 @@
-﻿using FontStashSharp;
-using piconavx.ui.controllers;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
+﻿using piconavx.ui.controllers;
 using System.Drawing;
 using System.Numerics;
 
@@ -19,52 +15,14 @@ namespace piconavx.ui.graphics.ui
 
         public interface ButtonColor
         {
-            public Rgba32 Background { get; }
-            public Rgba32 BackgroundDisabled { get; }
-            public Rgba32 BackgroundHover { get; }
-            public Rgba32 BackgroundActive { get; }
+            public UIColor Background { get; }
+            public UIColor BackgroundDisabled { get; }
+            public UIColor BackgroundHover { get; }
+            public UIColor BackgroundActive { get; }
 
-            public Rgba32 Text { get; }
-            public Rgba32 TextSecondary { get; }
-            public Rgba32 TextDisabled { get; }
-
-            public static readonly ButtonColor Neutral = new Neutral();
-            public static readonly ButtonColor Primary = new Primary();
-            public static readonly ButtonColor Success = new Success();
-            public static readonly ButtonColor Error = new Neutral();
-        }
-
-        public struct Neutral : ButtonColor
-        {
-            public readonly Rgba32 Background => Rgba32.ParseHex("#383838");
-            public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#242424");
-            public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#424242");
-            public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#4d4d4d");
-            public readonly Rgba32 Text => Rgba32.ParseHex("#fff");
-            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#BCBCBC");
-            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#b3b3b3");
-        }
-
-        public struct Primary : ButtonColor
-        {
-            public readonly Rgba32 Background => Rgba32.ParseHex("#2e65c9");
-            public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#0e2247");
-            public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#3b76e3");
-            public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#2a5dbd");
-            public readonly Rgba32 Text => Rgba32.ParseHex("#fff");
-            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#BCBCBC");
-            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#b3b3b3");
-        }
-
-        public struct Success : ButtonColor
-        {
-            public readonly Rgba32 Background => Rgba32.ParseHex("#0d1a0e");
-            public readonly Rgba32 BackgroundDisabled => Rgba32.ParseHex("#151c16");
-            public readonly Rgba32 BackgroundHover => Rgba32.ParseHex("#152b17");
-            public readonly Rgba32 BackgroundActive => Rgba32.ParseHex("#1b381d");
-            public readonly Rgba32 Text => Rgba32.ParseHex("#c3f7be");
-            public readonly Rgba32 TextSecondary => Rgba32.ParseHex("#7eab79");
-            public readonly Rgba32 TextDisabled => Rgba32.ParseHex("#72916e");
+            public UIColor Text { get; }
+            public UIColor TextSecondary { get; }
+            public UIColor TextDisabled { get; }
         }
 
         public Button(string text, Canvas canvas) : base(canvas)
@@ -100,7 +58,7 @@ namespace piconavx.ui.graphics.ui
             this.text = new Label(text, canvas);
             this.text.FontSize = 10;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = new FSColor(Color.Text.ToVector4());
+            this.text.Color = Color.Text;
             textAnchor = new AnchorLayout(this.text, this);
             textAnchor.Anchor = Anchor.TopLeft | Anchor.Bottom;
             textAnchor.Insets = new Insets(padding.Left + (Icon == null ? 0 : iconSize.Width + iconGap), padding.Top, padding.Right, padding.Bottom);
@@ -119,7 +77,7 @@ namespace piconavx.ui.graphics.ui
 
         public Tooltip? Tooltip => tooltip;
 
-        public ButtonColor Color { get; set; } = ButtonColor.Neutral;
+        public ButtonColor Color { get; set; } = Theme.Neutral;
 
         public string Text { get => this.text.Text; set => this.text.Text = value; }
         public float FontSize { get => this.text.FontSize; set => this.text.FontSize = value; }
@@ -310,7 +268,7 @@ namespace piconavx.ui.graphics.ui
 
             background.Color = isDisabled ? Color.BackgroundDisabled : MouseDown ? Color.BackgroundActive : MouseOver ? Color.BackgroundHover : Color.Background;
             icon.Color = isDisabled ? Color.TextDisabled : Color.Text;
-            text.Color = new FSColor((isDisabled ? Color.TextDisabled : Color.Text).ToVector4());
+            text.Color = isDisabled ? Color.TextDisabled : Color.Text;
         }
     }
 }

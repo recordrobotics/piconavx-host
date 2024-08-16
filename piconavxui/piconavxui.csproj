@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <None Remove="assets\config\settings.json" />
+    <None Remove="assets\config\themes\dark.json" />
+    <None Remove="assets\config\themes\light.json" />
     <None Remove="assets\fonts\Inter-Bold.ttf" />
     <None Remove="assets\fonts\Inter-Light.ttf" />
     <None Remove="assets\fonts\Inter-Regular.ttf" />
@@ -62,6 +64,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="assets\config\themes\light.json" />
+    <EmbeddedResource Include="assets\config\themes\dark.json" />
     <EmbeddedResource Include="assets\fonts\Inter-Bold.ttf" />
     <EmbeddedResource Include="assets\fonts\Inter-Light.ttf" />
     <EmbeddedResource Include="assets\fonts\Inter-Regular.ttf" />

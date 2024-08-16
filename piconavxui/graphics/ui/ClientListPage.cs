@@ -45,10 +45,6 @@ namespace piconavx.ui.graphics.ui
         private ClientPreviewPage clientPreviewPage;
         private SettingsPage settingsPage;
 
-        public readonly Rgba32 BACKGROUND = Rgba32.ParseHex("#0F0F0F");
-        public readonly Rgba32 HEADER = Rgba32.ParseHex("#FFF");
-        public readonly Rgba32 TEXT_SECONDARY = Rgba32.ParseHex("#6C6C6C");
-
         public ClientListPage(Canvas canvas, Navigator navigator, ClientPreviewPage clientPreviewPage, SettingsPage settingsPage) : base(canvas, navigator)
         {
             this.clientPreviewPage = clientPreviewPage;
@@ -61,7 +57,7 @@ namespace piconavx.ui.graphics.ui
             });
 
             background = new Image(canvas);
-            background.Color = BACKGROUND;
+            background.Color = Theme.Background;
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
@@ -73,7 +69,7 @@ namespace piconavx.ui.graphics.ui
             headerPanelLayout.Insets = new Insets(0);
 
             headerBackground = new Image(canvas);
-            headerBackground.Color = BACKGROUND;
+            headerBackground.Color = Theme.Background;
             headerBackgroundLayout = new AnchorLayout(headerBackground, headerPanel);
             headerBackgroundLayout.Anchor = Anchor.All;
             headerBackgroundLayout.Insets = new Insets(0);
@@ -81,7 +77,7 @@ namespace piconavx.ui.graphics.ui
             header = new Label("Connected Clients", canvas);
             header.FontSize = 24.5f;
             header.Font = FontFace.InterSemiBold;
-            header.Color = new FontStashSharp.FSColor(HEADER.ToVector4());
+            header.Color = Theme.Header;
             headerLayout = new AnchorLayout(header, headerPanel);
             headerLayout.Anchor = Anchor.TopLeft | Anchor.Bottom;
             headerLayout.AllowResize = false;
@@ -101,13 +97,24 @@ namespace piconavx.ui.graphics.ui
 
             startButton = new Button("Start", canvas);
             startButton.Icon = playIcon;
-            startButton.Color = Button.ButtonColor.Success;
+            startButton.Color = Theme.Success;
             startButton.IconSize = new SizeF(45, 45);
             startButton.IconGap = 4.5f;
             startButton.FontSize = 15;
             startButton.RenderOffset = new System.Numerics.Vector2(0, 2);
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
+            startButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Medium, () =>
+            {
+                if(SavedResource.Settings.Current.Theme == "dark.json")
+                {
+                    SavedResource.Settings.Current.Theme = "light.json";
+                } else
+                {
+                    SavedResource.Settings.Current.Theme = "dark.json";
+                }
+                Theme.UpdateTheme();
+            });
             controlPanel.Components.Add(startButton);
             startButton.SetTooltip("Run host server");
 
@@ -139,7 +146,7 @@ namespace piconavx.ui.graphics.ui
             clientListLayout.Insets = new Insets(0);
 
             bottomBar = new Image(canvas);
-            bottomBar.Color = BACKGROUND;
+            bottomBar.Color = Theme.Background;
             bottomBar.Bounds = new RectangleF(0, 0, 0, 60);
             bottomBarLayout = new AnchorLayout(bottomBar, this);
             bottomBarLayout.Anchor = Anchor.Left | Anchor.Right | Anchor.Bottom;
@@ -148,7 +155,7 @@ namespace piconavx.ui.graphics.ui
             statusLabel = new Label("Server running on 192.168.1.140:65432", canvas);
             statusLabel.FontSize = 13;
             statusLabel.Font = FontFace.InterLight;
-            statusLabel.Color = new FontStashSharp.FSColor(TEXT_SECONDARY.ToVector4());
+            statusLabel.Color = Theme.TextSecondary;
             statusLabelLayout = new AnchorLayout(statusLabel, this);
             statusLabelLayout.Anchor = Anchor.Left | Anchor.Right | Anchor.Bottom;
             statusLabelLayout.AllowResize = false;

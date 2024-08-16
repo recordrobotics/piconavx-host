@@ -1,5 +1,4 @@
-﻿using FontStashSharp;
-using piconavx.ui.controllers;
+﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 using System.Numerics;
@@ -26,7 +25,7 @@ namespace piconavx.ui.graphics.ui
         public CursorBlinkMode BlinkMode { get; set; } = CursorBlinkMode.Blink;
         public double BlinkInterval { get; set; } = 0.5;
 
-        public ButtonColor BackgroundColor { get; set; } = ButtonColor.Neutral;
+        public ButtonColor Color { get; set; } = Theme.Neutral;
 
         private int zIndex = 0;
         public override int ZIndex
@@ -72,14 +71,8 @@ namespace piconavx.ui.graphics.ui
         private Vector2 renderOffset;
         public Vector2 RenderOffset { get => renderOffset; set { renderOffset = value; InvalidateGlyphs(false); } }
 
-        private FSColor color;
-        public FSColor Color
-        {
-            get => color; set => color = value;
-        }
-
-        private Rgba32 selectionColor;
-        public Rgba32 SelectionColor
+        private UIColor selectionColor;
+        public UIColor SelectionColor
         {
             get => selectionColor; set => selectionColor = value;
         }
@@ -104,7 +97,7 @@ namespace piconavx.ui.graphics.ui
             background.Transform = Transform;
             background.ZIndex = ZIndex - 1; // background
             background.HitTestAlphaClip = 0.9f;
-            background.Color = BackgroundColor.Background;
+            background.Color = Color.Background;
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;
             background.Size = new Size(15, 15);
@@ -120,8 +113,7 @@ namespace piconavx.ui.graphics.ui
             RaycastTransparency = RaycastTransparency.Transparent;
 
             this.text = new(text);
-            color = FSColor.White;
-            selectionColor = Rgba32.ParseHex("#1857ba");
+            selectionColor = Theme.TextSelection;
             bounds = GetAutoSizeBounds(out _);
             InvalidateGlyphs(true);
         }
@@ -197,7 +189,7 @@ namespace piconavx.ui.graphics.ui
             }
 
             Window.FontRenderer.Begin(Transform.Matrix);
-            font.DrawText(Window.FontRenderer, text, new Vector2(contentBounds.X, contentBounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+            font.DrawText(Window.FontRenderer, text, new Vector2(contentBounds.X, contentBounds.Y), Color.Text, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();
 
             if (InputFocused && !Disabled && cursorVisible)
@@ -218,7 +210,7 @@ namespace piconavx.ui.graphics.ui
                 cursorBounds.Height = lineHeight;
 
                 UIMaterial.ColorMaterial.Use(properties, Transform);
-                var colorVec = color.ToVector4();
+                var colorVec = Color.Text.Value.ToVector4();
                 colorVec.W = cursorOpacity;
                 Tessellator.Quad.DrawQuad(cursorBounds, new Rgba32(colorVec));
                 Tessellator.Quad.Flush();
@@ -275,7 +267,7 @@ namespace piconavx.ui.graphics.ui
             }
 
             Transform.UpdateCache();
-            background.Color = Disabled ? BackgroundColor.BackgroundDisabled : (MouseOver || InputFocused) ? BackgroundColor.BackgroundHover : BackgroundColor.Background;
+            background.Color = Disabled ? Color.BackgroundDisabled : (MouseOver || InputFocused) ? Color.BackgroundHover : Color.Background;
 
             if (InputFocused && !Disabled)
             {

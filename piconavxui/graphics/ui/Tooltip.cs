@@ -38,7 +38,7 @@ namespace piconavx.ui.graphics.ui
             shadow = new Image(canvas);
             shadow.RaycastTransparency = RaycastTransparency.Hidden;
             shadow.ZIndex = ZIndex;
-            shadow.Color = new Rgba32(0, 0, 0, 128);
+            shadow.Color = Theme.TooltipShadow;
             shadow.Texture = cardShadowTexture;
             shadow.ImageType = ImageType.Sliced;
             shadow.Size = new Size(25, 25);
@@ -51,12 +51,12 @@ namespace piconavx.ui.graphics.ui
             this.text = new Label(text, canvas);
             this.text.FontSize = 14;
             this.text.ZIndex = ContentZIndex;
-            this.text.Color = new FSColor(Color.Text.ToVector4());
+            this.text.Color = Color.Text;
 
             this.description = new Label(description, canvas);
             this.description.FontSize = 12;
             this.description.ZIndex = ContentZIndex;
-            this.description.Color = new FSColor(Color.TextSecondary.ToVector4());
+            this.description.Color = Color.TextSecondary;
 
             flow = new FlowLayout(this);
             flow.Direction = FlowDirection.Vertical;
@@ -77,7 +77,7 @@ namespace piconavx.ui.graphics.ui
 
         private PopupLayout popupLayout;
 
-        public ButtonColor Color { get; set; } = ButtonColor.Neutral;
+        public ButtonColor Color { get; set; } = Theme.Neutral;
 
         public string Text { get => this.text.Text; set => this.text.Text = value; }
         public float FontSize { get => this.text.FontSize; set => this.text.FontSize = value; }
@@ -206,8 +206,8 @@ namespace piconavx.ui.graphics.ui
             }
 
             background.Color = Color.Background;
-            text.Color = new FSColor(Color.Text.ToVector4());
-            description.Color = new FSColor(Color.TextSecondary.ToVector4());
+            text.Color = Color.Text;
+            description.Color = Color.TextSecondary;
 
             if (popupLayout.Target != null)
             {

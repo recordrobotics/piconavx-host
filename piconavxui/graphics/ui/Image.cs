@@ -97,8 +97,8 @@ namespace piconavx.ui.graphics.ui
         private Texture? mask;
         public Texture? Mask { get => mask; set => mask = value; }
 
-        private Rgba32 color;
-        public Rgba32 Color { get => color; set => color = value; }
+        private UIColor color;
+        public UIColor Color { get => color; set => color = value; }
 
         private float hitTestAlphaClip = 0.5f;
         public float HitTestAlphaClip { get => hitTestAlphaClip; set => hitTestAlphaClip = value; }
@@ -120,7 +120,7 @@ namespace piconavx.ui.graphics.ui
             bounds = new RectangleF(0, 0, 0, 0);
             material ??= Scene.AddResource(new ImageMaterial());
             maskedMaterial ??= Scene.AddResource(new MaskedImageMaterial());
-            color = new Rgba32(200, 200, 200, 255);
+            color = new SolidUIColor(new Rgba32(200, 200, 200, 255));
         }
 
         private void UVAspect<T>(ref T vertex, bool uv1, bool uv2) where T : unmanaged, ITessellatorVertex<T>

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using piconavx.ui.graphics.ui;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace piconavx.ui
@@ -17,11 +18,11 @@ namespace piconavx.ui
 
             public static Settings Default => new Settings()
             {
-                Test = 69
+                Theme = null
             };
 
-            [JsonPropertyName("test")]
-            public int Test { get; set; }
+            [JsonPropertyName("theme")]
+            public string? Theme { get; set; }
         }
 
         private static string? savePath;
@@ -105,6 +106,30 @@ namespace piconavx.ui
             }
         }
 
+        internal static Theme.ThemeFile ReadTheme(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return Theme.ThemeFile.Default;
+
+            Stream? fs = GetResource(Path.Join("themes", name));
+
+            if (fs != null)
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<Theme.ThemeFile>(fs, SourceGenerationContext.Default.ThemeFile) ?? Theme.ThemeFile.Default;
+                }
+                finally
+                {
+                    fs.Dispose();
+                }
+            }
+            else
+            {
+                return Theme.ThemeFile.Default;
+            }
+        }
+
         public static bool WriteSettings(Settings settings)
         {
             if (isReadOnly || savePath == null) return false;
@@ -128,6 +153,7 @@ namespace piconavx.ui
 
     [JsonSourceGenerationOptions(WriteIndented = true)]
     [JsonSerializable(typeof(SavedResource.Settings))]
+    [JsonSerializable(typeof(Theme.ThemeFile))]
     internal partial class SourceGenerationContext : JsonSerializerContext
     {
     }
