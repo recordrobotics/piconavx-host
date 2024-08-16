@@ -366,6 +366,23 @@ namespace piconavx.ui.graphics.ui
                         }
                     }
                     break;
+                case Key.V:
+                    {
+                        if (modifiers == Modifiers.Ctrl)
+                        {
+                            if (SelectionLength != 0)
+                            {
+                                RemoveChars(SelectionStart, SelectionLength);
+                                SelectionLength = 0;
+                                Cursor = SelectionStart;
+                            }
+
+                            string clipboard = Window.Current.PrimaryKeyboard?.ClipboardText ?? string.Empty;
+                            AddString(clipboard, Cursor);
+                            Cursor += clipboard.Length;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -447,23 +464,6 @@ namespace piconavx.ui.graphics.ui
                             {
                                 Window.Current.PrimaryKeyboard.ClipboardText = GetChars(SelectionStart, SelectionLength);
                             }
-                        }
-                    }
-                    break;
-                case Key.V:
-                    {
-                        if (modifiers == Modifiers.Ctrl)
-                        {
-                            if (SelectionLength != 0)
-                            {
-                                RemoveChars(SelectionStart, SelectionLength);
-                                SelectionLength = 0;
-                                Cursor = SelectionStart;
-                            }
-
-                            string clipboard = Window.Current.PrimaryKeyboard?.ClipboardText ?? string.Empty;
-                            AddString(clipboard, Cursor);
-                            Cursor += clipboard.Length;
                         }
                     }
                     break;

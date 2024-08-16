@@ -78,6 +78,12 @@ namespace piconavx.ui.graphics.ui
             get => color; set => color = value;
         }
 
+        private Rgba32 selectionColor;
+        public Rgba32 SelectionColor
+        {
+            get => selectionColor; set => selectionColor = value;
+        }
+
         private bool overrideInputFocused = false;
         public override bool InputFocused { get => overrideInputFocused || Canvas.LastTarget == background; set => overrideInputFocused = value; }
 
@@ -115,6 +121,7 @@ namespace piconavx.ui.graphics.ui
 
             this.text = new(text);
             color = FSColor.White;
+            selectionColor = Rgba32.ParseHex("#1857ba");
             bounds = GetAutoSizeBounds(out _);
             InvalidateGlyphs(true);
         }
@@ -172,7 +179,7 @@ namespace piconavx.ui.graphics.ui
                     {
                         if (i >= SelectionStart)
                         {
-                            Tessellator.Quad.DrawQuad(new RectangleF(xs, contentBounds.Y + row * lineHeight, xe - xs, lineHeight), new Rgba32(0, 0, 255, 255));
+                            Tessellator.Quad.DrawQuad(new RectangleF(xs, contentBounds.Y + row * lineHeight, xe - xs, lineHeight), selectionColor);
                         }
 
                         row++;
@@ -181,9 +188,9 @@ namespace piconavx.ui.graphics.ui
                     }
                 }
 
-                if(xe > (int)contentBounds.X)
+                if (xe > (int)contentBounds.X)
                 {
-                    Tessellator.Quad.DrawQuad(new RectangleF(xs, contentBounds.Y + row * lineHeight, xe - xs, lineHeight), new Rgba32(0, 0, 255, 255));
+                    Tessellator.Quad.DrawQuad(new RectangleF(xs, contentBounds.Y + row * lineHeight, xe - xs, lineHeight), selectionColor);
                 }
 
                 Tessellator.Quad.Flush();
