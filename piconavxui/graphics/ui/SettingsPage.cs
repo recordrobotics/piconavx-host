@@ -87,12 +87,9 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(cancelButton);
             cancelButton.SetTooltip("Discard changes");
 
-            inputField = new InputField("Hello\nhello\nHELLO", canvas);
+            inputField = new InputField("Hello", canvas);
             inputField.Cursor = inputField.Text.Length;
             inputField.FontSize = 20;
-            inputField.BlinkMode = InputField.CursorBlinkMode.Blink;
-            inputField.Multiline = true;
-            inputField.AutoSizeMultiline = true;
             inputFieldLayout = new AnchorLayout(inputField, this);
             inputFieldLayout.Anchor = Anchor.TopLeft;
             inputFieldLayout.Insets = new Insets(40, 200, 0, 0);

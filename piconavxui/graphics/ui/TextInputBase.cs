@@ -378,6 +378,7 @@ namespace piconavx.ui.graphics.ui
                             }
 
                             string clipboard = Window.Current.PrimaryKeyboard?.ClipboardText ?? string.Empty;
+                            clipboard = clipboard.Replace("\n", "");
                             AddString(clipboard, Cursor);
                             Cursor += clipboard.Length;
                         }

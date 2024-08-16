@@ -265,7 +265,7 @@ namespace piconavx.ui.graphics.ui
 
                 if (autoSize)
                 {
-                    bounds = new RectangleF(bounds.X, bounds.Y, size.Width, data.lineHeight);
+                    bounds = new RectangleF(bounds.X, bounds.Y, size.Width, data.lineHeight + padding.Vertical);
                 }
 
                 if (autoSizeMultiline)
