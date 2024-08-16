@@ -330,6 +330,20 @@ namespace piconavx.ui.graphics.ui
             InvalidateGlyphs(true);
         }
 
+        protected override string GetChars(int index, int length)
+        {
+            return text.ToString().Substring(index, length);
+        }
+
+        protected override void AddString(string str, int index)
+        {
+            if (index < text.Length)
+                text.Insert(index, str);
+            else
+                text.Append(str);
+            InvalidateGlyphs(true);
+        }
+
         protected override void InvalidateCursor()
         {
             cursorVisible = true;

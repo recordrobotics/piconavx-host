@@ -1,6 +1,5 @@
 ﻿using FontStashSharp;
 using Silk.NET.Input;
-using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 
@@ -153,7 +152,9 @@ namespace piconavx.ui.graphics.ui
         protected abstract void InvalidateCursor();
         protected abstract void InvalidateGlyphs(bool contentsModified);
         protected abstract void AddChar(char chr, int index);
+        protected abstract void AddString(string str, int index);
         protected abstract void RemoveChars(int index, int length);
+        protected abstract string GetChars(int index, int length);
 
         private void Repeater_KeyDown(Key key)
         {
@@ -163,9 +164,18 @@ namespace piconavx.ui.graphics.ui
             {
                 case Key.Backspace:
                     {
-                        if (Cursor > 0)
+                        if (SelectionLength == 0)
                         {
-                            RemoveChars(--Cursor, 1);
+                            if (Cursor > 0)
+                            {
+                                RemoveChars(--Cursor, 1);
+                                InvalidateCursor();
+                            }
+                        } else
+                        {
+                            RemoveChars(SelectionStart, SelectionLength);
+                            SelectionLength = 0;
+                            Cursor = SelectionStart;
                             InvalidateCursor();
                         }
                     }
@@ -174,6 +184,13 @@ namespace piconavx.ui.graphics.ui
                     {
                         if (Multiline)
                         {
+                            if(SelectionLength != 0)
+                            {
+                                RemoveChars(SelectionStart, SelectionLength);
+                                SelectionLength = 0;
+                                Cursor = SelectionStart;
+                            }
+
                             AddChar((char)NEW_LINE_CODEPOINT, Cursor++);
                             InvalidateCursor();
                         }
@@ -181,7 +198,14 @@ namespace piconavx.ui.graphics.ui
                     break;
                 case Key.Left:
                     {
-                        if (Cursor > 0)
+                        if (SelectionLength != 0 && !modifiers.HasFlag(Modifiers.Shift))
+                        {
+                            Cursor = SelectionStart;
+                            SelectionStart = 0;
+                            SelectionLength = 0;
+                            InvalidateCursor();
+                        }
+                        else if (Cursor > 0)
                         {
                             Cursor--;
 
@@ -192,7 +216,7 @@ namespace piconavx.ui.graphics.ui
                                     SelectionLength = 1;
                                     SelectionStart = Cursor;
                                 }
-                                else if(SelectionStart > Cursor)
+                                else if (SelectionStart > Cursor)
                                 {
                                     SelectionStart = Cursor;
                                     SelectionLength++;
@@ -214,7 +238,13 @@ namespace piconavx.ui.graphics.ui
                     break;
                 case Key.Right:
                     {
-                        if (Cursor < glyphs.Count)
+                        if (SelectionLength != 0 && !modifiers.HasFlag(Modifiers.Shift))
+                        {
+                            Cursor = SelectionStart + SelectionLength;
+                            SelectionStart = 0;
+                            SelectionLength = 0;
+                            InvalidateCursor();
+                        } else if (Cursor < glyphs.Count)
                         {
                             if (modifiers.HasFlag(Modifiers.Shift))
                             {
@@ -341,7 +371,14 @@ namespace piconavx.ui.graphics.ui
 
         private void Repeater_Char(char key)
         {
-            if (Disabled || !InputFocused) return;
+            if (Disabled || !InputFocused || modifiers.HasFlag(Modifiers.Ctrl)) return;
+
+            if (SelectionLength != 0)
+            {
+                RemoveChars(SelectionStart, SelectionLength);
+                SelectionLength = 0;
+                Cursor = SelectionStart;
+            }
 
             AddChar(key, Cursor++);
         }
@@ -350,6 +387,7 @@ namespace piconavx.ui.graphics.ui
         enum Modifiers : uint
         {
             Shift = 1 << 0,
+            Ctrl = 1 << 1,
             None = 0
         }
 
@@ -365,6 +403,12 @@ namespace piconavx.ui.graphics.ui
                         modifiers &= ~Modifiers.Shift;
                     }
                     break;
+                case Key.ControlLeft:
+                case Key.ControlRight:
+                    {
+                        modifiers &= ~Modifiers.Ctrl;
+                    }
+                    break;
             }
         }
 
@@ -378,6 +422,51 @@ namespace piconavx.ui.graphics.ui
                         modifiers |= Modifiers.Shift;
                     }
                     break;
+                case Key.ControlLeft:
+                case Key.ControlRight:
+                    {
+                        modifiers |= Modifiers.Ctrl;
+                    }
+                    break;
+                case Key.A:
+                    {
+                        if(modifiers == Modifiers.Ctrl)
+                        {
+                            SelectionStart = 0;
+                            SelectionLength = glyphs.Count;
+                            Cursor = glyphs.Count;
+                            InvalidateCursor();
+                        }
+                    }
+                    break;
+                case Key.C:
+                    {
+                        if (modifiers == Modifiers.Ctrl)
+                        {
+                            if (SelectionLength != 0 && Window.Current.PrimaryKeyboard != null)
+                            {
+                                Window.Current.PrimaryKeyboard.ClipboardText = GetChars(SelectionStart, SelectionLength);
+                            }
+                        }
+                    }
+                    break;
+                case Key.V:
+                    {
+                        if (modifiers == Modifiers.Ctrl)
+                        {
+                            if (SelectionLength != 0)
+                            {
+                                RemoveChars(SelectionStart, SelectionLength);
+                                SelectionLength = 0;
+                                Cursor = SelectionStart;
+                            }
+
+                            string clipboard = Window.Current.PrimaryKeyboard?.ClipboardText ?? string.Empty;
+                            AddString(clipboard, Cursor);
+                            Cursor += clipboard.Length;
+                        }
+                    }
+                    break;
                 default:
                     {
                         var repeater = new EventRepeater<GenericPriority, Key>(key);
@@ -389,6 +478,9 @@ namespace piconavx.ui.graphics.ui
         }
 
         bool prevMouseDown = false;
+        int selectStart = 0;
+        int prevSelectEnd = -1;
+
         private void Scene_Update(double deltaTime)
         {
             if (MouseDown && !prevMouseDown)
@@ -399,8 +491,33 @@ namespace piconavx.ui.graphics.ui
                 if (newCursor != -1)
                 {
                     Cursor = newCursor;
+                    selectStart = newCursor;
                     InvalidateCursor();
                 }
+            }
+
+            if (MouseDown)
+            {
+                Vector2 mouse = (Window.Current.Input?.Mice.FirstOrDefault()?.Position / GlobalScale) ?? new(0);
+                int row = (int)MathF.Floor((mouse.Y - ContentBounds.Y) / GetLineHeight());
+                var newCursor = GetGlyphAt(row, (int)mouse.X);
+                if (newCursor != -1)
+                {
+                    Cursor = newCursor;
+                    int selectEnd = newCursor;
+
+                    if (selectEnd != prevSelectEnd)
+                    {
+                        InvalidateCursor();
+                    }
+                    prevSelectEnd = selectEnd;
+
+                    SelectionStart = Math.Min(selectStart, selectEnd);
+                    SelectionLength = Math.Max(selectStart, selectEnd) - SelectionStart;
+                }
+            } else
+            {
+                prevSelectEnd = -1;
             }
 
             prevMouseDown = MouseDown;
