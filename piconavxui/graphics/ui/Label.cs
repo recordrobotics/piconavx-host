@@ -76,14 +76,6 @@ namespace piconavx.ui.graphics.ui
             var fontSystem = Window.FontSystems[this.font];
             var font = fontSystem.GetFont(fontSize);
 
-            /*var glyphs = font.GetGlyphs(text, new Vector2(bounds.X, bounds.Y), renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
-            UIMaterial.ColorMaterial.Use(properties);
-            foreach (var glyph in glyphs)
-            {
-                Tessellator.Quad.DrawQuad(glyph.Bounds.AsFloat().Transform(Transform.Matrix), new Rgba32(255, 0, 255, 255));
-            }
-            Tessellator.Quad.Flush();
-*/
             Window.FontRenderer.Begin(Transform.Matrix);
             font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
             Window.FontRenderer.End();

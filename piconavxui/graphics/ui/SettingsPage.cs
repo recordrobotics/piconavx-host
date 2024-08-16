@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
+using System.Numerics;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -86,10 +87,12 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(cancelButton);
             cancelButton.SetTooltip("Discard changes");
 
-            inputField = new InputField("Hello", canvas);
+            inputField = new InputField("Hello\nhello\nHELLO", canvas);
             inputField.Cursor = inputField.Text.Length;
-            inputField.Bounds = new RectangleF(0, 0, 100, 100);
             inputField.FontSize = 20;
+            inputField.BlinkMode = InputField.CursorBlinkMode.Blink;
+            inputField.Multiline = true;
+            inputField.AutoSizeMultiline = true;
             inputFieldLayout = new AnchorLayout(inputField, this);
             inputFieldLayout.Anchor = Anchor.TopLeft;
             inputFieldLayout.Insets = new Insets(40, 200, 0, 0);
@@ -105,7 +108,7 @@ namespace piconavx.ui.graphics.ui
             controlPanel.ZIndex = ZIndex + 9;
             saveButton.ZIndex = ZIndex + 9;
             cancelButton.ZIndex = ZIndex + 9;
-            inputField.ZIndex = ZIndex + 9;
+            inputField.ZIndex = ZIndex + 10;
         }
 
         public override void Show()

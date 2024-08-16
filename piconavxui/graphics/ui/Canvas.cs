@@ -1,12 +1,6 @@
 ﻿using Silk.NET.OpenGL;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -23,6 +17,9 @@ namespace piconavx.ui.graphics.ui
 
         private UIController? target = null;
         public UIController? Target { get => target; }
+
+        private UIController? lastTarget = null;
+        public UIController? LastTarget { get => lastTarget; }
 
         public Canvas()
         {
@@ -176,6 +173,7 @@ namespace piconavx.ui.graphics.ui
                     {
                         if (component.MouseDown && component.MouseOver)
                         {
+                            lastTarget = component;
                             component.NotifyClick();
                         }
 

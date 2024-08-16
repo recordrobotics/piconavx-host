@@ -24,6 +24,10 @@ namespace piconavx.ui.controllers
         /// </summary>
         public bool TargetBoundsOutline { get; set; } = false;
         /// <summary>
+        /// Draws a thin red outline around the current <see cref="Canvas.LastTarget"/> of the <see cref="Canvas.InputCanvas"/>
+        /// </summary>
+        public bool LastTargetBoundsOutline { get; set; } = false;
+        /// <summary>
         /// Draws a thin cyan outline around the <see cref="FlowLayout.ContentBounds"/> of every <see cref="FlowLayout"/> in <see cref="FlowLayout.Instances"/>
         /// </summary>
         public bool FlowLayoutContentBoundsOutline { get; set; } = false;
@@ -103,6 +107,15 @@ namespace piconavx.ui.controllers
                     if (TargetBoundsOutline)
                     {
                         Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.Target.Bounds.Transform(Canvas.InputCanvas.Target.Transform.Matrix), new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 255, 0, 255), 1);
+                    }
+                }
+
+                if (Canvas.InputCanvas.LastTarget != null)
+                {
+                    // Draw outline around target bounds
+                    if (LastTargetBoundsOutline)
+                    {
+                        Tessellator.Quad.DrawRectangleOutline(Canvas.InputCanvas.LastTarget.Bounds.Transform(Canvas.InputCanvas.LastTarget.Transform.Matrix), new SixLabors.ImageSharp.PixelFormats.Rgba32(255, 0, 0, 255), 1);
                     }
                 }
 

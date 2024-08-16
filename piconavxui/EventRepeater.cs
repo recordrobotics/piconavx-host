@@ -12,7 +12,7 @@ namespace piconavx.ui
         private bool started;
         public bool Started => started;
 
-        private double initialDelay = 0.625;
+        private double initialDelay = 0.5;
         public double InitialDelay { get => initialDelay; set => initialDelay = value; }
 
         private double repeatInterval = 0.033;

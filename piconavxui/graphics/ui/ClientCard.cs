@@ -97,6 +97,8 @@ namespace piconavx.ui.graphics.ui
 
         public ClientCard(string id, bool highBandwidth, string address, string port, string version, string status, string memory, string temperature, Canvas canvas) : base(canvas)
         {
+            Transform.SetOrigin(this, new(0.5f));
+
             SupportsInputEvents = true;
             this.highBandwidth = highBandwidth;
 
@@ -474,7 +476,7 @@ namespace piconavx.ui.graphics.ui
             scaleTransition.Value = MouseDown ? 0.95f : MouseOver ? 1.05f : 1f;
             scaleTransition.Step(delta);
 
-            Transform.Origin = new Vector3(Bounds.Left + Bounds.Width / 2, Bounds.Top + Bounds.Height / 2, 0);
+            Transform.UpdateCache();
             Transform.Scale = new Vector3(scaleTransition.Value);
         }
     }
