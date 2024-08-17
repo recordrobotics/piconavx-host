@@ -32,7 +32,7 @@ namespace piconavx.ui.graphics.ui
         private Badge? readOnlyBadge;
         private Tooltip? readOnlyBadgeTooltip;
 
-        public SettingsPage(Canvas canvas, Navigator navigator) : base(canvas, navigator)
+        public SettingsPage(Canvas canvas, Navigator navigator, UIServer server) : base(canvas, navigator)
         {
             background = new Image(canvas);
             background.Color = Theme.Background;
@@ -101,6 +101,15 @@ namespace piconavx.ui.graphics.ui
                     newSettings.Port = SavedResource.Settings.Current.Port;
                 }
 
+                if (int.TryParse(clientIdentificationTimeout?.Text.ToString() ?? "5000", out p))
+                {
+                    newSettings.IdentificationTimeout = p;
+                }
+                else
+                {
+                    newSettings.IdentificationTimeout = SavedResource.Settings.Current.IdentificationTimeout;
+                }
+
                 if (int.TryParse(clientTimeout?.Text.ToString() ?? "1000", out p))
                 {
                     newSettings.Timeout = p;
@@ -123,9 +132,19 @@ namespace piconavx.ui.graphics.ui
 
                 if (SavedResource.WriteSettings(newSettings))
                 {
+                    bool serverChanged = !(SavedResource.Settings.Current.Address?.Equals(newSettings.Address) ?? false) || !SavedResource.Settings.Current.Port.Equals(newSettings.Port);
+
                     SavedResource.Settings.SetSettings(newSettings);
+
                     Theme.UpdateTheme();
+
                     Alert.CreateOneShot("Settings successfully saved!", "File written to '" + Path.Join(SavedResource.SavePath, "settings.json") + "'.", canvas).Color = Theme.Success;
+
+                    if (serverChanged)
+                    {
+                        server.Stop();
+                        server.Start(canvas);
+                    }
                 } else if(!SavedResource.ReadOnly)
                 {
                     Alert.CreateOneShot("Could not save settings!", "An error occurred while trying to write to\n'" + Path.Join(SavedResource.SavePath, "settings.json") + "'.", canvas).Color = Theme.Error;
@@ -248,6 +267,7 @@ namespace piconavx.ui.graphics.ui
 
         private InputField? serverIp;
         private InputField? serverPort;
+        private InputField? clientIdentificationTimeout;
         private InputField? clientTimeout;
         private InputField? clientHighBandwidthTimeout;
         private InputField? theme;
@@ -294,6 +314,14 @@ namespace piconavx.ui.graphics.ui
             serverPort.MaxLength = 7;
             serverPort.Filter = char.IsAsciiDigit;
             serverPort.Bounds = serverPort.GetAutoSizeBounds('0', 7, out _);
+
+            clientIdentificationTimeout = AddInput("Client identification timeout",
+                "This is the maximum number of milliseconds that a client\n" +
+                "has to identify themselves before getting disconnected.", SavedResource.Settings.Current.IdentificationTimeout.ToString());
+            clientIdentificationTimeout.AutoSize = false;
+            clientIdentificationTimeout.MaxLength = 10;
+            clientIdentificationTimeout.Filter = char.IsAsciiDigit;
+            clientIdentificationTimeout.Bounds = clientIdentificationTimeout.GetAutoSizeBounds('0', 10, out _);
 
             clientTimeout = AddInput("Client connection timeout",
                 "This is the maximum number of milliseconds without updates\n" +

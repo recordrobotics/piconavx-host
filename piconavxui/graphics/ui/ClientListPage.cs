@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
+using System.Net;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -45,10 +46,13 @@ namespace piconavx.ui.graphics.ui
         private ClientPreviewPage clientPreviewPage;
         private SettingsPage settingsPage;
 
-        public ClientListPage(Canvas canvas, Navigator navigator, ClientPreviewPage clientPreviewPage, SettingsPage settingsPage) : base(canvas, navigator)
+        private UIServer server;
+
+        public ClientListPage(Canvas canvas, Navigator navigator, ClientPreviewPage clientPreviewPage, SettingsPage settingsPage, UIServer server) : base(canvas, navigator)
         {
             this.clientPreviewPage = clientPreviewPage;
             this.settingsPage = settingsPage;
+            this.server = server;
 
             cardShadowTexture ??= Scene.AddResource(new Texture("assets/textures/cardshadow.png")
             {
@@ -95,17 +99,24 @@ namespace piconavx.ui.graphics.ui
             playIcon = new Texture("assets/textures/play.png");
             stopIcon = new Texture("assets/textures/stop.png");
 
-            startButton = new Button("Start", canvas);
-            startButton.Icon = playIcon;
-            startButton.Color = Theme.Success;
+            startButton = new Button(server.Running ? "Stop" : "Start", canvas);
+            startButton.Icon = server.Running ? stopIcon : playIcon;
+            startButton.Color = server.Running ? Theme.Error : Theme.Success;
             startButton.IconSize = new SizeF(45, 45);
-            startButton.IconGap = 4.5f;
+            startButton.IconGap = server.Running ? 6.0f : 4.5f;
             startButton.FontSize = 15;
             startButton.RenderOffset = new System.Numerics.Vector2(0, 2);
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
+            startButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
+            {
+                if (server.Running)
+                    server.Stop();
+                else
+                    server.Start(canvas);
+            });
             controlPanel.Components.Add(startButton);
-            startButton.SetTooltip("Run host server");
+            startButton.SetTooltip(server.Running ? "Stop host server" : "Run host server");
 
             settingsIcon = new Texture("assets/textures/settings.png");
 
@@ -141,7 +152,31 @@ namespace piconavx.ui.graphics.ui
             bottomBarLayout.Anchor = Anchor.Left | Anchor.Right | Anchor.Bottom;
             bottomBarLayout.Insets = new Insets(0);
 
-            statusLabel = new Label("Server running on 192.168.1.140:65432", canvas);
+            statusLabel = new Label(() =>
+            {
+                if (!server.Running)
+                    return "Server not started";
+
+                if (server.LocalEndpoint is IPEndPoint endpoint)
+                {
+                    if (endpoint.Address.Equals(IPAddress.Any))
+                    {
+                        var addresses = server.GetInterfaceAddresses();
+                        if (addresses == null)
+                            return $"Server running on {endpoint.Address}:{endpoint.Port}";
+
+                        return $"Server running on {string.Join(", ", addresses.Select(v => $"{v}:{endpoint.Port}"))}";
+                    }
+                    else
+                    {
+                        return $"Server running on {endpoint.Address}:{endpoint.Port}";
+                    }
+                }
+                else
+                {
+                    return "Server running with unsupported endpoint";
+                }
+            }, canvas);
             statusLabel.FontSize = 13;
             statusLabel.Font = FontFace.InterLight;
             statusLabel.Color = Theme.TextSecondary;
@@ -173,6 +208,8 @@ namespace piconavx.ui.graphics.ui
 
         public override void Show()
         {
+            Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
+
             SubscribeLater(
                 background, backgroundAnchor,
                 headerPanel, headerPanelLayout,
@@ -250,6 +287,18 @@ namespace piconavx.ui.graphics.ui
                 bottomBar, bottomBarLayout,
                 statusLabel, statusLabelLayout
                 );
+
+            Scene.Update -= Scene_Update;
+        }
+
+        private void Scene_Update(double deltaTime)
+        {
+            startButton.Text = server.Running ? "Stop" : "Start";
+            startButton.Color = server.Running ? Theme.Error : Theme.Success;
+            startButton.SetTooltip(server.Running ? "Stop host server" : "Run host server");
+            startButton.RenderOffset = server.Running ? new System.Numerics.Vector2(0, 0) : new System.Numerics.Vector2(0, 2);
+            startButton.Icon = server.Running ? stopIcon : playIcon;
+            startButton.IconGap = server.Running ? 6.0f : 4.5f;
         }
     }
 }

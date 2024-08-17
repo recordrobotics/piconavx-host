@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -145,8 +146,10 @@ namespace piconavx.ui.graphics.ui
         {
             get => icon.Texture; set
             {
+                if (value != null && icon.Texture == value)
+                    return;
                 icon.Texture = value;
-                icon.Bounds = (value == null && !isIconButton) ? new RectangleF(0, 0, 0, iconSize.Height) : new RectangleF(0, 0, iconSize.Width, iconSize.Height);
+                icon.Bounds = (value == null && !isIconButton) ? new RectangleF(icon.Bounds.X, icon.Bounds.Y, 0, iconSize.Height) : new RectangleF(icon.Bounds.X, icon.Bounds.Y, iconSize.Width, iconSize.Height);
                 textAnchor.Insets = new Insets(padding.Left + (value == null ? 0 : iconSize.Width + iconGap), padding.Top, padding.Right, padding.Bottom);
             }
         }
@@ -156,9 +159,11 @@ namespace piconavx.ui.graphics.ui
         {
             get => isIconButton; set
             {
+                if (isIconButton == value)
+                    return;
                 isIconButton = value;
                 iconAnchor.Anchor = isIconButton ? Anchor.All : (Anchor.TopLeft | Anchor.Bottom);
-                icon.Bounds = (Icon == null && !isIconButton) ? new RectangleF(0, 0, 0, iconSize.Height) : new RectangleF(0, 0, iconSize.Width, iconSize.Height);
+                icon.Bounds = (Icon == null && !isIconButton) ? new RectangleF(icon.Bounds.X, icon.Bounds.Y, 0, iconSize.Height) : new RectangleF(icon.Bounds.X, icon.Bounds.Y, iconSize.Width, iconSize.Height);
                 if (isIconButton)
                 {
                     Canvas.RemoveComponent(text);
@@ -202,18 +207,21 @@ namespace piconavx.ui.graphics.ui
         public void SetTooltip(string tooltip)
         {
             this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Text = tooltip;
             this.tooltip.Anchor = PopupAnchor.Bottom;
         }
 
         public void SetTooltip(string tooltip, PopupAnchor anchor)
         {
             this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Text = tooltip;
             this.tooltip.Anchor = anchor;
         }
 
         public void SetTooltip(string tooltip, PopupAnchor anchor, Vector2 offset)
         {
             this.tooltip ??= new Tooltip(tooltip, string.Empty, this, Canvas);
+            this.tooltip.Text = tooltip;
             this.tooltip.Anchor = anchor;
             this.tooltip.Offset = offset;
         }

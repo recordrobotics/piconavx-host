@@ -29,7 +29,7 @@ namespace piconavx.ui.graphics.ui
         private ClientDetails dataPanel;
         private AnchorLayout dataPanelLayout;
 
-        public ClientPreviewPage(Canvas canvas, Camera camera, Navigator navigator) : base(canvas, navigator)
+        public ClientPreviewPage(Canvas canvas, Camera camera, Navigator navigator, UIServer server) : base(canvas, navigator)
         {
             reference = Scene.AddResource(new Model("assets/models/reference.obj"));
             reference.RenderPriority = RenderPriority.DrawTransparent;

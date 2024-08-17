@@ -1,35 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace piconavx
 {
     public class Server : IDisposable
     {
         public List<Client> Clients { get; } = new List<Client>();
-        public int ClientTimeout = 1000;
+        public int ClientTimeout { get; set; } = 1000;
+        public int ClientIdentificationTimeout { get; set; } = 5000;
         // Longer timeout for high bandwidth clients because they send less frequent updates to fit more data through
-        public int ClientHighBandwidthTimeout = 10000;
+        public int ClientHighBandwidthTimeout { get; set; } = 10000;
 
         public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
         public event EventHandler<ClientDisconnectedEventArgs>? ClientDisconnected;
 
-        private TcpListener listener;
+        private TcpListener? listener;
         private Task? acceptTask = null;
-        private CancellationTokenSource cancelSource;
+        private CancellationTokenSource? cancelSource;
 
-        public Server(int port)
-        {
-            cancelSource = new CancellationTokenSource();
-            listener = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
-        }
+        private bool running = false;
+        public bool Running => running;
+
+        public EndPoint? LocalEndpoint => listener?.LocalEndpoint;
+        public Socket? Socket => listener?.Server;
 
         private void FireClientConnected(object? sender, ClientConnectedEventArgs eventArgs)
         {
@@ -53,7 +47,8 @@ namespace piconavx
                 {
                     using CancellationTokenSource source = new CancellationTokenSource();
                     source.CancelAfter(client.HighBandwidthMode ? ClientHighBandwidthTimeout : ClientTimeout);
-                    string? line = await client.Reader.ReadLineAsync(source.Token);
+                    using var link = CancellationTokenSource.CreateLinkedTokenSource(source.Token, cancellationToken);
+                    string? line = await client.Reader.ReadLineAsync(link.Token);
                     if (line == null)
                     {
                         Debug.WriteLine("Error: client reader got null");
@@ -195,10 +190,11 @@ namespace piconavx
             using StreamReader reader = new StreamReader(client.GetStream());
             using StreamWriter writer = new StreamWriter(client.GetStream());
             using CancellationTokenSource source = new CancellationTokenSource();
+            using CancellationTokenSource idTimeout = new CancellationTokenSource(ClientIdentificationTimeout);
 
             Client dataClient = new Client(null, client, reader, writer);
 
-            if (await Protocol.IdentifyClient(dataClient, source.Token))
+            if (await Protocol.IdentifyClient(dataClient, idTimeout.Token))
             {
                 dataClient.Connected = true;
                 Clients.Add(dataClient);
@@ -207,7 +203,7 @@ namespace piconavx
                 Task<Exception?> read = ReadClient(dataClient, source.Token);
                 Task<Exception?> write = WriteClient(dataClient, source.Token);
 
-                while (!cancelSource.IsCancellationRequested && client.Connected && !read.GetAwaiter().IsCompleted && !write.GetAwaiter().IsCompleted)
+                while (cancelSource != null && !cancelSource.IsCancellationRequested && client.Connected && !read.GetAwaiter().IsCompleted && !write.GetAwaiter().IsCompleted)
                 {
                     await Task.Delay(20);
                 }
@@ -227,7 +223,7 @@ namespace piconavx
         private async Task AcceptTask()
         {
             List<Task> tasks = new List<Task>();
-            while (!cancelSource.IsCancellationRequested)
+            while (cancelSource != null && listener != null && !cancelSource.IsCancellationRequested)
             {
                 try
                 {
@@ -245,24 +241,52 @@ namespace piconavx
             Task.WaitAll(tasks.ToArray());
         }
 
-        public async Task Start()
+        public bool Start(IPAddress localEndpoint, int port)
         {
-            listener.Start();
-            acceptTask = Task.Run(AcceptTask, cancelSource.Token);
-            await acceptTask;
+            if (!running)
+            {
+                cancelSource?.Dispose();
+                cancelSource = new CancellationTokenSource();
+                listener?.Dispose();
+
+                try
+                {
+                    listener = new TcpListener(localEndpoint, port);
+                    listener.Start();
+                }
+                catch
+                {
+                    return false;
+                }
+
+                acceptTask?.Dispose();
+                acceptTask = Task.Run(AcceptTask, cancelSource.Token);
+
+                running = true;
+                return true;
+            }
+
+            return false;
         }
 
         public void Stop()
         {
-            cancelSource.Cancel();
-            acceptTask?.Wait();
-            listener.Stop();
+            if (running)
+            {
+                running = false;
+                cancelSource?.Cancel();
+                acceptTask?.Wait();
+                listener?.Stop();
+            }
         }
 
         public void Dispose()
         {
-            cancelSource.Dispose();
-            listener.Dispose();
+            GC.SuppressFinalize(this);
+            Stop();
+            cancelSource?.Dispose();
+            acceptTask?.Dispose();
+            listener?.Dispose();
         }
 
         public Client ConnectSimulatedClient(string? id)

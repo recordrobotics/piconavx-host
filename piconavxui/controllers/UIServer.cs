@@ -1,13 +1,39 @@
 ﻿using piconavx.ui.graphics;
+using piconavx.ui.graphics.ui;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace piconavx.ui.controllers
 {
     public class UIServer : Controller
     {
         private readonly Server server;
-        private Task? serverTask = null;
+
+        public bool Running => server.Running;
+        public EndPoint? LocalEndpoint => server.LocalEndpoint;
+
+        private static IEnumerable<IPAddress>? _GetInterfaceAddresses_cached = null;
+        private static Stopwatch? _GetInterfaceAddresses_cached_sw = null;
+        const long _GetInterfaceAddresses_cached_refresh = 10000;
+        // https://stackoverflow.com/a/60092903
+        public IEnumerable<IPAddress>? GetInterfaceAddresses()
+        {
+            if (_GetInterfaceAddresses_cached == null || _GetInterfaceAddresses_cached_sw == null || _GetInterfaceAddresses_cached_sw.ElapsedMilliseconds >= _GetInterfaceAddresses_cached_refresh)
+            {
+                _GetInterfaceAddresses_cached = NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(i => i.OperationalStatus == OperationalStatus.Up && i.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                    .SelectMany(i => i.GetIPProperties().UnicastAddresses)
+                    .Where(u => u.Address.AddressFamily == AddressFamily.InterNetwork)
+                    .Select(i => i.Address);
+                _GetInterfaceAddresses_cached_sw ??= new();
+                _GetInterfaceAddresses_cached_sw.Restart();
+            }
+
+            return _GetInterfaceAddresses_cached;
+        }
 
         public IReadOnlyList<Client> Clients => server.Clients.AsReadOnly();
 
@@ -28,20 +54,42 @@ namespace piconavx.ui.controllers
             return clientFeeds.ContainsKey(client) ? clientFeeds[client].AsReadOnly() : null;
         }
 
-        public UIServer(int port)
+        public UIServer()
         {
-            server = new Server(port);
+            server = new Server();
             server.ClientConnected += Server_ClientConnected;
             server.ClientDisconnected += Server_ClientDisconnected;
         }
 
-        public void Start()
+        public bool Start()
         {
-            serverTask = server.Start();
-            Scene.InvokeLater(() =>
+            return Start(null);
+        }
+
+        public bool Start(Canvas? alertCanvas)
+        {
+            var ip = SavedResource.Settings.Current.Address;
+            var port = SavedResource.Settings.Current.Port;
+
+            if (IPAddress.TryParse(ip, out var ipAddress) && server.Start(ipAddress, port))
             {
-                server.ConnectSimulatedClient("Demo Client");
-            }, DeferralMode.WhenAvailable);
+                Scene.InvokeLater(() =>
+                {
+                    server.ConnectSimulatedClient("Demo Client");
+                }, DeferralMode.WhenAvailable);
+                return true;
+            }
+            else if (alertCanvas != null)
+            {
+                Alert.CreateOneShot("Server not started!", $"There was an error binding the listener to '{ip}:{port}'", alertCanvas).Color = Theme.Error;
+            }
+
+            return false;
+        }
+
+        public void Stop()
+        {
+            server.Stop();
         }
 
         public void Shutdown()
@@ -49,8 +97,7 @@ namespace piconavx.ui.controllers
             server.ClientConnected -= Server_ClientConnected;
             server.ClientDisconnected -= Server_ClientDisconnected;
 
-            server.Stop();
-            serverTask?.Wait(200);
+            server.Dispose();
 
             clientUpdates.Clear();
             clientConnects.Clear();
@@ -136,6 +183,10 @@ namespace piconavx.ui.controllers
 
         private void Scene_Update(double deltaTime)
         {
+            server.ClientIdentificationTimeout = SavedResource.Settings.Current.IdentificationTimeout;
+            server.ClientTimeout = SavedResource.Settings.Current.Timeout;
+            server.ClientHighBandwidthTimeout = SavedResource.Settings.Current.HighTimeout;
+
             {
                 if (clientConnects.TryDequeue(out Client? client))
                 {

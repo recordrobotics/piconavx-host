@@ -26,6 +26,7 @@ namespace piconavx.ui
                 Theme = null,
                 Address = "0.0.0.0",
                 Port = 65432,
+                IdentificationTimeout = 5000,
                 Timeout = 1000,
                 HighTimeout = 10000
             };
@@ -34,6 +35,8 @@ namespace piconavx.ui
             public string? Address { get; set; }
             [JsonPropertyName("port")]
             public int Port { get; set; }
+            [JsonPropertyName("id_timeout")]
+            public int IdentificationTimeout { get; set; }
             [JsonPropertyName("timeout")]
             public int Timeout { get; set; }
             [JsonPropertyName("high_timeout")]

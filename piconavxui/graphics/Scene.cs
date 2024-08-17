@@ -52,48 +52,30 @@ namespace piconavx.ui.graphics
                 LastTargetBoundsOutline = true,*/
             });
 
+            UIServer server = AddController(new UIServer());
+            server.Start(canvas);
+
             Navigator navigator = new();
 
-            SettingsPage settingsPage = AddController(new SettingsPage(canvas, navigator));
+            SettingsPage settingsPage = AddController(new SettingsPage(canvas, navigator, server));
             settingsPage.ZIndex = 20;
             AnchorLayout settingsPageLayout = AddController(new AnchorLayout(settingsPage));
             settingsPageLayout.Anchor = Anchor.All;
             settingsPageLayout.Insets = new Insets(0);
 
-            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator));
+            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator, server));
             clientPreviewPage.ZIndex = 0;
             AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
             clientPreviewPageLayout.Anchor = Anchor.All;
             clientPreviewPageLayout.Insets = new Insets(0);
 
-            ClientListPage clientListPage = AddController(new ClientListPage(canvas, navigator, clientPreviewPage, settingsPage));
+            ClientListPage clientListPage = AddController(new ClientListPage(canvas, navigator, clientPreviewPage, settingsPage, server));
             clientListPage.ZIndex = 10;
             AnchorLayout clientListPageLayout = AddController(new AnchorLayout(clientListPage));
             clientListPageLayout.Anchor = Anchor.All;
             clientListPageLayout.Insets = new Insets(0);
 
             navigator.Push(clientListPage);
-
-            /*
-                        UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
-                        {
-                            clientPreviewPage.Client = client;
-                            livePreview.Client = client;
-                            feedPreview.Client = client;
-                        });
-
-                        UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, (client) =>
-                        {
-                            clientPreviewPage.Client = null;
-                            feedPreview.Client = null;
-                            livePreview.Client = null;
-                        });*/
-        }
-
-        public static void CreateUIServer(int port)
-        {
-            UIServer server = AddController(new UIServer(port));
-            server.Start();
         }
 
         public static void DestroyResources()

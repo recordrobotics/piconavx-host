@@ -33,7 +33,6 @@ namespace piconavx.ui
             Window.Current.Internal.IsVisible = true; // only show window after loading graphics api
             Window.Current.Internal.WindowState = Silk.NET.Windowing.WindowState.Maximized;
             Scene.CreateTestScene();
-            Scene.CreateUIServer(65432);
         }
     }
 }
