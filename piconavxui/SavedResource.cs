@@ -18,9 +18,21 @@ namespace piconavx.ui
 
             public static Settings Default => new Settings()
             {
-                Theme = null
+                Theme = null,
+                Address = "0.0.0.0",
+                Port = 65432,
+                Timeout = 1000,
+                HighTimeout = 10000
             };
 
+            [JsonPropertyName("address")]
+            public string? Address { get; set; }
+            [JsonPropertyName("port")]
+            public int Port { get; set; }
+            [JsonPropertyName("timeout")]
+            public int Timeout { get; set; }
+            [JsonPropertyName("high_timeout")]
+            public int HighTimeout { get; set; }
             [JsonPropertyName("theme")]
             public string? Theme { get; set; }
         }
@@ -29,6 +41,8 @@ namespace piconavx.ui
 
         private static bool isReadOnly;
         public static bool ReadOnly => isReadOnly;
+
+        public static string? SavePath => savePath;
 
         static SavedResource()
         {
@@ -51,7 +65,7 @@ namespace piconavx.ui
             try
             {
                 // Test file
-                File.OpenWrite(Path.Join(savePath, "LOCK")).Close();
+                File.Open(Path.Join(savePath, "LOCK"), FileMode.Create, FileAccess.ReadWrite).Close();
                 File.Delete(Path.Join(savePath, "LOCK"));
 
                 isReadOnly = false;
@@ -70,7 +84,7 @@ namespace piconavx.ui
             {
                 try
                 {
-                    fs = File.OpenRead(Path.Join(savePath, name));
+                    fs = File.Open(Path.Join(savePath, name), FileMode.Open, FileAccess.Read);
                 }
                 catch
                 {
@@ -136,7 +150,7 @@ namespace piconavx.ui
 
             try
             {
-                Stream fs = File.OpenWrite(Path.Join(savePath, "settings.json"));
+                Stream fs = File.Open(Path.Join(savePath, "settings.json"), FileMode.Create, FileAccess.Write);
                 try
                 {
                     JsonSerializer.Serialize<Settings>(fs, settings, SourceGenerationContext.Default.Settings);

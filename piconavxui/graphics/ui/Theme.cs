@@ -105,6 +105,16 @@ namespace piconavx.ui.graphics.ui
                     Text = "#c3f7be",
                     TextSecondary = "#7eab79",
                     TextDisabled = "#72916e"
+                },
+                Error = new()
+                {
+                    Background = "#1f0d0d",
+                    BackgroundDisabled = "#170404",
+                    BackgroundHover = "#331212",
+                    BackgroundActive = "#421717",
+                    Text = "#f2a7a7",
+                    TextSecondary = "#d97e7e",
+                    TextDisabled = "#8c6565"
                 }
             };
 

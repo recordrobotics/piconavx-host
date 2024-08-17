@@ -9,6 +9,14 @@ namespace piconavx.ui.graphics.ui
         private List<UIController> components;
         private Framebuffer raycastFrameBuffer;
 
+        private bool inEvent = false;
+        /// <summary>
+        /// Is the canvas currently in an event. Use this to make sure not to modify the
+        /// component list (or call <see cref="AddComponent(UIController)"/> / <see cref="RemoveComponent(UIController)"/>)
+        /// while in an event. Instead, defer the modification (see <see cref="Scene.InvokeLater(Action, DeferralMode)"/>)
+        /// </summary>
+        public bool InEvent { get { return inEvent; } }
+
         public static Canvas? InputCanvas { get; set; } = null;
 
         public IReadOnlyList<UIController> Components { get { return components.AsReadOnly(); } }
@@ -35,6 +43,9 @@ namespace piconavx.ui.graphics.ui
 
         public void AddComponent(UIController component)
         {
+            if (InEvent)
+                throw new InvalidOperationException("Adding components inside events is not supported.");
+
             component.OnAdd();
             components.Add(component);
             InvalidateHierarchy();
@@ -42,12 +53,18 @@ namespace piconavx.ui.graphics.ui
 
         public void RemoveComponent(UIController component)
         {
+            if (InEvent)
+                throw new InvalidOperationException("Removing components inside events is not supported.");
+
             component.OnRemove();
             components.Remove(component);
         }
 
         public void InvalidateHierarchy()
         {
+            if (InEvent)
+                throw new InvalidOperationException("Editing the hierarchy inside events is not supported.");
+
             components.Sort();
         }
 
@@ -142,16 +159,19 @@ namespace piconavx.ui.graphics.ui
 
         private void Scene_MouseMove(float x, float y, float dx, float dy)
         {
+            inEvent = true;
             target = RaycastAt(new Vector2(x, y), RaycastMode.Primary);
-            foreach(var component in components)
+            foreach (var component in components)
             {
-                if(component.IsRenderable)
+                if (component.IsRenderable)
                     component.MouseOver = component == target;
             }
+            inEvent = false;
         }
 
         private void Scene_MouseDown(Silk.NET.Input.MouseButton button)
         {
+            inEvent = true;
             target = RaycastAt(Window.Current.Input!.Mice[0].Position, RaycastMode.Primary);
             if (button == Silk.NET.Input.MouseButton.Left)
             {
@@ -161,10 +181,12 @@ namespace piconavx.ui.graphics.ui
                         component.MouseDown = component == target;
                 }
             }
+            inEvent = false;
         }
 
         private void Scene_MouseUp(Silk.NET.Input.MouseButton button)
         {
+            inEvent = true;
             if (button == Silk.NET.Input.MouseButton.Left)
             {
                 foreach (var component in components)
@@ -181,10 +203,12 @@ namespace piconavx.ui.graphics.ui
                     }
                 }
             }
+            inEvent = false;
         }
 
         private void Scene_MouseScroll(Silk.NET.Input.ScrollWheel scrollWheel)
         {
+            inEvent = true;
             target = RaycastAt(Window.Current.Input!.Mice[0].Position, RaycastMode.Secondary);
             Vector2 scroll = new(scrollWheel.X, scrollWheel.Y);
 
@@ -193,10 +217,12 @@ namespace piconavx.ui.graphics.ui
                 if (component.IsRenderable && component.SecondaryInputVisible && component == target)
                     component.NotifyScroll(scroll);
             }
+            inEvent = false;
         }
 
         private void Scene_Render(double deltaTime, RenderProperties properties)
         {
+            inEvent = true;
             properties.Canvas = this;
             Matrix = CreateMatrix();
 
@@ -206,6 +232,7 @@ namespace piconavx.ui.graphics.ui
                 if (component.IsRenderable)
                     component.Render(deltaTime, properties);
             }
+            inEvent = false;
         }
 
         private void Scene_ViewportChange(Silk.NET.Maths.Rectangle<int> viewport)

@@ -5,11 +5,34 @@ using static piconavx.ui.graphics.ui.Button;
 
 namespace piconavx.ui.graphics.ui
 {
-    public class Tooltip : UIController
+    public class Alert : UIController
     {
         private static Texture? cardShadowTexture;
 
-        public Tooltip(string text, string description, UIController target, Canvas canvas) : base(canvas)
+        private static void _alertOneShot(Alert alert)
+        {
+            alert.OneShot = true;
+            alert.Subscribe();
+            alert.Show();
+        }
+
+        public static Alert CreateOneShot(string text, string description, Canvas canvas)
+        {
+            var alert = new Alert(text, description, canvas);
+
+            if (Scene.InEvent)
+            {
+                Scene.InvokeLater(() => _alertOneShot(alert), DeferralMode.NextEvent);
+            }
+            else
+            {
+                _alertOneShot(alert);
+            }
+
+            return alert;
+        }
+
+        public Alert(string text, string description, Canvas canvas) : base(canvas)
         {
             cardShadowTexture ??= Scene.AddResource(new Texture("assets/textures/cardshadow.png")
             {
@@ -17,52 +40,63 @@ namespace piconavx.ui.graphics.ui
                 WrapMode = TextureWrapMode.Clamp
             });
 
-            popupLayout = new PopupLayout(this, target);
-            popupLayout.UseTransform = true;
-            popupLayout.Anchor = PopupAnchor.Left;
-            popupLayout.Offset = new Vector2(10, 0);
+            StackCount++;
+            zIndex += StackIndex += StackIncr;
+
+            popupLayout = new PopupLayout(this);
+            popupLayout.Anchor = PopupAnchor.Bottom;
+            popupLayout.Offset = new Vector2(0, 40);
 
             background = new Image(canvas);
-            background.ZIndex = ZIndex + 1; // background
+            background.Transform = Transform;
             background.HitTestAlphaClip = 0.9f;
             background.Color = Color.Background;
             background.Texture = Texture.RoundedRect;
             background.ImageType = ImageType.Sliced;
-            background.Size = new Size(10, 10);
+            background.Size = new Size(20, 20);
             backgroundAnchor = new AnchorLayout(background, this);
             backgroundAnchor.Anchor = controllers.Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
 
             shadow = new Image(canvas);
+            shadow.Transform = Transform;
             shadow.RaycastTransparency = RaycastTransparency.Hidden;
-            shadow.ZIndex = ZIndex;
-            shadow.Color = Theme.TooltipShadow;
+            shadow.Color = Theme.CardShadow;
             shadow.Texture = cardShadowTexture;
             shadow.ImageType = ImageType.Sliced;
-            shadow.Size = new Size(25, 25);
+            shadow.Size = new Size(80, 80);
             shadowAnchor = new AnchorLayout(shadow, this);
             shadowAnchor.Anchor = controllers.Anchor.All;
             shadowAnchor.Insets = new Insets(-shadow.Size.Width + background.Size.Width, 8 - shadow.Size.Height + background.Size.Height, -shadow.Size.Width + background.Size.Width, -8 - shadow.Size.Height + background.Size.Height);
 
-            RaycastTransparency = RaycastTransparency.Hidden;
+            RaycastTransparency = RaycastTransparency.Transparent;
 
             this.text = new Label(text, canvas);
-            this.text.FontSize = 14;
-            this.text.ZIndex = ContentZIndex;
+            this.text.Transform = Transform;
+            this.text.FontSize = 18;
             this.text.Color = Color.Text;
 
             this.description = new Label(description, canvas);
-            this.description.FontSize = 12;
-            this.description.ZIndex = ContentZIndex;
+            this.description.Transform = Transform;
+            this.description.FontSize = 14;
             this.description.Color = Color.TextSecondary;
 
             flow = new FlowLayout(this);
             flow.Direction = FlowDirection.Vertical;
             flow.Padding = padding;
+            flow.Gap = 20;
             flow.Components.Add(this.text);
             flow.Components.Add(this.description);
 
             bounds = GetAutoSizeBounds();
+
+            if (Canvas.InEvent)
+            {
+                Scene.InvokeLater(UpdateZIndex, DeferralMode.NextEvent);
+            } else
+            {
+                UpdateZIndex();
+            }
         }
 
         private Image background;
@@ -88,18 +122,28 @@ namespace piconavx.ui.graphics.ui
         private bool autoSize = true;
         public bool AutoSize { get => autoSize; set => autoSize = value; }
 
-        private int zIndex = 80;
+        const int StackIncr = 3;
+
+        private static int StackCount = 0;
+        private static int StackIndex = 0;
+
+        private int zIndex = 60;
         public override int ZIndex
         {
             get => zIndex; set
             {
                 zIndex = value;
-                background.ZIndex = zIndex + 1;
-                shadow.ZIndex = zIndex;
-                text.ZIndex = ContentZIndex;
-                description.ZIndex = ContentZIndex;
-                Canvas.InvalidateHierarchy();
+                UpdateZIndex();
             }
+        }
+
+        public void UpdateZIndex()
+        {
+            background.ZIndex = zIndex + 1;
+            shadow.ZIndex = zIndex;
+            text.ZIndex = ContentZIndex;
+            description.ZIndex = ContentZIndex;
+            Canvas.InvalidateHierarchy();
         }
 
         public int ContentZIndex => zIndex + 2;
@@ -114,7 +158,7 @@ namespace piconavx.ui.graphics.ui
         }
 
 
-        private Insets padding = new Insets(15, 6.5f, 15, 6.5f);
+        private Insets padding = new Insets(60, 40, 60, 40);
         public Insets Padding
         {
             get => padding; set
@@ -132,11 +176,11 @@ namespace piconavx.ui.graphics.ui
         private bool shown = false;
         public bool Shown => shown;
 
-        private double showDelay = 0.2;
-        public double ShowDelay { get => showDelay; set => showDelay = value; }
+        private double showDuration = 2;
+        public double ShowDuration { get => showDuration; set => showDuration = value; }
 
-        private double hideDelay = 0.1;
-        public double HideDelay { get => hideDelay; set => hideDelay = value; }
+        private bool oneShot = false;
+        public bool OneShot { get => oneShot; set => oneShot = value; }
 
         public RectangleF GetAutoSizeBounds()
         {
@@ -161,8 +205,7 @@ namespace piconavx.ui.graphics.ui
         {
             shown = false;
             flow.Visible = false;
-            hideTimer = 0;
-            showTimer = 0;
+            timer = 0;
             Canvas.RemoveComponent(this);
             Scene.Update -= Scene_Update;
             background.Unsubscribe();
@@ -191,10 +234,34 @@ namespace piconavx.ui.graphics.ui
             Canvas.RemoveComponent(shadow);
             Canvas.RemoveComponent(text);
             Canvas.RemoveComponent(description);
+
+            if(--StackCount == 0)
+            {
+                StackIndex = 0;
+            }
         }
 
-        private double showTimer = 0;
-        private double hideTimer = 0;
+        public void Show()
+        {
+            if (Scene.InEvent)
+            {
+                Scene.InvokeLater(Show, DeferralMode.NextEvent);
+            }
+            else
+            {
+                timer = 0;
+
+                if (shown)
+                    return;
+
+                shown = true;
+                flow.Visible = true;
+                Canvas.AddComponent(this);
+            }
+        }
+
+        private double timer = 0;
+        private Transition<float> entranceTransition = new(100, 0.05);
 
         private void Scene_Update(double deltaTime)
         {
@@ -207,40 +274,39 @@ namespace piconavx.ui.graphics.ui
             text.Color = Color.Text;
             description.Color = Color.TextSecondary;
 
-            if (popupLayout.Target != null)
+            if (shown)
             {
-                bool over = popupLayout.Target.MouseOver;
-                if (over)
+                timer += deltaTime;
+                if (timer > showDuration)
                 {
-                    hideTimer = 0;
-                } else
-                {
-                    showTimer = 0;
+                    timer = 0;
+                    shown = false;
+                    entranceTransition.Value = 100;
                 }
-
-                if (over && !shown)
+                else
                 {
-                    showTimer += deltaTime;
-                    if (showTimer > showDelay)
-                    {
-                        showTimer = 0;
-                        shown = true;
-                        flow.Visible = true;
-                        Canvas.AddComponent(this);
-                    }
-                }
-                else if (!over && shown)
-                {
-                    hideTimer += deltaTime;
-                    if (hideTimer > hideDelay)
-                    {
-                        hideTimer = 0;
-                        shown = false;
-                        flow.Visible = false;
-                        Canvas.RemoveComponent(this);
-                    }
+                    entranceTransition.Value = 0;
                 }
             }
+            else
+            {
+                entranceTransition.Value = 100;
+            }
+
+            entranceTransition.Step(deltaTime);
+            if (!shown && entranceTransition.Reached)
+            {
+                flow.Visible = false;
+                Canvas.RemoveComponent(this);
+
+                if (oneShot)
+                {
+                    Scene.InvokeLater(Unsubscribe, DeferralMode.NextEvent);
+                }
+            }
+
+            Transform.UpdateCache();
+            Transform.Position = new Vector3(0, entranceTransition.Value / 100f * (Bounds.Height + popupLayout.Offset.Y), 0);
         }
     }
 }

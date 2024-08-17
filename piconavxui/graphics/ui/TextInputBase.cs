@@ -2,6 +2,7 @@
 using Silk.NET.Input;
 using System.Drawing;
 using System.Numerics;
+using System.Text;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -24,6 +25,8 @@ namespace piconavx.ui.graphics.ui
         public virtual bool Multiline { get; set; } = false;
         public virtual bool Disabled { get; set; } = false;
         public abstract bool InputFocused { get; set; }
+        public virtual int MaxLength { get; set; } = -1;
+        public virtual Func<char, bool>? Filter { get; set; } = null;
 
         public override abstract bool MouseOver { get; set; }
         public override abstract bool MouseDown { get; set; }
@@ -171,7 +174,8 @@ namespace piconavx.ui.graphics.ui
                                 RemoveChars(--Cursor, 1);
                                 InvalidateCursor();
                             }
-                        } else
+                        }
+                        else
                         {
                             RemoveChars(SelectionStart, SelectionLength);
                             SelectionLength = 0;
@@ -184,14 +188,17 @@ namespace piconavx.ui.graphics.ui
                     {
                         if (Multiline)
                         {
-                            if(SelectionLength != 0)
+                            if (SelectionLength != 0)
                             {
                                 RemoveChars(SelectionStart, SelectionLength);
                                 SelectionLength = 0;
                                 Cursor = SelectionStart;
                             }
 
-                            AddChar((char)NEW_LINE_CODEPOINT, Cursor++);
+                            if (MaxLength < 0 || Glyphs.Count < MaxLength)
+                            {
+                                AddChar((char)NEW_LINE_CODEPOINT, Cursor++);
+                            }
                             InvalidateCursor();
                         }
                     }
@@ -244,7 +251,8 @@ namespace piconavx.ui.graphics.ui
                             SelectionStart = 0;
                             SelectionLength = 0;
                             InvalidateCursor();
-                        } else if (Cursor < glyphs.Count)
+                        }
+                        else if (Cursor < glyphs.Count)
                         {
                             if (modifiers.HasFlag(Modifiers.Shift))
                             {
@@ -293,11 +301,12 @@ namespace piconavx.ui.graphics.ui
                                         SelectionLength = oldCursor - Cursor;
                                         SelectionStart = Cursor;
                                     }
-                                    else if(SelectionStart >= oldCursor)
+                                    else if (SelectionStart >= oldCursor)
                                     {
                                         SelectionStart = Cursor;
                                         SelectionLength += oldCursor - Cursor;
-                                    } else
+                                    }
+                                    else
                                     {
                                         SelectionLength -= oldCursor - Cursor;
                                         if (SelectionLength < 0)
@@ -378,7 +387,30 @@ namespace piconavx.ui.graphics.ui
                             }
 
                             string clipboard = Window.Current.PrimaryKeyboard?.ClipboardText ?? string.Empty;
-                            clipboard = clipboard.Replace("\n", "");
+                            if (!Multiline)
+                            {
+                                clipboard = clipboard.Replace("\n", "");
+                            }
+
+                            if (MaxLength >= 0)
+                            {
+                                int budget = MaxLength - Glyphs.Count;
+                                if (clipboard.Length > budget)
+                                {
+                                    clipboard = clipboard[..budget];
+                                }
+                            }
+
+                            if (Filter != null)
+                            {
+                                StringBuilder sb = new StringBuilder(clipboard.Length);
+                                foreach (var c in clipboard)
+                                {
+                                    if (Filter(c))
+                                        sb.Append(c);
+                                }
+                                clipboard = sb.ToString();
+                            }
                             AddString(clipboard, Cursor);
                             Cursor += clipboard.Length;
                         }
@@ -398,7 +430,10 @@ namespace piconavx.ui.graphics.ui
                 Cursor = SelectionStart;
             }
 
-            AddChar(key, Cursor++);
+            if ((MaxLength < 0 || Glyphs.Count < MaxLength) && (Filter == null || Filter(key)))
+            {
+                AddChar(key, Cursor++);
+            }
         }
 
         [Flags]

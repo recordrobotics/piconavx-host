@@ -40,5 +40,14 @@
     "text": "#1f451b",
     "text_secondary": "#4d7d48",
     "text_disabled": "#567353"
+  },
+  "error": {
+    "background": "#e8dfdf",
+    "background_disabled": "#c9b9b9",
+    "background_hover": "#ebd8d8",
+    "background_active": "#e3c3c3",
+    "text": "#9c2828",
+    "text_secondary": "#c46c6c",
+    "text_disabled": "#996767"
   }
 }

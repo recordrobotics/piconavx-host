@@ -136,6 +136,24 @@ namespace piconavx.ui.graphics.ui
             return new RectangleF(bounds.X, bounds.Y, contentBounds.Width + padding.Horizontal, contentBounds.Height + padding.Vertical);
         }
 
+        public RectangleF GetAutoSizeBounds(char chr, int length, out AutoSizeData data)
+        {
+            var fontSystem = Window.FontSystems[this.font];
+            var font = fontSystem.GetFont(fontSize);
+
+            // Get measured glyph bounds
+            Vector2 size = font.MeasureString(new string(chr, length), new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+
+            // Set additional data
+            data = new AutoSizeData(font.LineHeight * fontSystem.FontResolutionFactor);
+
+            // Overwrite measured height with a stable line-height based size
+            size.Y = GetLineCount() * data.lineHeight;
+
+            contentBounds = new RectangleF(bounds.X + padding.Left, bounds.Y + padding.Top, size.X, size.Y);
+            return new RectangleF(bounds.X, bounds.Y, contentBounds.Width + padding.Horizontal, contentBounds.Height + padding.Vertical);
+        }
+
         protected override float GetLineHeight()
         {
             GetAutoSizeBounds(out var data);
