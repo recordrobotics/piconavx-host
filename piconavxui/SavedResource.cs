@@ -11,6 +11,11 @@ namespace piconavx.ui
             private static Settings current;
             public static Settings Current => current;
 
+            public static void SetSettings(Settings settings)
+            {
+                current = settings;
+            }
+
             static Settings()
             {
                 current = ReadSettings();
@@ -80,7 +85,7 @@ namespace piconavx.ui
         {
             Stream? fs;
 
-            if (!isReadOnly && savePath != null && File.Exists(Path.Join(savePath, name)))
+            if (savePath != null && File.Exists(Path.Join(savePath, name)))
             {
                 try
                 {

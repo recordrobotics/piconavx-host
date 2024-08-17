@@ -1,6 +1,4 @@
 ﻿using piconavx.ui.controllers;
-using Silk.NET.Input.Sdl;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace piconavx.ui.graphics.ui
@@ -30,6 +28,9 @@ namespace piconavx.ui.graphics.ui
 
         private FlowPanel settingsList;
         private AnchorLayout settingsListLayout;
+
+        private Badge? readOnlyBadge;
+        private Tooltip? readOnlyBadgeTooltip;
 
         public SettingsPage(Canvas canvas, Navigator navigator) : base(canvas, navigator)
         {
@@ -69,6 +70,17 @@ namespace piconavx.ui.graphics.ui
             controlPanelLayout.AllowResize = false;
             controlPanelLayout.Insets = new Insets(0, 0, 51, 0);
 
+            if (SavedResource.ReadOnly)
+            {
+                readOnlyBadge = new Badge("Currently in read-only mode", canvas);
+                readOnlyBadge.Color = Theme.Warning;
+                readOnlyBadge.Padding = new Insets(30, 14, 30, 14);
+                readOnlyBadge.FontSize = 14;
+                controlPanel.Components.Add(readOnlyBadge);
+                readOnlyBadgeTooltip = new Tooltip("These settings are loaded in read-only mode.", "Read-only mode is enabled when there is\nno write access to the settings directory.", readOnlyBadge, canvas);
+                readOnlyBadgeTooltip.Anchor = PopupAnchor.Left;
+            }
+
             saveButton = new Button("Save", canvas);
             saveButton.Color = Theme.Primary;
             saveButton.FontSize = 15;
@@ -78,32 +90,49 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(saveButton);
             saveButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
             {
-                SavedResource.Settings.Current.Address = serverIp?.Text.ToString() ?? "0.0.0.0";
+                var newSettings = new SavedResource.Settings();
+                newSettings.Address = serverIp?.Text.ToString() ?? "0.0.0.0";
 
                 if (int.TryParse(serverPort?.Text.ToString() ?? "65432", out var p))
                 {
-                    SavedResource.Settings.Current.Port = p;
+                    newSettings.Port = p;
+                } else
+                {
+                    newSettings.Port = SavedResource.Settings.Current.Port;
                 }
 
                 if (int.TryParse(clientTimeout?.Text.ToString() ?? "1000", out p))
                 {
-                    SavedResource.Settings.Current.Timeout = p;
+                    newSettings.Timeout = p;
+                }
+                else
+                {
+                    newSettings.Timeout = SavedResource.Settings.Current.Timeout;
                 }
 
                 if (int.TryParse(clientHighBandwidthTimeout?.Text.ToString() ?? "10000", out p))
                 {
-                    SavedResource.Settings.Current.HighTimeout = p;
+                    newSettings.HighTimeout = p;
+                }
+                else
+                {
+                    newSettings.HighTimeout = SavedResource.Settings.Current.HighTimeout;
                 }
 
-                SavedResource.Settings.Current.Theme = theme?.Text.ToString();
-                Theme.UpdateTheme();
+                newSettings.Theme = theme?.Text.ToString();
 
-                if (SavedResource.WriteSettings(SavedResource.Settings.Current))
+                if (SavedResource.WriteSettings(newSettings))
                 {
+                    SavedResource.Settings.SetSettings(newSettings);
+                    Theme.UpdateTheme();
                     Alert.CreateOneShot("Settings successfully saved!", "File written to '" + Path.Join(SavedResource.SavePath, "settings.json") + "'.", canvas).Color = Theme.Success;
-                } else
+                } else if(!SavedResource.ReadOnly)
                 {
                     Alert.CreateOneShot("Could not save settings!", "An error occurred while trying to write to\n'" + Path.Join(SavedResource.SavePath, "settings.json") + "'.", canvas).Color = Theme.Error;
+                }
+                else
+                {
+                    Alert.CreateOneShot("Settings loaded in read-only mode!", "An error occurred while trying to write to\n'" + Path.Join(SavedResource.SavePath, "settings.json") + "'.", canvas).Color = Theme.Warning;
                 }
             });
             saveButton.SetTooltip("Save changes");
@@ -141,6 +170,8 @@ namespace piconavx.ui.graphics.ui
             headerBackground.ZIndex = ZIndex + 8;
             header.ZIndex = ZIndex + 9;
             controlPanel.ZIndex = ZIndex + 9;
+            if(readOnlyBadge != null)
+                readOnlyBadge.ZIndex = ZIndex + 9;
             saveButton.ZIndex = ZIndex + 9;
             cancelButton.ZIndex = ZIndex + 9;
             settingsListContainer.ZIndex = ZIndex + 2;
@@ -230,7 +261,8 @@ namespace piconavx.ui.graphics.ui
                 headerBackground, headerBackgroundLayout,
                 controlPanel, controlPanelLayout,
                 settingsListContainer, settingsListContainerLayout,
-                settingsList, settingsListLayout
+                settingsList, settingsListLayout,
+                readOnlyBadgeTooltip
                 );
 
             Canvas.AddComponent(background);
@@ -238,6 +270,8 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(headerBackground);
             Canvas.AddComponent(header);
             Canvas.AddComponent(controlPanel);
+            if(readOnlyBadge != null)
+                Canvas.AddComponent(readOnlyBadge);
             Canvas.AddComponent(saveButton);
             Canvas.AddComponent(cancelButton);
             Canvas.AddComponent(settingsListContainer);
@@ -310,7 +344,8 @@ namespace piconavx.ui.graphics.ui
                 header, headerLayout,
                 controlPanel, controlPanelLayout,
                 settingsListContainer, settingsListContainerLayout,
-                settingsList, settingsListLayout
+                settingsList, settingsListLayout,
+                readOnlyBadgeTooltip
                 );
         }
     }

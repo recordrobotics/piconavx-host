@@ -115,6 +115,16 @@ namespace piconavx.ui.graphics.ui
                     Text = "#f2a7a7",
                     TextSecondary = "#d97e7e",
                     TextDisabled = "#8c6565"
+                },
+                Warning = new()
+                {
+                    Background = "#241f0a",
+                    BackgroundDisabled = "#242115",
+                    BackgroundHover = "#362f0f",
+                    BackgroundActive = "#4a4010",
+                    Text = "#edcc47",
+                    TextSecondary = "#ded4ad",
+                    TextDisabled = "#a39b7c"
                 }
             };
 
@@ -156,6 +166,8 @@ namespace piconavx.ui.graphics.ui
             public ButtonColorFile? Success { get; set; }
             [JsonPropertyName("error")]
             public ButtonColorFile? Error { get; set; }
+            [JsonPropertyName("warning")]
+            public ButtonColorFile? Warning { get; set; }
         }
 
         private static DelegateUIColor _Background = new DelegateUIColor(() => ParseColor(current?.Background));
@@ -228,6 +240,16 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.Error?.TextDisabled))
             );
         public static ThemeButtonColor Error => _Error;
+        private static ThemeButtonColor _Warning = new(
+            new DelegateUIColor(() => ParseColor(current?.Warning?.Background)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundDisabled)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundHover)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.Text)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.TextSecondary)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.TextDisabled))
+            );
+        public static ThemeButtonColor Warning => _Warning;
 
         private static ThemeFile current;
 

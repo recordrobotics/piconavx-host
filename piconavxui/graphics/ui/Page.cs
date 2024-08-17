@@ -29,19 +29,21 @@ namespace piconavx.ui.graphics.ui
             Scene.InvokeLater(controller.Unsubscribe, DeferralMode.NextFrame);
         }
 
-        protected void SubscribeLater(params Controller[] controllers)
+        protected void SubscribeLater(params Controller?[] controllers)
         {
             foreach(var controller in controllers)
             {
-                SubscribeLater<Controller>(controller);
+                if(controller != null)
+                    SubscribeLater<Controller>(controller);
             }
         }
 
-        protected void UnsubscribeLater(params Controller[] controllers)
+        protected void UnsubscribeLater(params Controller?[] controllers)
         {
             foreach (var controller in controllers)
             {
-                UnsubscribeLater<Controller>(controller);
+                if (controller != null)
+                    UnsubscribeLater<Controller>(controller);
             }
         }
     }

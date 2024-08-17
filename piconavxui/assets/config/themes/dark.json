@@ -49,5 +49,14 @@
     "text": "#f2a7a7",
     "text_secondary": "#d97e7e",
     "text_disabled": "#8c6565"
+  },
+  "warning": {
+    "background": "#241f0a",
+    "background_disabled": "#242115",
+    "background_hover": "#362f0f",
+    "background_active": "#4a4010",
+    "text": "#edcc47",
+    "text_secondary": "#ded4ad",
+    "text_disabled": "#a39b7c"
   }
 }
