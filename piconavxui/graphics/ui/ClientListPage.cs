@@ -104,17 +104,6 @@ namespace piconavx.ui.graphics.ui
             startButton.RenderOffset = new System.Numerics.Vector2(0, 2);
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
-            startButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Medium, () =>
-            {
-                if(SavedResource.Settings.Current.Theme == "dark.json")
-                {
-                    SavedResource.Settings.Current.Theme = "light.json";
-                } else
-                {
-                    SavedResource.Settings.Current.Theme = "dark.json";
-                }
-                Theme.UpdateTheme();
-            });
             controlPanel.Components.Add(startButton);
             startButton.SetTooltip("Run host server");
 
