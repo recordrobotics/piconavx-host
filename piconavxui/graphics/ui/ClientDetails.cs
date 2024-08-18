@@ -5,7 +5,7 @@ namespace piconavx.ui.graphics.ui
 {
     public class ClientDetails : FlowPanel
     {
-        private AHRSPosUpdate lastUpdate;
+        private Dictionary<Client, AHRSPosUpdate> lastUpdates = [];
         private Client? client;
         private Texture stopIcon;
         private Texture recordIcon;
@@ -89,8 +89,16 @@ namespace piconavx.ui.graphics.ui
                     "Sea level press set: " + (sealevelPressSet ? "YES" : "NO");
                 });
                 AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2") + "%)");
-                AddLabel(() => "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | " + lastUpdate.BaroTemp.ToString("N2") + "°c (Baro)") : ""));
-                AddLabel(() => "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll);
+                AddLabel(() =>
+                {
+                    var lastUpdate = client == null ? default : lastUpdates.GetValueOrDefault(client);
+                    return "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | " + lastUpdate.BaroTemp.ToString("N2") + "°c (Baro)") : "");
+                });
+                AddLabel(() =>
+                {
+                    var lastUpdate = client == null ? default : lastUpdates.GetValueOrDefault(client);
+                    return "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll;
+                });
 
                 FlowPanel recordingRow = new FlowPanel(Canvas);
                 Canvas.AddComponent(recordingRow);
@@ -139,7 +147,8 @@ namespace piconavx.ui.graphics.ui
         {
             if (client == this.client)
             {
-                lastUpdate = update;
+                if (!lastUpdates.TryAdd(client, update))
+                    lastUpdates[client] = update;
             }
         }
 

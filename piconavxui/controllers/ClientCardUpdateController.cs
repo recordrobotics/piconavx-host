@@ -13,6 +13,8 @@ namespace piconavx.ui.controllers
 
         public ClientCard Target { get; }
 
+        public static Action<Client>? RemoveCard { get; set; }
+
         public ClientCardUpdateController(ClientCard target)
         {
             Target = target;
@@ -42,6 +44,11 @@ namespace piconavx.ui.controllers
         {
             if (client != null)
             {
+                if (!client.Connected)
+                {
+                    RemoveCard?.Invoke(client);
+                }
+
                 try
                 {
                     card.Id = client.Id ?? "<UNKNOWN>";

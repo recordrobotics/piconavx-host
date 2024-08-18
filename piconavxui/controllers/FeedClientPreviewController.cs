@@ -1,11 +1,5 @@
 ﻿using piconavx.ui.graphics;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.controllers
 {
@@ -49,6 +43,7 @@ namespace piconavx.ui.controllers
             if (Client != client)
             {
                 client = Client;
+                Target.Transforms = client == null ? [] : new Transform[UIServer.GetClientFeed(client)?.Count ?? 0];
             }
 
             if (client != null)
@@ -64,6 +59,9 @@ namespace piconavx.ui.controllers
                         Target.Transforms[i]!.Rotation = new Quaternion((float)chunk.Data.QuatX, (float)chunk.Data.QuatZ, -(float)chunk.Data.QuatY, (float)chunk.Data.QuatW);
                         Target.Transforms[i]!.Position = new Vector3(10*(float)chunk.Data.DispX, 10 * (float)chunk.Data.DispZ, 10 * -(float)chunk.Data.DispY);
                     }
+                } else
+                {
+                    Target.Transforms = [];
                 }
             }
             else

@@ -1,4 +1,5 @@
 ﻿using piconavx.ui.controllers;
+using System.Collections.Frozen;
 using System.Drawing;
 using System.Net;
 
@@ -186,6 +187,8 @@ namespace piconavx.ui.graphics.ui
             statusLabelLayout.AllowResize = false;
             statusLabelLayout.Insets = new Insets(0, 0, 0, 16.5f);
 
+            ClientCardUpdateController.RemoveCard = RemoveCardEvt;
+
             UpdateZIndex();
         }
 
@@ -292,7 +295,8 @@ namespace piconavx.ui.graphics.ui
 
             clientList.Components.Clear();
 
-            foreach (var client in server.Clients)
+            var clients = server.Clients.ToArray();
+            foreach (var client in clients)
             {
                 AddCard(client, false);
             }

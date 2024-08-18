@@ -13,6 +13,8 @@ namespace piconavx.ui.graphics.ui
             {
                 client = value;
                 dataPanel.Client = client;
+                livePreview.Client = client;
+                feedPreview.Client = client;
             }
         }
 
@@ -29,7 +31,7 @@ namespace piconavx.ui.graphics.ui
         private ClientDetails dataPanel;
         private AnchorLayout dataPanelLayout;
 
-        public ClientPreviewPage(Canvas canvas, Camera camera, Navigator navigator, UIServer server) : base(canvas, navigator)
+        public ClientPreviewPage(Canvas canvas, Camera camera, Navigator navigator) : base(canvas, navigator)
         {
             reference = Scene.AddResource(new Model("assets/models/reference.obj"));
             reference.RenderPriority = RenderPriority.DrawTransparent;
@@ -92,6 +94,7 @@ namespace piconavx.ui.graphics.ui
 
         public override void Show()
         {
+            UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, Server_ClientDisconnected);
             SubscribeLater(
                 reference,
                 sensor, livePreview,
@@ -119,6 +122,18 @@ namespace piconavx.ui.graphics.ui
                 sidepanel,
                 dataPanel, dataPanelLayout
                 );
+            UIServer.ClientDisconnected -= Server_ClientDisconnected;
+        }
+
+        private void Server_ClientDisconnected(Client client)
+        {
+            if (client == this.client)
+            {
+                Navigator.Back();
+                var alert = Alert.CreateOneShot("Connection lost!", $"The connection to '{client.Id}' was interrupted or closed.\nPossible reasons are unreliable wifi, power, or physical connection to the sensor.", Canvas);
+                alert.Color = Theme.Error;
+                alert.ShowDuration = 10;
+            }
         }
     }
 }

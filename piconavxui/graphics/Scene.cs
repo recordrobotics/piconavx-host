@@ -62,7 +62,7 @@ namespace piconavx.ui.graphics
             settingsPageLayout.Anchor = Anchor.All;
             settingsPageLayout.Insets = new Insets(0);
 
-            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator, server));
+            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator));
             clientPreviewPage.ZIndex = 0;
             AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
             clientPreviewPageLayout.Anchor = Anchor.All;
