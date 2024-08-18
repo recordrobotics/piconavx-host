@@ -1,5 +1,4 @@
 ﻿using piconavx.ui.controllers;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 using System.Net;
 
@@ -47,6 +46,8 @@ namespace piconavx.ui.graphics.ui
         private SettingsPage settingsPage;
 
         private UIServer server;
+
+        private List<ClientCardUpdateController> cardControllers = [];
 
         public ClientListPage(Canvas canvas, Navigator navigator, ClientPreviewPage clientPreviewPage, SettingsPage settingsPage, UIServer server) : base(canvas, navigator)
         {
@@ -206,9 +207,62 @@ namespace piconavx.ui.graphics.ui
             }
         }
 
+        private void AddCardEvt(Client client)
+        {
+            Scene.InvokeLater(() => AddCard(client, true), DeferralMode.NextFrame);
+        }
+
+        private void RemoveCardEvt(Client client)
+        {
+            Scene.InvokeLater(() =>
+            {
+                ClientCardUpdateController? controller = cardControllers.Find(c => c.Client == client);
+                if (controller != null)
+                {
+                    controller.Target.Unsubscribe();
+                    clientList.Components.Remove(controller.Target);
+                    Canvas.RemoveComponent(controller.Target);
+                    UpdateZIndex();
+
+                    cardControllers.Remove(controller);
+                    controller.Unsubscribe();
+                }
+            }, DeferralMode.NextFrame);
+        }
+
+        private void AddCard(Client client, bool revalidate)
+        {
+            var component = new ClientCard(Canvas);
+            if(revalidate)
+                component.Subscribe();
+
+            ClientCardUpdateController.UpdateClient(component, client, null);
+            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<Client, Action>((client) => new Action(() => OnCardClick(client)))(client));
+
+            var controller = new ClientCardUpdateController(component)
+            {
+                Client = client
+            };
+            
+            if(revalidate)
+                controller.Subscribe();
+
+            cardControllers.Add(controller);
+            clientList.Components.Add(component);
+            Canvas.AddComponent(component);
+
+            if (revalidate)
+                UpdateZIndex();
+
+            if(revalidate)
+                Scene.ComplainLayoutShift(2);
+        }
+
         public override void Show()
         {
             Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
+            UIServer.ClientConnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, AddCardEvt);
+            UIServer.ClientDisconnected += new PrioritizedAction<GenericPriority, Client>(GenericPriority.Medium, RemoveCardEvt);
 
             SubscribeLater(
                 background, backgroundAnchor,
@@ -234,34 +288,25 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(bottomBar);
             Canvas.AddComponent(statusLabel);
 
+            cardControllers.Clear();
+
             clientList.Components.Clear();
-            var component = new ClientCard("Robot", true, "192.168.1.64", "58271", "3.1.0", "Calibrated", "109kB / 187kB (58.43%)", "27.04 °C | 34.40 °C", Canvas);
-            clientList.Components.Add(component);
-            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
-            Canvas.AddComponent(component);
-            component = new ClientCard("Speaker Note 1", false, "192.168.1.78", "52612", "3.1.0", "Initializing", "43kB / 187kB (27.32%)", "23.10 °C | ---- °C", Canvas);
-            clientList.Components.Add(component);
-            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
-            Canvas.AddComponent(component);
-            component = new ClientCard("Speaker Note 2", false, "192.168.1.45", "54151", "3.1.0", "Calibrated", "119kB / 187kB (61.28%)", "29.12 °C | 32.30 °C", Canvas);
-            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
-            clientList.Components.Add(component);
-            Canvas.AddComponent(component);
-            component = new ClientCard("Speaker Note 3", false, "192.168.1.89", "55133", "3.1.0", "Calibrating", "107kB / 187kB (56.03%)", "25.20 °C | 36.31 °C", Canvas);
-            clientList.Components.Add(component);
-            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
-            Canvas.AddComponent(component);
-            component = new ClientCard("Preloaded Note", true, "192.168.1.73", "51892", "3.1.0", "Calibrated", "112kB / 187kB (59.30%)", "26.12 °C | 33.07 °C", Canvas);
-            clientList.Components.Add(component);
-            component.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, new Func<ClientCard, Action>((card) => new Action(() => OnCardClick(card)))(component));
-            Canvas.AddComponent(component);
+
+            foreach (var client in server.Clients)
+            {
+                AddCard(client, false);
+            }
+
+            Scene.InvokeLater(() => Scene.ComplainLayoutShift(2), DeferralMode.NextEvent);
+
+            SubscribeLater(cardControllers);
 
             UpdateZIndex();
         }
 
-        private void OnCardClick(ClientCard card)
+        private void OnCardClick(Client client)
         {
-            clientPreviewPage.Client = Client.CreateVirtual(card.Id);
+            clientPreviewPage.Client = client;
             Navigator.Push(clientPreviewPage);
         }
 
@@ -288,6 +333,10 @@ namespace piconavx.ui.graphics.ui
                 statusLabel, statusLabelLayout
                 );
 
+            UnsubscribeLater(cardControllers);
+
+            UIServer.ClientConnected -= AddCardEvt;
+            UIServer.ClientDisconnected -= AddCardEvt;
             Scene.Update -= Scene_Update;
         }
 

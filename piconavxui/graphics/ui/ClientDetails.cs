@@ -1,11 +1,5 @@
 ﻿using piconavx.ui.controllers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -147,6 +141,12 @@ namespace piconavx.ui.graphics.ui
             {
                 lastUpdate = update;
             }
+        }
+
+        public override void OnAdd()
+        {
+            base.OnAdd();
+            InvalidateComponents();
         }
 
         private void Scene_Update(double deltaTime)

@@ -277,6 +277,12 @@ namespace piconavx
                 cancelSource?.Cancel();
                 acceptTask?.Wait();
                 listener?.Stop();
+
+                for (int i = Clients.Count - 1; i >= 0; i--)
+                {
+                    if (Clients[i].IsVirtual)
+                        DisconnectClient(Clients[i]);
+                }
             }
         }
 

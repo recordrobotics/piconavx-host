@@ -56,10 +56,11 @@ namespace piconavx.ui.graphics
         private void Window_Update(double deltaTime)
         {
             currentWindow = this;
+            Scene.TagUpdateEvent();
             Scene.ExecuteDeferredDelegates(DeferralMode.NextFrame);
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.ExecuteDeferredDelegates(DeferralMode.WhenAvailable);
-            Scene.NotifyUpdate(deltaTime);
+            Scene.NotifyUpdate(Math.Min(0.3, deltaTime));
         }
 
         private void Window_Render(double deltaTime)
@@ -67,7 +68,7 @@ namespace piconavx.ui.graphics
             currentWindow = this;
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             RenderProperties properties = new RenderProperties();
-            Scene.NotifyRender(deltaTime, properties);
+            Scene.NotifyRender(Math.Min(0.3, deltaTime), properties);
         }
 
         public static Vector2 GetSystemDpiScale()
@@ -125,11 +126,8 @@ namespace piconavx.ui.graphics
             CheckDpi();
             Scene.ExecuteDeferredDelegates(DeferralMode.NextEvent);
             Scene.NotifyViewportChange(new Rectangle<int>(0, 0, newSize));
-
-            for (int i = 0; i < RESIZE_UPDATE_DEPTH; i++)
-            {
-                Window_Update(0);
-            }
+            Scene.ComplainLayoutShift(RESIZE_UPDATE_DEPTH);
+            Scene.NotifyUpdate(0);
         }
 
         private void AddFont(FontFace font, string path)

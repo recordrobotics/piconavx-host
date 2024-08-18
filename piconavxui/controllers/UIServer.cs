@@ -75,7 +75,100 @@ namespace piconavx.ui.controllers
             {
                 Scene.InvokeLater(() =>
                 {
-                    server.ConnectSimulatedClient("Demo Client");
+                    var client = server.ConnectSimulatedClient("Robot");
+                    client.HighBandwidthMode = true;
+                    client.BoardId = new BoardIdUpdate()
+                    {
+                        FwVerMajor = 3,
+                        FwVerMinor = 1
+                    };
+                    client.BoardState = new BoardStateUpdate()
+                    {
+                        OpStatus = NavXOPStatus.Normal,
+                        CalStatus = NavXCalStatus.Complete
+                    };
+                    client.Health = new HealthUpdate()
+                    {
+                        MemoryUsed = 111616,
+                        MemoryTotal = 191488,
+                        CoreTemp = 27.04
+                    };
+
+                    client = server.ConnectSimulatedClient("Speaker Note 1");
+                    client.HighBandwidthMode = false;
+                    client.BoardId = new BoardIdUpdate()
+                    {
+                        FwVerMajor = 3,
+                        FwVerMinor = 1
+                    };
+                    client.BoardState = new BoardStateUpdate()
+                    {
+                        OpStatus = NavXOPStatus.Initializing,
+                        CalStatus = NavXCalStatus.InProgress
+                    };
+                    client.Health = new HealthUpdate()
+                    {
+                        MemoryUsed = 44032,
+                        MemoryTotal = 191488,
+                        CoreTemp = 23.10
+                    };
+
+                    client = server.ConnectSimulatedClient("Speaker Note 2");
+                    client.HighBandwidthMode = false;
+                    client.BoardId = new BoardIdUpdate()
+                    {
+                        FwVerMajor = 3,
+                        FwVerMinor = 1
+                    };
+                    client.BoardState = new BoardStateUpdate()
+                    {
+                        OpStatus = NavXOPStatus.Normal,
+                        CalStatus = NavXCalStatus.Complete
+                    };
+                    client.Health = new HealthUpdate()
+                    {
+                        MemoryUsed = 121856,
+                        MemoryTotal = 191488,
+                        CoreTemp = 29.12
+                    };
+
+                    client = server.ConnectSimulatedClient("Speaker Note 3");
+                    client.HighBandwidthMode = false;
+                    client.BoardId = new BoardIdUpdate()
+                    {
+                        FwVerMajor = 3,
+                        FwVerMinor = 1
+                    };
+                    client.BoardState = new BoardStateUpdate()
+                    {
+                        OpStatus = NavXOPStatus.IMUAutocalInProgress,
+                        CalStatus = NavXCalStatus.InProgress
+                    };
+                    client.Health = new HealthUpdate()
+                    {
+                        MemoryUsed = 109568,
+                        MemoryTotal = 191488,
+                        CoreTemp = 25.20
+                    };
+
+                    client = server.ConnectSimulatedClient("Preloaded Note");
+                    client.HighBandwidthMode = true;
+                    client.BoardId = new BoardIdUpdate()
+                    {
+                        FwVerMajor = 3,
+                        FwVerMinor = 1
+                    };
+                    client.BoardState = new BoardStateUpdate()
+                    {
+                        OpStatus = NavXOPStatus.Normal,
+                        CalStatus = NavXCalStatus.Complete
+                    };
+                    client.Health = new HealthUpdate()
+                    {
+                        MemoryUsed = 114688,
+                        MemoryTotal = 191488,
+                        CoreTemp = 26.12
+                    };
                 }, DeferralMode.WhenAvailable);
                 return true;
             }

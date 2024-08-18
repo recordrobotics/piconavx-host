@@ -1,6 +1,4 @@
-﻿using FontStashSharp;
-using piconavx.ui.controllers;
-using SixLabors.ImageSharp.PixelFormats;
+﻿using piconavx.ui.controllers;
 using System.Drawing;
 using System.Numerics;
 
@@ -74,20 +72,25 @@ namespace piconavx.ui.graphics.ui
         public string Temperature { get => temperatureLabel.Text; set => temperatureLabel.Text = value; }
 
         private bool highBandwidth = false;
+        private bool highBandwidthBadgeCreated = false;
         public bool HighBandwidth
         {
             get => highBandwidth; set
             {
-                if (!highBandwidth && value)
+                if (!highBandwidth && value && highBandwidthBadgeCreated)
                 {
                     Canvas.AddComponent(idBadge);
                 }
-                else if (highBandwidth && !value)
+                else if (highBandwidth && !value && highBandwidthBadgeCreated)
                 {
                     Canvas.RemoveComponent(idBadge);
                 }
                 highBandwidth = value;
             }
+        }
+
+        public ClientCard(Canvas canvas) : this(string.Empty, false, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, canvas)
+        {
         }
 
         public ClientCard(string id, bool highBandwidth, string address, string port, string version, string status, string memory, string temperature, Canvas canvas) : base(canvas)
@@ -436,6 +439,7 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(row4);
             Canvas.AddComponent(row5);
             Canvas.AddComponent(idLabel);
+            highBandwidthBadgeCreated = true;
             if (highBandwidth)
             {
                 Canvas.AddComponent(idBadge);
@@ -458,6 +462,7 @@ namespace piconavx.ui.graphics.ui
         public override void OnRemove()
         {
             base.OnRemove();
+            highBandwidthBadgeCreated = false;
             Canvas.RemoveComponent(background);
             Canvas.RemoveComponent(shadow);
             Canvas.RemoveComponent(thumbnail);

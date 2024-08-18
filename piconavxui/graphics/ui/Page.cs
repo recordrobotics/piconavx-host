@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,32 +20,50 @@ namespace piconavx.ui.graphics.ui
         public abstract void Show();
         public abstract void Hide();
 
-        protected void SubscribeLater<T>(T controller) where T : Controller
+        [DebuggerStepThrough]
+        protected T SubscribeLater<T>(T controller) where T : Controller
         {
             Scene.InvokeLater(controller.Subscribe, DeferralMode.NextFrame);
+            return controller;
         }
 
-        protected void UnsubscribeLater<T>(T controller) where T : Controller
+        [DebuggerStepThrough]
+        protected T UnsubscribeLater<T>(T controller) where T : Controller
         {
             Scene.InvokeLater(controller.Unsubscribe, DeferralMode.NextFrame);
+            return controller;
         }
 
-        protected void SubscribeLater(params Controller?[] controllers)
+        [DebuggerStepThrough]
+        protected void SubscribeLater(IEnumerable<Controller?> controllers)
         {
-            foreach(var controller in controllers)
+            foreach (var controller in controllers)
             {
-                if(controller != null)
+                if (controller != null)
                     SubscribeLater<Controller>(controller);
             }
         }
 
-        protected void UnsubscribeLater(params Controller?[] controllers)
+        [DebuggerStepThrough]
+        protected void UnsubscribeLater(IEnumerable<Controller?> controllers)
         {
             foreach (var controller in controllers)
             {
                 if (controller != null)
                     UnsubscribeLater<Controller>(controller);
             }
+        }
+
+        [DebuggerStepThrough]
+        protected void SubscribeLater(params Controller?[] controllers)
+        {
+            SubscribeLater(controllers.AsEnumerable());
+        }
+
+        [DebuggerStepThrough]
+        protected void UnsubscribeLater(params Controller?[] controllers)
+        {
+            UnsubscribeLater(controllers.AsEnumerable());
         }
     }
 }

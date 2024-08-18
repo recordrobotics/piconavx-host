@@ -1,10 +1,9 @@
-﻿using FontStashSharp;
-using piconavx.ui.controllers;
+﻿using piconavx.ui.controllers;
 using piconavx.ui.graphics.ui;
 using Silk.NET.Input;
 using Silk.NET.Maths;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace piconavx.ui.graphics
@@ -113,6 +112,17 @@ namespace piconavx.ui.graphics
             return controller;
         }
 
+        private static long updateId = -1;
+        /// <summary>
+        /// The ID of the current or last update event.
+        /// </summary>
+        public static long UpdateId { get { return updateId; } }
+
+        internal static void TagUpdateEvent()
+        {
+            updateId++;
+        }
+
         private static bool inEvent = false;
         /// <summary>
         /// Is the engine currently in an event. Use this to make sure not to modify the
@@ -120,6 +130,12 @@ namespace piconavx.ui.graphics
         /// while in an event. Instead, defer the subscription (see <see cref="Scene.InvokeLater(Action, DeferralMode)"/>)
         /// </summary>
         public static bool InEvent { get { return inEvent; } }
+
+        private static int layoutShiftCount = 0;
+        /// <summary>
+        /// The number of layout shift complaints waiting to be processed. (see <see cref="ComplainLayoutShift(int)"/>)
+        /// </summary>
+        public static int LayoutShiftCount { get { return layoutShiftCount; } }
 
         public static PrioritizedList<PrioritizedAction<GenericPriority, Rectangle<int>>> ViewportChange = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, char>> KeyChar = new();
@@ -213,14 +229,35 @@ namespace piconavx.ui.graphics
             inEvent = false;
         }
 
+        const int MAX_LAYOUT_SHIFT_IN_UPDATE = 10;
         public static void NotifyUpdate(double deltaTime)
         {
             inEvent = true;
-            foreach (var action in Update)
+            int shifts = MAX_LAYOUT_SHIFT_IN_UPDATE;
+
+            do
             {
-                action.Action.Invoke(deltaTime);
+                foreach (var action in Update)
+                {
+                    action.Action.Invoke(shifts < MAX_LAYOUT_SHIFT_IN_UPDATE ? 0 : deltaTime);
+                }
+
+                if (shifts < MAX_LAYOUT_SHIFT_IN_UPDATE && layoutShiftCount > 0)
+                    layoutShiftCount--;
+            } while (shifts-- > 0 && layoutShiftCount > 0);
+
+            if (shifts == 0 && layoutShiftCount > 0)
+            {
+                Debug.WriteLine("Excessive number of layout shifts! Leaving update loop.");
             }
+
             inEvent = false;
+        }
+
+        public static void ComplainLayoutShift(int shiftCount)
+        {
+            if (shiftCount > layoutShiftCount)
+                layoutShiftCount = shiftCount;
         }
 
         public static void NotifyRender(double deltaTime, RenderProperties properties)
@@ -309,11 +346,13 @@ namespace piconavx.ui.graphics
             }
         }
 
+        [DebuggerStepThrough]
         public static void InvokeLater(Action action, DeferralMode deferralMode)
         {
             InvokeLater(action, deferralMode, 0);
         }
 
+        [DebuggerStepThrough]
         public static void InvokeLater(Action action, DeferralMode deferralMode, int ttl)
         {
             switch (deferralMode)

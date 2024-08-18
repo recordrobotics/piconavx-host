@@ -44,5 +44,10 @@ namespace piconavx.ui
         {
             controller.Transform.SetOrigin(controller, origin);
         }
+
+        public static string InsertFromEnd(this string str, int index, string value)
+        {
+            return str.Insert(str.Length - index, value);
+        }
     }
 }
