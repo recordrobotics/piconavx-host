@@ -98,8 +98,8 @@ namespace piconavx.ui.graphics.ui
             controlPanelLayout.AllowResize = false;
             controlPanelLayout.Insets = new Insets(0, 0, 51, 0);
 
-            playIcon = new Texture("assets/textures/play.png");
-            stopIcon = new Texture("assets/textures/stop.png");
+            playIcon = Scene.AddResource(new Texture("assets/textures/play.png"));
+            stopIcon = Scene.AddResource(new Texture("assets/textures/stop.png"));
 
             startButton = new Button(server.Running ? "Stop" : "Start", canvas);
             startButton.Icon = server.Running ? stopIcon : playIcon;
@@ -120,7 +120,7 @@ namespace piconavx.ui.graphics.ui
             controlPanel.Components.Add(startButton);
             startButton.SetTooltip(server.Running ? "Stop host server" : "Run host server");
 
-            settingsIcon = new Texture("assets/textures/settings.png");
+            settingsIcon = Scene.AddResource(new Texture("assets/textures/settings.png"));
 
             settingsButton = new Button("Settings", canvas);
             settingsButton.Padding = new Insets(16);

@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,16 @@ namespace piconavx.ui.graphics.ui
         public float Gap { get => flowLayout.Gap; set => flowLayout.Gap = value; }
         public Insets Padding { get => flowLayout.Padding; set => flowLayout.Padding = value; }
 
+        public RectangleF ContentBounds => flowLayout.ContentBounds;
+        public RectangleF WorkingRectangle => flowLayout.WorkingRectangle;
+        private VirtualUIController virtualWorkingRectangle;
+        public VirtualUIController VirtualWorkingRectangle => virtualWorkingRectangle;
+
         public FlowPanel(Canvas canvas) : base(canvas)
         {
             flowLayout = new FlowLayout(this);
+            virtualWorkingRectangle = new VirtualUIController(canvas);
+            virtualWorkingRectangle.GetBounds = () => flowLayout.WorkingRectangle;
         }
 
         public override void Subscribe()

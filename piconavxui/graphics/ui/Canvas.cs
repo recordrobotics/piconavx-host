@@ -230,7 +230,9 @@ namespace piconavx.ui.graphics.ui
             foreach (UIController component in components)
             {
                 if (component.IsRenderable)
+                {
                     component.Render(deltaTime, properties);
+                }
             }
             inEvent = false;
         }

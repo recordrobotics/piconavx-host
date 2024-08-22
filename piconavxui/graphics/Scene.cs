@@ -41,14 +41,9 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-/*                ShowBounds = true,
+                ShowBounds = true,
                 ShowNonRenderableBounds = true,
-                FlowLayoutContentBoundsOutline = true,
-                HighlightMouseOver = true,
-                HighlightMouseDown = true,
-                HighlightNonRenderable = true,
-                TargetBoundsOutline = true,
-                LastTargetBoundsOutline = true,*/
+                FlowLayoutContentBoundsOutline = true
             });
 
             UIServer server = AddController(new UIServer());
@@ -62,7 +57,7 @@ namespace piconavx.ui.graphics
             settingsPageLayout.Anchor = Anchor.All;
             settingsPageLayout.Insets = new Insets(0);
 
-            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator));
+            ClientPreviewPage clientPreviewPage = AddController(new ClientPreviewPage(canvas, camera, navigator, settingsPage, server));
             clientPreviewPage.ZIndex = 0;
             AnchorLayout clientPreviewPageLayout = AddController(new AnchorLayout(clientPreviewPage));
             clientPreviewPageLayout.Anchor = Anchor.All;

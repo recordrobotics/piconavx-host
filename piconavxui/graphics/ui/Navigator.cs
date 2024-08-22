@@ -57,5 +57,16 @@
                 currentPage = page;
             }
         }
+
+        public bool RemoveIncluding(Page page)
+        {
+            while (history.TryPop(out Page? _page))
+            {
+                if (_page.Equals(page))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

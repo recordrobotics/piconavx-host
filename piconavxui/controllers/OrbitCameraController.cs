@@ -73,7 +73,7 @@ namespace piconavx.ui.controllers
 
         private void Scene_MouseDown(MouseButton button)
         {
-            if (button == MouseButton.Left && Window.Current.Input != null && (Canvas.InputCanvas == null || Canvas.InputCanvas.Target == null) )
+            if (button == MouseButton.Left && Window.Current.Input != null && (Canvas.InputCanvas == null || Canvas.InputCanvas.Target == null))
             {
                 foreach (var mouse in Window.Current.Input.Mice)
                 {
@@ -97,7 +97,10 @@ namespace piconavx.ui.controllers
 
         private void Scene_MouseScroll(ScrollWheel scroll)
         {
-            Distance = Math.Clamp(Distance - scroll.Y * 0.3f, 1.0f, 20f);
+            if (Canvas.InputCanvas == null || Canvas.InputCanvas.RaycastAt(Window.Current.Input!.Mice[0].Position, Canvas.RaycastMode.Primary) == null) // use primary here because we only care about misses
+            {
+                Distance = Math.Clamp(Distance - scroll.Y * 0.3f, 1.0f, 20f);
+            }
         }
     }
 }

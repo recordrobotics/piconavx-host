@@ -38,7 +38,9 @@ namespace piconavx.ui.controllers
         public Insets Padding { get; set; } = new Insets(0);
 
         private RectangleF contentBounds = default;
+        private RectangleF workingRectangle = default;
         public RectangleF ContentBounds => contentBounds;
+        public RectangleF WorkingRectangle => workingRectangle;
 
         public FlowLayout(UIController container)
         {
@@ -48,11 +50,17 @@ namespace piconavx.ui.controllers
             AlignItems = AlignItems.Start;
             JustifyContent = AlignItems.Start;
             instances.Add(this);
+            workingRectangle = GetWorkingRectangle();
         }
 
         ~FlowLayout()
         {
             instances.Remove(this);
+        }
+        
+        public RectangleF GetWorkingRectangle()
+        {
+            return new RectangleF(Container.Bounds.X + Padding.Left, Container.Bounds.Y + Padding.Top, Container.Bounds.Width - Padding.Horizontal, Container.Bounds.Height - Padding.Vertical);
         }
 
         public RectangleF GetAutoSizeBounds()
@@ -153,6 +161,8 @@ namespace piconavx.ui.controllers
 
         private void Scene_Update(double deltaTime)
         {
+            workingRectangle = GetWorkingRectangle();
+
             if (AutoSizeContainer != AutoSize.None)
                 Container.Bounds = GetAutoSizeBounds();
 
