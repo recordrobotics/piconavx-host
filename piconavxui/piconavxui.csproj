@@ -56,11 +56,15 @@
     <None Remove="assets\textures\pill.png" />
     <None Remove="assets\textures\play.png" />
     <None Remove="assets\textures\record.png" />
+    <None Remove="assets\textures\recordings.png" />
+    <None Remove="assets\textures\refresh.png" />
+    <None Remove="assets\textures\restore.png" />
     <None Remove="assets\textures\roundrect.png" />
     <None Remove="assets\textures\settings.png" />
     <None Remove="assets\textures\stop.png" />
     <None Remove="assets\textures\temperature.png" />
     <None Remove="assets\textures\uvtest.png" />
+    <None Remove="assets\textures\zero.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,11 +116,15 @@
     <EmbeddedResource Include="assets\textures\pill.png" />
     <EmbeddedResource Include="assets\textures\play.png" />
     <EmbeddedResource Include="assets\textures\record.png" />
+    <EmbeddedResource Include="assets\textures\recordings.png" />
+    <EmbeddedResource Include="assets\textures\refresh.png" />
+    <EmbeddedResource Include="assets\textures\restore.png" />
     <EmbeddedResource Include="assets\textures\roundrect.png" />
     <EmbeddedResource Include="assets\textures\settings.png" />
     <EmbeddedResource Include="assets\textures\stop.png" />
     <EmbeddedResource Include="assets\textures\temperature.png" />
     <EmbeddedResource Include="assets\textures\uvtest.png" />
+    <EmbeddedResource Include="assets\textures\zero.png" />
   </ItemGroup>
 
   <ItemGroup>
