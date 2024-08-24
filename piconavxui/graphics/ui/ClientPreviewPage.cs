@@ -219,7 +219,7 @@ namespace piconavx.ui.graphics.ui
             headerPanel.Components.Add(backButton);
             backButton.SetTooltip("Go back");
 
-            headerTitle = new Label(() => client?.Id ?? "<UNKNOWN>", canvas);
+            headerTitle = new Label(() => (client?.Id ?? "<UNKNOWN>", null), canvas);
             headerTitle.FontSize = 20f;
             headerTitle.Font = FontFace.InterSemiBold;
             headerTitle.Color = Theme.Header;
@@ -262,7 +262,7 @@ namespace piconavx.ui.graphics.ui
 
             startRecordingButton = new Button("Start Recording", canvas);
             startRecordingButton.Color = Theme.Primary;
-            startRecordingButton.FontSize = 12;
+            startRecordingButton.FontSize = 13;
             startRecordingButton.IconSize = new SizeF(30, 30);
             startRecordingButton.IconGap = 15;
             startRecordingButton.CornerSize = new Size(9, 9);
@@ -284,7 +284,7 @@ namespace piconavx.ui.graphics.ui
 
             manageRecordingsButton = new Button("Manage Recordings", canvas);
             manageRecordingsButton.Color = Theme.Neutral;
-            manageRecordingsButton.FontSize = 12;
+            manageRecordingsButton.FontSize = 13;
             manageRecordingsButton.IconSize = new SizeF(30, 30);
             manageRecordingsButton.IconGap = 15;
             manageRecordingsButton.CornerSize = new Size(9, 9);

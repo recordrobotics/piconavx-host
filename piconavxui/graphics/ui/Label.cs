@@ -22,8 +22,14 @@ namespace piconavx.ui.graphics.ui
             get => text; set => text = value;
         }
 
-        private Func<string>? textFunc;
-        public Func<string>? TextDelegate { get => textFunc; set => textFunc = value; }
+        private TextSegment[]? segments = null;
+        public TextSegment[]? Segments
+        {
+            get => segments; set => segments = value;
+        }
+
+        private Func<(string, TextSegment[]?)>? textFunc;
+        public Func<(string, TextSegment[]?)>? TextDelegate { get => textFunc; set => textFunc = value; }
 
         private float fontSize = 12.0f;
         public float FontSize
@@ -49,15 +55,24 @@ namespace piconavx.ui.graphics.ui
             get => color; set => color = value;
         }
 
-        public Label(string text, Canvas canvas) : base(canvas)
+        public Label(string text, Canvas canvas) : this(text, null, canvas)
+        {
+        }
+
+        public Label(string text, TextSegment[]? segments, Canvas canvas) : base(canvas)
         {
             RaycastTransparency = RaycastTransparency.Hidden; // don't perform input events on text
             this.text = text;
+            this.segments = segments;
             color = SolidUIColor.White;
             bounds = GetAutoSizeBounds();
         }
 
-        public Label(Func<string> textDelegate, Canvas canvas) : this(textDelegate.Invoke(), canvas)
+        private Label((string, TextSegment[]?) tuple, Canvas canvas) : this(tuple.Item1, tuple.Item2, canvas)
+        {
+        }
+
+        public Label(Func<(string, TextSegment[]?)> textDelegate, Canvas canvas) : this(textDelegate.Invoke(), canvas)
         {
             this.textFunc = textDelegate;
         }
@@ -76,7 +91,14 @@ namespace piconavx.ui.graphics.ui
             var font = fontSystem.GetFont(fontSize);
 
             Window.FontRenderer.Begin(Transform.Matrix);
-            font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+            if (segments == null)
+            {
+                font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), color, 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+            }
+            else
+            {
+                font.DrawText(Window.FontRenderer, text, new Vector2(bounds.X, bounds.Y), TextSegmentColorizer.GetCharacterColors(text, color, segments), 0, renderOffset, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
+            }
             Window.FontRenderer.End();
         }
 
@@ -98,7 +120,35 @@ namespace piconavx.ui.graphics.ui
             }
 
             if (textFunc != null)
-                text = textFunc.Invoke();
+            {
+                var tuple = textFunc.Invoke();
+                text = tuple.Item1;
+                segments = tuple.Item2;
+            }
+        }
+    }
+
+    public struct TextSegment(Range range, UIColor color)
+    {
+        public Range Range = range;
+        public UIColor Color = color;
+    }
+
+    public static class TextSegmentColorizer
+    {
+        public static FSColor[] GetCharacterColors(string text, UIColor defaultColor, TextSegment[] segments)
+        {
+            FSColor[] colors = new FSColor[text.Length];
+            var defaultFS = (FSColor)defaultColor;
+            Array.Fill(colors, defaultFS);
+
+            foreach (var segment in segments)
+            {
+                (int Offset, int Length) = segment.Range.GetOffsetAndLength(colors.Length);
+                Array.Fill(colors, segment.Color, Offset, Length);
+            }
+
+            return colors;
         }
     }
 }

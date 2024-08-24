@@ -1,6 +1,9 @@
 ﻿using piconavx.ui.controllers;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
+using System.Net;
+using static piconavx.ui.graphics.ui.RichTextSegmentation;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -13,6 +16,8 @@ namespace piconavx.ui.graphics.ui
         private static Texture? refreshIcon;
         private static Texture? restoreIcon;
         private static Texture? zeroIcon;
+
+        private ConcurrentBag<Controller> unsubscribeList = [];
 
         public ClientDetails(Canvas canvas) : base(canvas)
         {
@@ -68,12 +73,33 @@ namespace piconavx.ui.graphics.ui
             Scene.InvokeLater(row.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
-        private void AddLabel(Func<string> textDelegate)
+        private FlowPanel AddSection()
+        {
+            FlowPanel row = new FlowPanel(Canvas);
+            row.Direction = FlowDirection.Vertical;
+            row.Gap = 15;
+            row.Padding = new Insets(30, 0, 30, 0);
+            row.AutoSize = FlowLayout.AutoSize.Y;
+            FillLayout layout = new FillLayout(row, this);
+            layout.Horizontal = true;
+            unsubscribeList.Add(layout);
+
+            Canvas.AddComponent(row);
+            Components.Add(row);
+            row.ZIndex = ZIndex;
+            Scene.InvokeLater(row.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
+            Scene.InvokeLater(layout.Subscribe, DeferralMode.NextFrame);
+
+            return row;
+        }
+
+        private void AddLabel(FlowPanel section, Func<(string, TextSegment[]?)> textDelegate)
         {
             Label label = new Label(textDelegate, Canvas);
             label.Color = Theme.Text;
+            label.FontSize = 13;
             Canvas.AddComponent(label);
-            Components.Add(label);
+            section.Components.Add(label);
             label.ZIndex = ZIndex;
             Scene.InvokeLater(label.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
@@ -86,16 +112,27 @@ namespace piconavx.ui.graphics.ui
                 Canvas.RemoveComponent(component);
             }
 
+            while (unsubscribeList.TryTake(out var component))
+            {
+                Scene.InvokeLater(component.Unsubscribe, DeferralMode.NextEvent); // Destroy as soon as possible
+            }
+
             Components.Clear();
 
             if (Client != null)
             {
                 AddHeader("Device");
+
+                var section = AddSection();
+                AddLabel(section,
+                    () => Segment(
+                        $"{TextSecondary}Endpoint:{Default} {(((IPEndPoint?)client?.Tcp?.Client.RemoteEndPoint)?.Address)?.ToString() ?? "<UNKNOWN>"}{TextSecondary}:{(((IPEndPoint?)client?.Tcp?.Client.RemoteEndPoint)?.Port)?.ToString() ?? "<UNKNOWN>"}"
+                        ));
+
                 AddHeader("Health");
                 AddHeader("Data");
 
-                AddLabel(() => "Connected: " + client?.Id);
-                AddLabel(() => "Firmware: v" + client?.BoardId.FwVerMajor + "." + client?.BoardId.FwVerMinor + "." + client?.BoardId.FwRevision);
+                /*AddLabel(() => "Connected: " + client?.Id);
                 AddLabel(() => "Board: v" + string.Join('.', client?.BoardId.HwRev.ToString().ToCharArray() ?? []));
                 AddLabel(() => "Status: " + client?.BoardState.OpStatus.ToString() + " | Calibration: " + client?.BoardState.CalStatus.ToString());
                 AddLabel(() =>
@@ -135,7 +172,47 @@ namespace piconavx.ui.graphics.ui
                     var lastUpdate = client == null ? default : lastUpdates.GetValueOrDefault(client);
                     return "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll;
                 });
+*//*AddLabel(() => "Connected: " + client?.Id);
+                AddLabel(() => "Board: v" + string.Join('.', client?.BoardId.HwRev.ToString().ToCharArray() ?? []));
+                AddLabel(() => "Status: " + client?.BoardState.OpStatus.ToString() + " | Calibration: " + client?.BoardState.CalStatus.ToString());
+                AddLabel(() =>
+                {
+                    if (client == null) return "GYRO:NO | ACCEL:NO | MAG:NO | BARO:NO";
+                    bool gyro = client.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.GyroPassed);
+                    bool accel = client.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.AccelPassed);
+                    bool mag = client.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.MagPassed);
+                    bool baro = client.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed);
+                    return "GYRO:" + (gyro ? "OK" : "NO") + " | " + "ACCEL:" + (accel ? "OK" : "NO") + " | " + "MAG:" + (mag ? "OK" : "NO") + " | " + "BARO:" + (baro ? "OK" : "NO");
+                });
+                AddLabel(() =>
+                {
+                    if (client == null) return "Moving: NO\nAltitude Valid: NO\nFused Heading Valid: NO\nMag Disturbance: NO\nYaw Stable: NO\nSea level press set: NO";
 
+                    bool moving = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.Moving);
+                    bool altitudeValid = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.AltitudeValid);
+                    bool fusedHeadingValid = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.FusedHeadingValid);
+                    bool magDisturbance = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.MagDisturbance);
+                    bool yawStable = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.YawStable);
+                    bool sealevelPressSet = client.BoardState.SensorStatus.HasFlag(NavXSensorStatus.SealevelPressSet);
+                    return "Moving: " + (moving ? "YES" : "NO") + "\n" +
+                    "Altitude Valid: " + (altitudeValid ? "YES" : "NO") + "\n" +
+                    "Fused Heading Valid: " + (fusedHeadingValid ? "YES" : "NO") + "\n" +
+                    "Mag Disturbance: " + (magDisturbance ? "YES" : "NO") + "\n" +
+                    "Yaw Stable: " + (yawStable ? "YES" : "NO") + "\n" +
+                    "Sea level press set: " + (sealevelPressSet ? "YES" : "NO");
+                });
+                AddLabel(() => "Memory: " + client?.Health.MemoryUsed + "B / " + client?.Health.MemoryTotal + "B (" + MathF.Round((float)(client?.Health.MemoryUsed ?? 0) / (client?.Health.MemoryTotal ?? 1) * 100f, 2).ToString("N2") + "%)");
+                AddLabel(() =>
+                {
+                    var lastUpdate = client == null ? default : lastUpdates.GetValueOrDefault(client);
+                    return "Temperature: " + client?.Health.CoreTemp.ToString("N2") + "°c (Core) | " + lastUpdate.MpuTemp.ToString("N2") + "°c (Sensor)" + ((client?.BoardState.SelftestStatus.HasFlag(NavXSelftestStatus.BaroPassed) ?? false) ? (" | " + lastUpdate.BaroTemp.ToString("N2") + "°c (Baro)") : "");
+                });
+                AddLabel(() =>
+                {
+                    var lastUpdate = client == null ? default : lastUpdates.GetValueOrDefault(client);
+                    return "Yaw: " + lastUpdate.Yaw + "\nPitch: " + lastUpdate.Pitch + "\nRoll: " + lastUpdate.Roll;
+                });
+*/
                 FlowPanel recordingRow = new FlowPanel(Canvas);
                 Canvas.AddComponent(recordingRow);
                 Components.Add(recordingRow);

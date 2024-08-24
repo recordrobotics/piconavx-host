@@ -156,7 +156,7 @@ namespace piconavx.ui.graphics.ui
             statusLabel = new Label(() =>
             {
                 if (!server.Running)
-                    return "Server not started";
+                    return ("Server not started", null);
 
                 if (server.LocalEndpoint is IPEndPoint endpoint)
                 {
@@ -164,18 +164,18 @@ namespace piconavx.ui.graphics.ui
                     {
                         var addresses = server.GetInterfaceAddresses();
                         if (addresses == null)
-                            return $"Server running on {endpoint.Address}:{endpoint.Port}";
+                            return ($"Server running on {endpoint.Address}:{endpoint.Port}", null);
 
-                        return $"Server running on {string.Join(", ", addresses.Select(v => $"{v}:{endpoint.Port}"))}";
+                        return ($"Server running on {string.Join(", ", addresses.Select(v => $"{v}:{endpoint.Port}"))}", null);
                     }
                     else
                     {
-                        return $"Server running on {endpoint.Address}:{endpoint.Port}";
+                        return ($"Server running on {endpoint.Address}:{endpoint.Port}", null);
                     }
                 }
                 else
                 {
-                    return "Server running with unsupported endpoint";
+                    return ("Server running with unsupported endpoint", null);
                 }
             }, canvas);
             statusLabel.FontSize = 13;
