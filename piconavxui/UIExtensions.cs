@@ -49,5 +49,19 @@ namespace piconavx.ui
         {
             return str.Insert(str.Length - index, value);
         }
+
+        public static int GetLineCount(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
+            int j = 1;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == '\n')
+                    j++;
+            }
+            return j;
+        }
     }
 }

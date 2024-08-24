@@ -1,7 +1,6 @@
 ﻿using piconavx.ui.controllers;
 using System.Drawing;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -16,6 +15,8 @@ namespace piconavx.ui.graphics.ui
 
         public interface ButtonColor
         {
+            public bool TextIsBackground { get; }
+
             public UIColor Background { get; }
             public UIColor BackgroundDisabled { get; }
             public UIColor BackgroundHover { get; }
@@ -44,7 +45,7 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
 
-            RaycastTransparency = RaycastTransparency.Transparent;
+            RaycastTransparency = Color.TextIsBackground ? RaycastTransparency.Opaque : RaycastTransparency.Transparent;
 
             icon = new Image(canvas);
             icon.ZIndex = ContentZIndex;
@@ -116,6 +117,8 @@ namespace piconavx.ui.graphics.ui
             }
         }
 
+        public Size CornerSize { get => background.Size; set => background.Size = value; }
+
         private Insets padding = new Insets(20, 16, 20, 13);
         public Insets Padding
         {
@@ -138,7 +141,7 @@ namespace piconavx.ui.graphics.ui
         }
 
         public override RaycastTransparency RaycastTransparency { get => base.RaycastTransparency; set => base.RaycastTransparency = background.RaycastTransparency = value; }
-        public override bool IsRenderable => false;
+        public override bool IsRenderable => Color.TextIsBackground;
         public override bool MouseDown { get => background.MouseDown; set => background.MouseDown = value; }
         public override bool MouseOver { get => background.MouseOver; set => background.MouseOver = value; }
 
@@ -236,6 +239,8 @@ namespace piconavx.ui.graphics.ui
             iconAnchor.Subscribe();
             textAnchor.Subscribe();
             tooltip?.Subscribe();
+            prevTextIsBackground = Color.TextIsBackground;
+            RaycastTransparency = Color.TextIsBackground ? RaycastTransparency.Opaque : RaycastTransparency.Transparent;
         }
 
         public override void Unsubscribe()
@@ -253,7 +258,8 @@ namespace piconavx.ui.graphics.ui
         public override void OnAdd()
         {
             base.OnAdd();
-            Canvas.AddComponent(background);
+            if(!Color.TextIsBackground)
+                Canvas.AddComponent(background);
             Canvas.AddComponent(icon);
             if (!IsIconButton)
                 Canvas.AddComponent(text);
@@ -262,11 +268,13 @@ namespace piconavx.ui.graphics.ui
         public override void OnRemove()
         {
             base.OnRemove();
-            Canvas.RemoveComponent(background);
+            if (!Color.TextIsBackground)
+                Canvas.RemoveComponent(background);
             Canvas.RemoveComponent(icon);
             Canvas.RemoveComponent(text);
         }
 
+        bool prevTextIsBackground = false;
         private void Scene_Update(double deltaTime)
         {
             if (autoSize != AutoSizeMode.None)
@@ -274,9 +282,30 @@ namespace piconavx.ui.graphics.ui
                 bounds = GetAutoSizeBounds();
             }
 
-            background.Color = isDisabled ? Color.BackgroundDisabled : MouseDown ? Color.BackgroundActive : MouseOver ? Color.BackgroundHover : Color.Background;
-            icon.Color = isDisabled ? Color.TextDisabled : Color.Text;
-            text.Color = isDisabled ? Color.TextDisabled : Color.Text;
+            if (Color.TextIsBackground != prevTextIsBackground)
+            {
+                prevTextIsBackground = Color.TextIsBackground;
+                if (!Color.TextIsBackground)
+                    Canvas.AddComponent(background);
+                else
+                    Canvas.RemoveComponent(background);
+                RaycastTransparency = Color.TextIsBackground ? RaycastTransparency.Opaque : RaycastTransparency.Transparent;
+            }
+
+            var color = isDisabled ? Color.BackgroundDisabled : MouseDown ? Color.BackgroundActive : MouseOver ? Color.BackgroundHover : Color.Background;
+
+            background.Color = color;
+
+            if (Color.TextIsBackground)
+            {
+                icon.Color = color;
+                text.Color = color;
+            }
+            else
+            {
+                icon.Color = isDisabled ? Color.TextDisabled : Color.Text;
+                text.Color = isDisabled ? Color.TextDisabled : Color.Text;
+            }
         }
     }
 }

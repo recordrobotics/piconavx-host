@@ -107,7 +107,6 @@ namespace piconavx.ui.graphics.ui
             startButton.IconSize = new SizeF(45, 45);
             startButton.IconGap = server.Running ? 6.0f : 4.5f;
             startButton.FontSize = 15;
-            startButton.RenderOffset = new System.Numerics.Vector2(0, 2);
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
             startButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
@@ -349,7 +348,6 @@ namespace piconavx.ui.graphics.ui
             startButton.Text = server.Running ? "Stop" : "Start";
             startButton.Color = server.Running ? Theme.Error : Theme.Success;
             startButton.SetTooltip(server.Running ? "Stop host server" : "Run host server");
-            startButton.RenderOffset = server.Running ? new System.Numerics.Vector2(0, 0) : new System.Numerics.Vector2(0, 2);
             startButton.Icon = server.Running ? stopIcon : playIcon;
             startButton.IconGap = server.Running ? 6.0f : 4.5f;
         }

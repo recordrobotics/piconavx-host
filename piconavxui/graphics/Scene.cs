@@ -41,9 +41,9 @@ namespace piconavx.ui.graphics
             Canvas canvas = AddController(AddResource(new Canvas()));
             AddController(new InputCanvasDebugController()
             {
-                ShowBounds = true,
+/*                ShowBounds = true,
                 ShowNonRenderableBounds = true,
-                FlowLayoutContentBoundsOutline = true
+                FlowLayoutContentBoundsOutline = true*/
             });
 
             UIServer server = AddController(new UIServer());

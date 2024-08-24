@@ -30,5 +30,6 @@ namespace piconavx.ui.graphics.ui
         }
 
         public static readonly SolidUIColor White = new SolidUIColor(FSColor.White);
+        public static readonly SolidUIColor Transparent = new SolidUIColor(FSColor.Transparent);
     }
 }

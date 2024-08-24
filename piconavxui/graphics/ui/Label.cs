@@ -67,7 +67,7 @@ namespace piconavx.ui.graphics.ui
             var fontSystem = Window.FontSystems[this.font];
             var font = fontSystem.GetFont(fontSize);
             Vector2 size = font.MeasureString(text, new Vector2(fontSystem.FontResolutionFactor, fontSystem.FontResolutionFactor));
-            return new RectangleF(bounds.X, bounds.Y, size.X, size.Y);
+            return new RectangleF(bounds.X, bounds.Y, size.X, font.LineHeight * text.GetLineCount() * fontSystem.FontResolutionFactor);
         }
 
         public override void Render(double deltaTime, RenderProperties properties)

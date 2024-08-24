@@ -1,8 +1,6 @@
 ﻿using piconavx.ui.controllers;
-using Silk.NET.Assimp;
 using System.Drawing;
 using System.Numerics;
-using static Silk.NET.Core.Native.WinString;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -46,6 +44,9 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout sidepanelLayout;
 
         private FlowPanel headerPanel;
+        private FillLayout headerPanelLayout;
+        private Image headerBackground;
+        private AnchorLayout headerBackgroundAnchor;
         private Button backButton;
         private Texture backIcon;
         private Label headerTitle;
@@ -56,10 +57,19 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout scrollContentLayout;
 
         private Texture recordIcon;
+        private Texture manageRecordingsIcon;
         private FlowPanel recordingRow;
+        private AnchorLayout recordingRowLayout;
         private FlowPanel recordPart;
         private Button startRecordingButton;
         private Button stopRecordingButton;
+        private Button manageRecordingsButton;
+
+        private Image topBackground;
+        private AnchorLayout topBackgroundAnchor;
+
+        private Image bottomBackground;
+        private AnchorLayout bottomBackgroundAnchor;
 
         private ClientDetails dataPanel;
 
@@ -132,7 +142,6 @@ namespace piconavx.ui.graphics.ui
             startButton.IconSize = new SizeF(45, 45);
             startButton.IconGap = server.Running ? 6.0f : 4.5f;
             startButton.FontSize = 15;
-            startButton.RenderOffset = new Vector2(0, 2);
             startButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
             startButton.Padding = new Insets(11.25f, 7.5f, 20.25f, 7.5f);
             startButton.Click += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
@@ -157,7 +166,6 @@ namespace piconavx.ui.graphics.ui
 
             sidepanel = new FlowPanel(canvas);
             sidepanel.Direction = FlowDirection.Vertical;
-            sidepanel.Gap = 30;
             sidepanel.Padding = new Insets(51);
             sidepanel.Bounds = new RectangleF(0, 0, 831, 0);
             sidepanel.AutoSize = FlowLayout.AutoSize.None;
@@ -171,11 +179,35 @@ namespace piconavx.ui.graphics.ui
             backgroundAnchor.Anchor = Anchor.All;
             backgroundAnchor.Insets = new Insets(0);
 
+            topBackground = new Image(canvas);
+            topBackground.Color = Theme.Background;
+            topBackground.Bounds = new RectangleF(0, 0, 0, 51);
+            topBackgroundAnchor = new AnchorLayout(topBackground, sidepanel);
+            topBackgroundAnchor.Anchor = Anchor.Left | Anchor.Top | Anchor.Right;
+            topBackgroundAnchor.Insets = new Insets(0);
+
+            bottomBackground = new Image(canvas);
+            bottomBackground.Color = Theme.Background;
+            bottomBackground.Bounds = new RectangleF(0, 0, 0, 51);
+            bottomBackgroundAnchor = new AnchorLayout(bottomBackground, sidepanel);
+            bottomBackgroundAnchor.Anchor = Anchor.Left | Anchor.Bottom | Anchor.Right;
+            bottomBackgroundAnchor.Insets = new Insets(0);
+
             headerPanel = new FlowPanel(canvas);
             headerPanel.Direction = FlowDirection.Horizontal;
             headerPanel.AlignItems = AlignItems.Middle;
+            headerPanel.AutoSize = FlowLayout.AutoSize.Y;
             headerPanel.Gap = 51;
+            headerPanel.Padding = new Insets(0, 0, 0, 30);
             sidepanel.Components.Add(headerPanel);
+            headerPanelLayout = new FillLayout(headerPanel, sidepanel.VirtualWorkingRectangle);
+            headerPanelLayout.Horizontal = true;
+
+            headerBackground = new Image(canvas);
+            headerBackground.Color = Theme.Background;
+            headerBackgroundAnchor = new AnchorLayout(headerBackground, headerPanel);
+            headerBackgroundAnchor.Anchor = Anchor.All;
+            headerBackgroundAnchor.Insets = new Insets(0);
 
             backIcon = Scene.AddResource(new Texture("assets/textures/back.png"));
 
@@ -194,6 +226,9 @@ namespace piconavx.ui.graphics.ui
             headerPanel.Components.Add(headerTitle);
 
             scrollContent = new FlowPanel(canvas);
+            scrollContent.Direction = FlowDirection.Vertical;
+            scrollContent.Gap = 15;
+
             scrollPanel = new ScrollPanel(canvas, scrollContent);
             scrollPanel.Horizontal = false;
             sidepanel.Components.Add(scrollPanel);
@@ -201,13 +236,63 @@ namespace piconavx.ui.graphics.ui
             scrollPanelLayout.Horizontal = true;
             scrollPanelLayout.Vertical = true;
 
-            scrollContentLayout = new AnchorLayout(scrollContent, scrollPanel);
+            scrollContentLayout = new AnchorLayout(scrollContent, scrollPanel.VirtualWorkingRectangle);
             scrollContentLayout.Anchor = Anchor.Left | Anchor.Right;
             scrollContentLayout.Insets = new Insets(0);
 
             recordIcon = Scene.AddResource(new Texture("assets/textures/record.png"));
+            manageRecordingsIcon = Scene.AddResource(new Texture("assets/textures/recordings.png"));
 
-            
+            recordingRow = new FlowPanel(canvas);
+            recordingRow.Direction = FlowDirection.Horizontal;
+            recordingRow.Stretch = true;
+            recordingRow.AutoSize = FlowLayout.AutoSize.Y;
+            recordingRow.AlignItems = AlignItems.Middle;
+            recordingRow.Padding = new Insets(0, 0, 0, 6);
+            scrollContent.Components.Add(recordingRow);
+            recordingRowLayout = new AnchorLayout(recordingRow, scrollContent.VirtualWorkingRectangle);
+            recordingRowLayout.Anchor = Anchor.Left | Anchor.Right;
+            recordingRowLayout.Insets = new Insets(0);
+
+            recordPart = new FlowPanel(canvas);
+            recordPart.Direction = FlowDirection.Horizontal;
+            recordPart.AlignItems = AlignItems.Middle;
+            recordPart.Gap = 15;
+            recordingRow.Components.Add(recordPart);
+
+            startRecordingButton = new Button("Start Recording", canvas);
+            startRecordingButton.Color = Theme.Primary;
+            startRecordingButton.FontSize = 12;
+            startRecordingButton.IconSize = new SizeF(30, 30);
+            startRecordingButton.IconGap = 15;
+            startRecordingButton.CornerSize = new Size(9, 9);
+            startRecordingButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
+            startRecordingButton.Padding = new Insets(15, 9, 15, 9);
+            startRecordingButton.Icon = recordIcon;
+            startRecordingButton.SetTooltip("Begin feed recording");
+            recordPart.Components.Add(startRecordingButton);
+
+            stopRecordingButton = new Button("Stop Recording", canvas);
+            stopRecordingButton.Color = Theme.Error;
+            stopRecordingButton.IsIconButton = true;
+            stopRecordingButton.IconSize = new SizeF(33, 33);
+            stopRecordingButton.CornerSize = new Size(9, 9);
+            stopRecordingButton.Padding = new Insets(7.5f);
+            stopRecordingButton.Icon = stopIcon;
+            stopRecordingButton.SetTooltip("Stop recording");
+            recordPart.Components.Add(stopRecordingButton);
+
+            manageRecordingsButton = new Button("Manage Recordings", canvas);
+            manageRecordingsButton.Color = Theme.Neutral;
+            manageRecordingsButton.FontSize = 12;
+            manageRecordingsButton.IconSize = new SizeF(30, 30);
+            manageRecordingsButton.IconGap = 15;
+            manageRecordingsButton.CornerSize = new Size(9, 9);
+            manageRecordingsButton.AutoSize = Button.AutoSizeMode.TextAndIcon;
+            manageRecordingsButton.Padding = new Insets(15, 9, 15, 9);
+            manageRecordingsButton.Icon = manageRecordingsIcon;
+            manageRecordingsButton.SetTooltip("View and manage recordings");
+            recordingRow.Components.Add(manageRecordingsButton);
 
             dataPanel = new ClientDetails(canvas);
             scrollContent.Components.Add(dataPanel);
@@ -221,12 +306,20 @@ namespace piconavx.ui.graphics.ui
             startButton.ZIndex = ZIndex + 1;
             settingsButton.ZIndex = ZIndex + 1;
             background.ZIndex = ZIndex + 2;
+            topBackground.ZIndex = ZIndex + 10;
+            bottomBackground.ZIndex = ZIndex + 10;
             sidepanel.ZIndex = ZIndex + 3;
-            headerPanel.ZIndex = ZIndex + 3;
-            backButton.ZIndex = ZIndex + 3;
-            headerTitle.ZIndex = ZIndex + 3;
+            headerPanel.ZIndex = ZIndex + 11;
+            headerBackground.ZIndex = ZIndex + 10;
+            backButton.ZIndex = ZIndex + 11;
+            headerTitle.ZIndex = ZIndex + 11;
             scrollPanel.ZIndex = ZIndex + 3;
             scrollContent.ZIndex = ZIndex + 3;
+            recordingRow.ZIndex = ZIndex + 3;
+            recordPart.ZIndex = ZIndex + 3;
+            startRecordingButton.ZIndex = ZIndex + 3;
+            stopRecordingButton.ZIndex = ZIndex + 3;
+            manageRecordingsButton.ZIndex = ZIndex + 3;
             dataPanel.ZIndex = ZIndex + 3;
         }
 
@@ -242,9 +335,14 @@ namespace piconavx.ui.graphics.ui
                 cameraController,
                 controlPanel, controlPanelLayout,
                 sidepanel, sidepanelLayout,
+                headerPanelLayout,
                 scrollPanelLayout,
                 scrollContent, scrollContentLayout,
-                background, backgroundAnchor
+                background, backgroundAnchor,
+                headerBackground, headerBackgroundAnchor,
+                topBackground, topBackgroundAnchor,
+                bottomBackground, bottomBackgroundAnchor,
+                recordingRowLayout
                 );
 
             Canvas.AddComponent(controlPanel);
@@ -252,11 +350,19 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(settingsButton);
             Canvas.AddComponent(sidepanel);
             Canvas.AddComponent(background);
+            Canvas.AddComponent(topBackground);
+            Canvas.AddComponent(bottomBackground);
             Canvas.AddComponent(headerPanel);
+            Canvas.AddComponent(headerBackground);
             Canvas.AddComponent(backButton);
             Canvas.AddComponent(headerTitle);
             Canvas.AddComponent(scrollPanel);
             Canvas.AddComponent(scrollContent);
+            Canvas.AddComponent(recordingRow);
+            Canvas.AddComponent(recordPart);
+            Canvas.AddComponent(startRecordingButton);
+            Canvas.AddComponent(stopRecordingButton);
+            Canvas.AddComponent(manageRecordingsButton);
             Canvas.AddComponent(dataPanel);
         }
 
@@ -266,6 +372,9 @@ namespace piconavx.ui.graphics.ui
             Canvas.RemoveComponent(sidepanel);
             Canvas.RemoveComponent(scrollContent);
             Canvas.RemoveComponent(background);
+            Canvas.RemoveComponent(topBackground);
+            Canvas.RemoveComponent(bottomBackground);
+            Canvas.RemoveComponent(headerBackground);
             UnsubscribeLater(
                 reference,
                 sensor, livePreview,
@@ -274,9 +383,14 @@ namespace piconavx.ui.graphics.ui
                 cameraController,
                 controlPanel, controlPanelLayout,
                 sidepanel, sidepanelLayout,
+                headerPanelLayout,
                 scrollPanelLayout, 
                 scrollContent, scrollContentLayout,
-                background, backgroundAnchor
+                background, backgroundAnchor,
+                topBackground, topBackgroundAnchor,
+                bottomBackground, bottomBackgroundAnchor,
+                headerBackground, headerBackgroundAnchor,
+                recordingRowLayout
                 );
             UIServer.ClientDisconnected -= Server_ClientDisconnected;
             Scene.Update -= Scene_Update;
@@ -287,7 +401,6 @@ namespace piconavx.ui.graphics.ui
             startButton.Text = server.Running ? "Stop" : "Start";
             startButton.Color = server.Running ? Theme.Error : Theme.Success;
             startButton.SetTooltip(server.Running ? "Stop host server" : "Run host server");
-            startButton.RenderOffset = server.Running ? new System.Numerics.Vector2(0, 0) : new System.Numerics.Vector2(0, 2);
             startButton.Icon = server.Running ? stopIcon : playIcon;
             startButton.IconGap = server.Running ? 6.0f : 4.5f;
         }

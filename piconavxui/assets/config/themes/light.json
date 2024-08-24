@@ -15,6 +15,7 @@
   "scroll_thumb_hover": "#f0f0f0",
   "scroll_thumb_active": "#e6e6e6",
   "neutral": {
+    "text_is_background": false,
     "background": "#fff",
     "background_disabled": "#cfcfcf",
     "background_hover": "#f0f0f0",
@@ -24,6 +25,7 @@
     "text_disabled": "#828282"
   },
   "primary": {
+    "text_is_background": false,
     "background": "#2e65c9",
     "background_disabled": "#0e2247",
     "background_hover": "#3b76e3",
@@ -33,6 +35,7 @@
     "text_disabled": "#b3b3b3"
   },
   "success": {
+    "text_is_background": false,
     "background": "#e4f2e5",
     "background_disabled": "#90ab91",
     "background_hover": "#ceedd1",
@@ -42,6 +45,7 @@
     "text_disabled": "#567353"
   },
   "error": {
+    "text_is_background": false,
     "background": "#e8dfdf",
     "background_disabled": "#c9b9b9",
     "background_hover": "#ebd8d8",
@@ -51,6 +55,7 @@
     "text_disabled": "#996767"
   },
   "warning": {
+    "text_is_background": false,
     "background": "#edeadd",
     "background_disabled": "#c9c7bb",
     "background_hover": "#ebe6d1",
@@ -58,5 +63,15 @@
     "text": "#998511",
     "text_secondary": "#a89c54",
     "text_disabled": "#6e6848"
+  },
+  "text_secondary_button": {
+    "text_is_background": true,
+    "background": "#a1a1a1",
+    "background_disabled": "#666666",
+    "background_hover": "#878787",
+    "background_active": "#737373",
+    "text": "#000",
+    "text_secondary": "#616161",
+    "text_disabled": "#828282"
   }
 }

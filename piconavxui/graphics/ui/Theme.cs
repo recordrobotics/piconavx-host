@@ -11,6 +11,7 @@ namespace piconavx.ui.graphics.ui
         public class ThemeButtonColor : ButtonColor
         {
             internal ThemeButtonColor(
+                Func<bool?>? textIsBackground,
                 UIColor background,
                 UIColor backgroundDisabled,
                 UIColor backgroundHover,
@@ -20,6 +21,7 @@ namespace piconavx.ui.graphics.ui
                 UIColor textDisabled
                 )
             {
+                TextIsBackground_delegate = textIsBackground;
                 Background = background;
                 BackgroundDisabled = backgroundDisabled;
                 BackgroundHover = backgroundHover;
@@ -28,7 +30,28 @@ namespace piconavx.ui.graphics.ui
                 TextSecondary = textSecondary;
                 TextDisabled = textDisabled;
             }
+            
+            internal ThemeButtonColor(
+                UIColor background,
+                UIColor backgroundDisabled,
+                UIColor backgroundHover,
+                UIColor backgroundActive,
+                UIColor text,
+                UIColor textSecondary,
+                UIColor textDisabled
+                ) : this(null,
+                    background,
+                    backgroundDisabled,
+                    backgroundHover,
+                    backgroundActive,
+                    text,
+                    textSecondary,
+                    textDisabled)
+            {
+            }
 
+            private Func<bool?>? TextIsBackground_delegate;
+            public bool TextIsBackground { get => TextIsBackground_delegate?.Invoke() ?? false; }
             public UIColor Background { get; }
             public UIColor BackgroundDisabled { get; }
             public UIColor BackgroundHover { get; }
@@ -42,6 +65,8 @@ namespace piconavx.ui.graphics.ui
         {
             internal class ButtonColorFile
             {
+                [JsonPropertyName("text_is_background")]
+                public bool TextIsBackground { get; set; }
                 [JsonPropertyName("background")]
                 public string? Background { get; set; }
                 [JsonPropertyName("background_disabled")]
@@ -78,6 +103,7 @@ namespace piconavx.ui.graphics.ui
                 ScrollThumbActive = "#4d4d4d",
                 Neutral = new()
                 {
+                    TextIsBackground = false,
                     Background = "#383838",
                     BackgroundDisabled = "#242424",
                     BackgroundHover = "#424242",
@@ -88,6 +114,7 @@ namespace piconavx.ui.graphics.ui
                 },
                 Primary = new()
                 {
+                    TextIsBackground = false,
                     Background = "#2e65c9",
                     BackgroundDisabled = "#0e2247",
                     BackgroundHover = "#3b76e3",
@@ -98,6 +125,7 @@ namespace piconavx.ui.graphics.ui
                 },
                 Success = new()
                 {
+                    TextIsBackground = false,
                     Background = "#0d1a0e",
                     BackgroundDisabled = "#151c16",
                     BackgroundHover = "#152b17",
@@ -108,6 +136,7 @@ namespace piconavx.ui.graphics.ui
                 },
                 Error = new()
                 {
+                    TextIsBackground = false,
                     Background = "#1f0d0d",
                     BackgroundDisabled = "#170404",
                     BackgroundHover = "#331212",
@@ -118,6 +147,7 @@ namespace piconavx.ui.graphics.ui
                 },
                 Warning = new()
                 {
+                    TextIsBackground = false,
                     Background = "#241f0a",
                     BackgroundDisabled = "#242115",
                     BackgroundHover = "#362f0f",
@@ -125,6 +155,17 @@ namespace piconavx.ui.graphics.ui
                     Text = "#edcc47",
                     TextSecondary = "#ded4ad",
                     TextDisabled = "#a39b7c"
+                },
+                TextSecondaryButton = new()
+                {
+                    TextIsBackground = true,
+                    Background = "#383838",
+                    BackgroundDisabled = "#242424",
+                    BackgroundHover = "#424242",
+                    BackgroundActive = "#4d4d4d",
+                    Text = "#fff",
+                    TextSecondary = "#BCBCBC",
+                    TextDisabled = "#b3b3b3"
                 }
             };
 
@@ -168,6 +209,8 @@ namespace piconavx.ui.graphics.ui
             public ButtonColorFile? Error { get; set; }
             [JsonPropertyName("warning")]
             public ButtonColorFile? Warning { get; set; }
+            [JsonPropertyName("text_secondary_button")]
+            public ButtonColorFile? TextSecondaryButton { get; set; }
         }
 
         private static DelegateUIColor _Background = new DelegateUIColor(() => ParseColor(current?.Background));
@@ -201,6 +244,7 @@ namespace piconavx.ui.graphics.ui
         private static DelegateUIColor _ScrollThumbActive = new DelegateUIColor(() => ParseColor(current?.ScrollThumbActive));
         public static UIColor ScrollThumbActive => _ScrollThumbActive;
         private static ThemeButtonColor _Neutral = new(
+            () => current?.Neutral?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Neutral?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.BackgroundHover)),
@@ -211,6 +255,7 @@ namespace piconavx.ui.graphics.ui
             );
         public static ThemeButtonColor Neutral => _Neutral;
         private static ThemeButtonColor _Primary = new(
+            () => current?.Primary?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Primary?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.BackgroundHover)),
@@ -221,6 +266,7 @@ namespace piconavx.ui.graphics.ui
             );
         public static ThemeButtonColor Primary => _Primary;
         private static ThemeButtonColor _Success = new(
+            () => current?.Success?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Success?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Success?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Success?.BackgroundHover)),
@@ -231,6 +277,7 @@ namespace piconavx.ui.graphics.ui
             );
         public static ThemeButtonColor Success => _Success;
         private static ThemeButtonColor _Error = new(
+            () => current?.Error?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Error?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Error?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Error?.BackgroundHover)),
@@ -241,6 +288,7 @@ namespace piconavx.ui.graphics.ui
             );
         public static ThemeButtonColor Error => _Error;
         private static ThemeButtonColor _Warning = new(
+            () => current?.Warning?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Warning?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundHover)),
@@ -250,6 +298,17 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.Warning?.TextDisabled))
             );
         public static ThemeButtonColor Warning => _Warning;
+        private static ThemeButtonColor _TextSecondaryButton = new(
+            () => current?.TextSecondaryButton?.TextIsBackground,
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.Background)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundDisabled)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundHover)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.Text)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.TextSecondary)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.TextDisabled))
+            );
+        public static ThemeButtonColor TextSecondaryButton => _TextSecondaryButton;
 
         private static ThemeFile current;
 

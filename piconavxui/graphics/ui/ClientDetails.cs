@@ -1,5 +1,6 @@
 ﻿using piconavx.ui.controllers;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace piconavx.ui.graphics.ui
 {
@@ -9,9 +10,16 @@ namespace piconavx.ui.graphics.ui
         private Client? client;
         public Client? Client { get; set; }
 
+        private static Texture? refreshIcon;
+        private static Texture? restoreIcon;
+        private static Texture? zeroIcon;
+
         public ClientDetails(Canvas canvas) : base(canvas)
         {
-            Gap = 3;
+            Gap = 15;
+            refreshIcon ??= Scene.AddResource(new Texture("assets/textures/refresh.png"));
+            restoreIcon ??= Scene.AddResource(new Texture("assets/textures/restore.png"));
+            zeroIcon ??= Scene.AddResource(new Texture("assets/textures/zero.png"));
         }
 
         public override void Subscribe()
@@ -26,6 +34,38 @@ namespace piconavx.ui.graphics.ui
             UIServer.ClientUpdate -= Server_ClientUpdate;
             Scene.Update -= Scene_Update;
             base.Unsubscribe();
+        }
+
+        private void AddHeader(string name)
+        {
+            FlowPanel row = new FlowPanel(Canvas);
+            row.Direction = FlowDirection.Horizontal;
+            row.AlignItems = AlignItems.Middle;
+            row.Gap = 6;
+
+            Label label = new Label(name, Canvas);
+            label.Font = FontFace.InterSemiBold;
+            label.FontSize = 20;
+            label.Color = Theme.Header;
+            row.Components.Add(label);
+
+            Button refreshBtn = new Button("Refresh", Canvas);
+            refreshBtn.IsIconButton = true;
+            refreshBtn.Icon = refreshIcon;
+            refreshBtn.Color = Theme.TextSecondaryButton;
+            refreshBtn.Padding = new Insets(0);
+            refreshBtn.IconSize = new SizeF(27, 27);
+            refreshBtn.SetTooltip("Refresh");
+            row.Components.Add(refreshBtn);
+
+            Canvas.AddComponent(row);
+            Canvas.AddComponent(label);
+            Canvas.AddComponent(refreshBtn);
+            Components.Add(row);
+            row.ZIndex = ZIndex;
+            label.ZIndex = ZIndex;
+            refreshBtn.ZIndex = ZIndex;
+            Scene.InvokeLater(row.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
         private void AddLabel(Func<string> textDelegate)
@@ -50,6 +90,10 @@ namespace piconavx.ui.graphics.ui
 
             if (Client != null)
             {
+                AddHeader("Device");
+                AddHeader("Health");
+                AddHeader("Data");
+
                 AddLabel(() => "Connected: " + client?.Id);
                 AddLabel(() => "Firmware: v" + client?.BoardId.FwVerMajor + "." + client?.BoardId.FwVerMinor + "." + client?.BoardId.FwRevision);
                 AddLabel(() => "Board: v" + string.Join('.', client?.BoardId.HwRev.ToString().ToCharArray() ?? []));
