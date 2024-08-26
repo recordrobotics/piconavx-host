@@ -112,6 +112,8 @@ namespace piconavx.ui.graphics.ui
                     Border = new Insets(24),
                     WrapMode = TextureWrapMode.Clamp
                 });
+
+                cardBackgroundTexture.UpdateSettings();
             }
 
             if (cardShadowTexture == null)
@@ -121,6 +123,8 @@ namespace piconavx.ui.graphics.ui
                     Border = new Insets(32),
                     WrapMode = TextureWrapMode.Clamp
                 });
+
+                cardShadowTexture.UpdateSettings();
             }
 
             if (cardMaskTexture == null)

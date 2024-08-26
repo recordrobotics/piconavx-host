@@ -21,6 +21,7 @@ namespace piconavx.ui.graphics.ui
             public UIColor BackgroundDisabled { get; }
             public UIColor BackgroundHover { get; }
             public UIColor BackgroundActive { get; }
+            public UIColor Border { get; }
 
             public UIColor Text { get; }
             public UIColor TextSecondary { get; }

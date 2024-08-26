@@ -43,7 +43,12 @@ namespace piconavx.ui.graphics
             {
 /*                ShowBounds = true,
                 ShowNonRenderableBounds = true,
-                FlowLayoutContentBoundsOutline = true*/
+                FlowLayoutContentBoundsOutline = true,
+                HighlightMouseOver = true,
+                HighlightMouseDown = true,
+                HighlightNonRenderable = true,
+                TargetBoundsOutline = true,
+                LastTargetBoundsOutline = true,*/
             });
 
             UIServer server = AddController(new UIServer());

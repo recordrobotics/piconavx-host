@@ -35,7 +35,7 @@ namespace piconavx.ui.graphics
 
         public static Texture CreateWhite(uint width, uint height)
         {
-            return CreateSolidColor(new Rgba32(255,255,255,255), width, height);
+            return CreateSolidColor(new Rgba32(255, 255, 255, 255), width, height);
         }
 
         public static Texture CreateBlack(uint width, uint height)
@@ -43,9 +43,29 @@ namespace piconavx.ui.graphics
             return CreateSolidColor(new Rgba32(0, 0, 0, 255), width, height);
         }
 
+        private Texture? owner = null;
+
+        public Texture? Owner => owner;
+        public bool IsMutated => owner != null;
+
         private uint _handle;
 
-        public string? Path { get; set; }
+        private string? path;
+        public string? Path
+        {
+            get => IsMutated ? owner!.Path : path; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    path = value;
+                }
+            }
+        }
+
         public TextureType Type { get; }
         public readonly int Width;
         public readonly int Height;
@@ -54,24 +74,133 @@ namespace piconavx.ui.graphics
         private TextureWrapMode wrapModeV = TextureWrapMode.Repeat;
         private TextureWrapMode wrapModeW = TextureWrapMode.Repeat;
 
-        public TextureWrapMode WrapModeU { get=>wrapModeU; set=>wrapModeU = value; }
-        public TextureWrapMode WrapModeV { get=>wrapModeV; set=>wrapModeV = value; }
-        public TextureWrapMode WrapModeW { get=>wrapModeW; set=>wrapModeW = value; }
-        public TextureWrapMode WrapMode { get => wrapModeU; set => wrapModeU = wrapModeV = wrapModeW = value; }
+        public TextureWrapMode WrapModeU
+        {
+            get => IsMutated ? owner!.WrapModeU : wrapModeU; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    wrapModeU = value;
+                }
+            }
+        }
+
+        public TextureWrapMode WrapModeV
+        {
+            get => IsMutated ? owner!.WrapModeV : wrapModeV; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    wrapModeV = value;
+                }
+            }
+        }
+
+        public TextureWrapMode WrapModeW
+        {
+            get => IsMutated ? owner!.WrapModeW : wrapModeW; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    wrapModeW = value;
+                }
+            }
+        }
+
+        public TextureWrapMode WrapMode
+        {
+            get => IsMutated ? owner!.WrapMode : wrapModeU; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    wrapModeU = wrapModeV = wrapModeW = value;
+                }
+            }
+        }
 
         private FilterMode filterMode = FilterMode.Trilinear;
-        public FilterMode FilterMode { get => filterMode; set => filterMode = value; }
+        public FilterMode FilterMode
+        {
+            get => IsMutated ? owner!.FilterMode : filterMode; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    filterMode = value;
+                }
+            }
+        }
 
         private Insets border = new Insets(0);
-        public Insets Border { get => border; set => border = value; }
+        public Insets Border
+        {
+            get => border; set
+            {
+                border = value;
+            }
+        }
 
-        public bool UseMipmaps { get; set; } = true;
+        private bool useMipmaps = true;
+        public bool UseMipmaps
+        {
+            get => IsMutated ? owner!.UseMipmaps : useMipmaps; set
+            {
+                if (IsMutated)
+                {
+                    throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+                }
+                else
+                {
+                    useMipmaps = value;
+                }
+            }
+        }
+
+        private Texture(Texture owner, bool useMipmaps, Insets border, FilterMode filterMode, TextureWrapMode wrapModeU, TextureWrapMode wrapModeV, TextureWrapMode wrapModeW, int width, int height, TextureType type, string? path, uint handle)
+        {
+            this.owner = owner;
+            this.useMipmaps = useMipmaps;
+            this.border = border;
+            this.filterMode = filterMode;
+            this.wrapModeU = wrapModeU;
+            this.wrapModeV = wrapModeV;
+            this.wrapModeW = wrapModeW;
+            this.Width = width;
+            this.Height = height;
+            this.Type = type;
+            this.path = path;
+            this._handle = handle;
+        }
+
+        public Texture CloneMutated()
+        {
+            return new Texture(this, useMipmaps, border, filterMode, wrapModeU, wrapModeV, wrapModeW, Width, Height, Type, path, _handle);
+        }
 
         public unsafe Texture(string path, TextureType type = TextureType.None, bool useMipmaps = true)
         {
-            Path = path;
+            this.path = path;
             Type = type;
-            UseMipmaps = useMipmaps;
+            this.useMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -99,7 +228,7 @@ namespace piconavx.ui.graphics
 
         public unsafe Texture(Span<byte> data, uint width, uint height, bool useMipmaps = true)
         {
-            UseMipmaps = useMipmaps;
+            this.useMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -115,7 +244,7 @@ namespace piconavx.ui.graphics
 
         public unsafe Texture(uint width, uint height, bool useMipmaps = true)
         {
-            UseMipmaps = useMipmaps;
+            this.useMipmaps = useMipmaps;
             _handle = Window.GL.GenTexture();
             Bind();
 
@@ -128,6 +257,11 @@ namespace piconavx.ui.graphics
 
         public unsafe void SetData(Rectangle bounds, byte[] data)
         {
+            if (IsMutated)
+            {
+                throw new InvalidOperationException("Modifying texture data is not permitted for mutated instances.");
+            }
+
             Bind();
             fixed (byte* d = &data[0])
             {
@@ -137,6 +271,11 @@ namespace piconavx.ui.graphics
 
         public unsafe void SetData(System.Drawing.Rectangle bounds, byte[] data)
         {
+            if (IsMutated)
+            {
+                throw new InvalidOperationException("Modifying texture data is not permitted for mutated instances.");
+            }
+
             SetData(new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height), data);
         }
 
@@ -186,19 +325,24 @@ namespace piconavx.ui.graphics
 
         private void SetParameters()
         {
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)getWrapMode(wrapModeU));
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)getWrapMode(wrapModeV));
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)getWrapMode(wrapModeW));
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(UseMipmaps ? getFilterModeMipmap(filterMode) : getFilterMode(filterMode)));
-            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)getFilterMode(filterMode));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)getWrapMode(WrapModeU));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)getWrapMode(WrapModeV));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)getWrapMode(WrapModeW));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(UseMipmaps ? getFilterModeMipmap(FilterMode) : getFilterMode(FilterMode)));
+            Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)getFilterMode(FilterMode));
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
             Window.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, UseMipmaps ? 8 : 0);
-            if(UseMipmaps)
+            if (UseMipmaps)
                 Window.GL.GenerateMipmap(TextureTarget.Texture2D);
         }
 
         public void UpdateSettings()
         {
+            if (IsMutated)
+            {
+                throw new InvalidOperationException("Altering interface settings is not permitted for mutated instances.");
+            }
+
             Bind();
             SetParameters();
         }
@@ -211,7 +355,8 @@ namespace piconavx.ui.graphics
 
         public void Dispose()
         {
-            Window.GL.DeleteTexture(_handle);
+            if (!IsMutated)
+                Window.GL.DeleteTexture(_handle);
         }
     }
 

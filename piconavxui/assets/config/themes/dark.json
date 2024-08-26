@@ -14,14 +14,28 @@
   "scroll_thumb": "#383838",
   "scroll_thumb_hover": "#424242",
   "scroll_thumb_active": "#4d4d4d",
+  "status_ok": "#2F6D30",
+  "status_error": "#6E3131",
   "neutral": {
     "text_is_background": false,
     "background": "#383838",
     "background_disabled": "#242424",
     "background_hover": "#424242",
     "background_active": "#4d4d4d",
+    "border": "#797979",
     "text": "#fff",
     "text_secondary": "#BCBCBC",
+    "text_disabled": "#b3b3b3"
+  },
+  "outline": {
+    "text_is_background": false,
+    "background": "#0F0F0F",
+    "background_disabled": "#0F0F0F",
+    "background_hover": "#1a1a1a",
+    "background_active": "#262626",
+    "border": "#797979",
+    "text": "#BCBCBC",
+    "text_secondary": "#858585",
     "text_disabled": "#b3b3b3"
   },
   "primary": {
@@ -30,6 +44,7 @@
     "background_disabled": "#0e2247",
     "background_hover": "#3b76e3",
     "background_active": "#2a5dbd",
+    "border": "#7EA6ED",
     "text": "#fff",
     "text_secondary": "#BCBCBC",
     "text_disabled": "#b3b3b3"
@@ -40,6 +55,7 @@
     "background_disabled": "#151c16",
     "background_hover": "#152b17",
     "background_active": "#1b381d",
+    "border": "#797979",
     "text": "#c3f7be",
     "text_secondary": "#7eab79",
     "text_disabled": "#72916e"
@@ -50,6 +66,7 @@
     "background_disabled": "#170404",
     "background_hover": "#331212",
     "background_active": "#421717",
+    "border": "#797979",
     "text": "#f2a7a7",
     "text_secondary": "#d97e7e",
     "text_disabled": "#8c6565"
@@ -60,6 +77,7 @@
     "background_disabled": "#242115",
     "background_hover": "#362f0f",
     "background_active": "#4a4010",
+    "border": "#797979",
     "text": "#edcc47",
     "text_secondary": "#ded4ad",
     "text_disabled": "#a39b7c"
@@ -70,6 +88,7 @@
     "background_disabled": "#525252",
     "background_hover": "#7a7a7a",
     "background_active": "#8c8c8c",
+    "border": "#797979",
     "text": "#fff",
     "text_secondary": "#BCBCBC",
     "text_disabled": "#b3b3b3"

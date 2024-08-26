@@ -61,6 +61,10 @@
     <None Remove="assets\textures\restore.png" />
     <None Remove="assets\textures\roundrect.png" />
     <None Remove="assets\textures\settings.png" />
+    <None Remove="assets\textures\split_mbg.png" />
+    <None Remove="assets\textures\split_mfg.png" />
+    <None Remove="assets\textures\split_sbg.png" />
+    <None Remove="assets\textures\split_sfg.png" />
     <None Remove="assets\textures\stop.png" />
     <None Remove="assets\textures\temperature.png" />
     <None Remove="assets\textures\uvtest.png" />
@@ -121,6 +125,10 @@
     <EmbeddedResource Include="assets\textures\restore.png" />
     <EmbeddedResource Include="assets\textures\roundrect.png" />
     <EmbeddedResource Include="assets\textures\settings.png" />
+    <EmbeddedResource Include="assets\textures\split_mbg.png" />
+    <EmbeddedResource Include="assets\textures\split_mfg.png" />
+    <EmbeddedResource Include="assets\textures\split_sbg.png" />
+    <EmbeddedResource Include="assets\textures\split_sfg.png" />
     <EmbeddedResource Include="assets\textures\stop.png" />
     <EmbeddedResource Include="assets\textures\temperature.png" />
     <EmbeddedResource Include="assets\textures\uvtest.png" />

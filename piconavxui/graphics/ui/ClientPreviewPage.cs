@@ -72,6 +72,7 @@ namespace piconavx.ui.graphics.ui
         private AnchorLayout bottomBackgroundAnchor;
 
         private ClientDetails dataPanel;
+        private AnchorLayout dataPanelLayout;
 
         private SettingsPage settingsPage;
 
@@ -295,6 +296,9 @@ namespace piconavx.ui.graphics.ui
             recordingRow.Components.Add(manageRecordingsButton);
 
             dataPanel = new ClientDetails(canvas);
+            dataPanelLayout = new AnchorLayout(dataPanel, scrollContent);
+            dataPanelLayout.Anchor = Anchor.Left | Anchor.Right;
+            dataPanelLayout.Insets = new Insets(0);
             scrollContent.Components.Add(dataPanel);
 
             UpdateZIndex();
@@ -342,7 +346,8 @@ namespace piconavx.ui.graphics.ui
                 headerBackground, headerBackgroundAnchor,
                 topBackground, topBackgroundAnchor,
                 bottomBackground, bottomBackgroundAnchor,
-                recordingRowLayout
+                recordingRowLayout,
+                dataPanelLayout
                 );
 
             Canvas.AddComponent(controlPanel);
@@ -390,7 +395,8 @@ namespace piconavx.ui.graphics.ui
                 topBackground, topBackgroundAnchor,
                 bottomBackground, bottomBackgroundAnchor,
                 headerBackground, headerBackgroundAnchor,
-                recordingRowLayout
+                recordingRowLayout,
+                dataPanelLayout
                 );
             UIServer.ClientDisconnected -= Server_ClientDisconnected;
             Scene.Update -= Scene_Update;

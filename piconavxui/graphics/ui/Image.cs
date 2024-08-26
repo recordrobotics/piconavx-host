@@ -103,14 +103,28 @@ namespace piconavx.ui.graphics.ui
         private float hitTestAlphaClip = 0.5f;
         public float HitTestAlphaClip { get => hitTestAlphaClip; set => hitTestAlphaClip = value; }
 
-        private ImageType imageType;
+        private ImageType imageType = ImageType.Simple;
         public ImageType ImageType { get => imageType; set => imageType = value; }
+
+        private ImageSegment visibleSegments = ImageSegment.All;
+        public ImageSegment VisibleSegments { get => visibleSegments; set => visibleSegments = value; }
 
         private Size size = new Size(100, 100);
         public Size Size { get => size; set => size = value; }
 
+        private Size sizeAlt = new Size(-1, -1);
+        public Size SizeAlt { get => sizeAlt; set => sizeAlt = value; }
+
+        public bool HasSizeAlt => sizeAlt.Width != -1 && sizeAlt.Height != -1;
+
         private bool preserveAspect = false;
         public bool PreserveAspect { get => preserveAspect; set => preserveAspect = value; }
+
+        private bool flipHorizontal = false;
+        public bool FlipHorizontal { get => flipHorizontal; set => flipHorizontal = value; }
+
+        private bool flipVertical = false;
+        public bool FlipVertical { get => flipVertical; set => flipVertical = value; }
 
         private static ImageMaterial? material;
         private static MaskedImageMaterial? maskedMaterial;
@@ -121,6 +135,160 @@ namespace piconavx.ui.graphics.ui
             material ??= Scene.AddResource(new ImageMaterial());
             maskedMaterial ??= Scene.AddResource(new MaskedImageMaterial());
             color = new SolidUIColor(new Rgba32(200, 200, 200, 255));
+        }
+
+        private void UVFlip<T>(ref T v0, ref T v1, bool hor, bool ver) where T : unmanaged, ITessellatorVertex<T>
+        {
+            if (!hor && !ver)
+                return; 
+
+            float left = v0.TexCoords.X;
+            left = MathF.Min(left, v1.TexCoords.X);
+
+            float right = v0.TexCoords.X;
+            right = MathF.Max(right, v1.TexCoords.X);
+
+            float top = v0.TexCoords.Y;
+            top = MathF.Min(top, v1.TexCoords.Y);
+
+            float bottom = v0.TexCoords.Y;
+            bottom = MathF.Max(bottom, v1.TexCoords.Y);
+
+            v0.TexCoords = new Vector2(hor ? (right + left - v0.TexCoords.X) : v0.TexCoords.X, ver ? (bottom + top - v0.TexCoords.Y) : v0.TexCoords.Y);
+            v1.TexCoords = new Vector2(hor ? (right + left - v1.TexCoords.X) : v1.TexCoords.X, ver ? (bottom + top - v1.TexCoords.Y) : v1.TexCoords.Y);
+
+            left = v0.TexCoordsAlt.X;
+            left = MathF.Min(left, v1.TexCoordsAlt.X);
+
+            right = v0.TexCoordsAlt.X;
+            right = MathF.Max(right, v1.TexCoordsAlt.X);
+
+            top = v0.TexCoordsAlt.Y;
+            top = MathF.Min(top, v1.TexCoordsAlt.Y);
+
+            bottom = v0.TexCoordsAlt.Y;
+            bottom = MathF.Max(bottom, v1.TexCoordsAlt.Y);
+
+            v0.TexCoords = new Vector2(hor ? (right + left - v0.TexCoordsAlt.X) : v0.TexCoordsAlt.X, ver ? (bottom + top - v0.TexCoordsAlt.Y) : v0.TexCoordsAlt.Y);
+            v1.TexCoords = new Vector2(hor ? (right + left - v1.TexCoordsAlt.X) : v1.TexCoordsAlt.X, ver ? (bottom + top - v1.TexCoordsAlt.Y) : v1.TexCoordsAlt.Y);
+        }
+
+        private void UVFlip<T>(ref T v0, ref T v1, ref T v2, bool hor, bool ver) where T : unmanaged, ITessellatorVertex<T>
+        {
+            if (!hor && !ver)
+                return;
+
+            float left = v0.TexCoords.X;
+            left = MathF.Min(left, v1.TexCoords.X);
+            left = MathF.Min(left, v2.TexCoords.X);
+
+            float right = v0.TexCoords.X;
+            right = MathF.Max(right, v1.TexCoords.X);
+            right = MathF.Max(right, v2.TexCoords.X);
+
+            float top = v0.TexCoords.Y;
+            top = MathF.Min(top, v1.TexCoords.Y);
+            top = MathF.Min(top, v2.TexCoords.Y);
+
+            float bottom = v0.TexCoords.Y;
+            bottom = MathF.Max(bottom, v1.TexCoords.Y);
+            bottom = MathF.Max(bottom, v2.TexCoords.Y);
+
+            v0.TexCoords = new Vector2(hor ? (right + left - v0.TexCoords.X) : v0.TexCoords.X, ver ? (bottom + top - v0.TexCoords.Y) : v0.TexCoords.Y);
+            v1.TexCoords = new Vector2(hor ? (right + left - v1.TexCoords.X) : v1.TexCoords.X, ver ? (bottom + top - v1.TexCoords.Y) : v1.TexCoords.Y);
+            v2.TexCoords = new Vector2(hor ? (right + left - v2.TexCoords.X) : v2.TexCoords.X, ver ? (bottom + top - v2.TexCoords.Y) : v2.TexCoords.Y);
+
+            left = v0.TexCoordsAlt.X;
+            left = MathF.Min(left, v1.TexCoordsAlt.X);
+            left = MathF.Min(left, v2.TexCoordsAlt.X);
+
+            right = v0.TexCoordsAlt.X;
+            right = MathF.Max(right, v1.TexCoordsAlt.X);
+            right = MathF.Max(right, v2.TexCoordsAlt.X);
+
+            top = v0.TexCoordsAlt.Y;
+            top = MathF.Min(top, v1.TexCoordsAlt.Y);
+            top = MathF.Min(top, v2.TexCoordsAlt.Y);
+
+            bottom = v0.TexCoordsAlt.Y;
+            bottom = MathF.Max(bottom, v1.TexCoordsAlt.Y);
+            bottom = MathF.Max(bottom, v2.TexCoordsAlt.Y);
+
+            v0.TexCoordsAlt = new Vector2(hor ? (right + left - v0.TexCoordsAlt.X) : v0.TexCoordsAlt.X, ver ? (bottom + top - v0.TexCoordsAlt.Y) : v0.TexCoords.Y);
+            v1.TexCoordsAlt = new Vector2(hor ? (right + left - v1.TexCoordsAlt.X) : v1.TexCoordsAlt.X, ver ? (bottom + top - v1.TexCoordsAlt.Y) : v1.TexCoords.Y);
+            v2.TexCoordsAlt = new Vector2(hor ? (right + left - v2.TexCoordsAlt.X) : v2.TexCoordsAlt.X, ver ? (bottom + top - v2.TexCoordsAlt.Y) : v2.TexCoords.Y);
+        }
+
+        private void UVFlip<T>(ref T v0, ref T v1, ref T v2, ref T v3, bool hor, bool ver) where T : unmanaged, ITessellatorVertex<T>
+        {
+            if (!hor && !ver)
+                return;
+
+            float left = v0.TexCoords.X;
+            left = MathF.Min(left, v1.TexCoords.X);
+            left = MathF.Min(left, v2.TexCoords.X);
+            left = MathF.Min(left, v3.TexCoords.X);
+
+            float right = v0.TexCoords.X;
+            right = MathF.Max(right, v1.TexCoords.X);
+            right = MathF.Max(right, v2.TexCoords.X);
+            right = MathF.Max(right, v3.TexCoords.X);
+
+            float top = v0.TexCoords.Y;
+            top = MathF.Min(top, v1.TexCoords.Y);
+            top = MathF.Min(top, v2.TexCoords.Y);
+            top = MathF.Min(top, v3.TexCoords.Y);
+
+            float bottom = v0.TexCoords.Y;
+            bottom = MathF.Max(bottom, v1.TexCoords.Y);
+            bottom = MathF.Max(bottom, v2.TexCoords.Y);
+            bottom = MathF.Max(bottom, v3.TexCoords.Y);
+
+            v0.TexCoords = new Vector2(hor ? (right + left - v0.TexCoords.X) : v0.TexCoords.X, ver ? (bottom + top - v0.TexCoords.Y) : v0.TexCoords.Y);
+            v1.TexCoords = new Vector2(hor ? (right + left - v1.TexCoords.X) : v1.TexCoords.X, ver ? (bottom + top - v1.TexCoords.Y) : v1.TexCoords.Y);
+            v2.TexCoords = new Vector2(hor ? (right + left - v2.TexCoords.X) : v2.TexCoords.X, ver ? (bottom + top - v2.TexCoords.Y) : v2.TexCoords.Y);
+            v3.TexCoords = new Vector2(hor ? (right + left - v3.TexCoords.X) : v3.TexCoords.X, ver ? (bottom + top - v3.TexCoords.Y) : v3.TexCoords.Y);
+
+            left = v0.TexCoordsAlt.X;
+            left = MathF.Min(left, v1.TexCoordsAlt.X);
+            left = MathF.Min(left, v2.TexCoordsAlt.X);
+            left = MathF.Min(left, v3.TexCoordsAlt.X);
+
+            right = v0.TexCoordsAlt.X;
+            right = MathF.Max(right, v1.TexCoordsAlt.X);
+            right = MathF.Max(right, v2.TexCoordsAlt.X);
+            right = MathF.Max(right, v3.TexCoordsAlt.X);
+
+            top = v0.TexCoordsAlt.Y;
+            top = MathF.Min(top, v1.TexCoordsAlt.Y);
+            top = MathF.Min(top, v2.TexCoordsAlt.Y);
+            top = MathF.Min(top, v3.TexCoordsAlt.Y);
+
+            bottom = v0.TexCoordsAlt.Y;
+            bottom = MathF.Max(bottom, v1.TexCoordsAlt.Y);
+            bottom = MathF.Max(bottom, v2.TexCoordsAlt.Y);
+            bottom = MathF.Max(bottom, v3.TexCoordsAlt.Y);
+
+            v0.TexCoordsAlt = new Vector2(hor ? (right + left - v0.TexCoordsAlt.X) : v0.TexCoordsAlt.X, ver ? (bottom + top - v0.TexCoordsAlt.Y) : v0.TexCoordsAlt.Y);
+            v1.TexCoordsAlt = new Vector2(hor ? (right + left - v1.TexCoordsAlt.X) : v1.TexCoordsAlt.X, ver ? (bottom + top - v1.TexCoordsAlt.Y) : v1.TexCoordsAlt.Y);
+            v2.TexCoordsAlt = new Vector2(hor ? (right + left - v2.TexCoordsAlt.X) : v2.TexCoordsAlt.X, ver ? (bottom + top - v2.TexCoordsAlt.Y) : v2.TexCoordsAlt.Y);
+            v3.TexCoordsAlt = new Vector2(hor ? (right + left - v3.TexCoordsAlt.X) : v3.TexCoordsAlt.X, ver ? (bottom + top - v3.TexCoordsAlt.Y) : v3.TexCoordsAlt.Y);
+        }
+
+        private void UVFlip<T>(ref T v0, ref T v1, ref T v2, ref T v3, RectangleF rc, bool hor, bool ver) where T : unmanaged, ITessellatorVertex<T>
+        {
+            if (!hor && !ver)
+                return;
+
+            v0.TexCoords = new Vector2(hor ? (rc.Right + rc.Left - v0.TexCoords.X) : v0.TexCoords.X, ver ? (rc.Bottom + rc.Top - v0.TexCoords.Y) : v0.TexCoords.Y);
+            v1.TexCoords = new Vector2(hor ? (rc.Right + rc.Left - v1.TexCoords.X) : v1.TexCoords.X, ver ? (rc.Bottom + rc.Top - v1.TexCoords.Y) : v1.TexCoords.Y);
+            v2.TexCoords = new Vector2(hor ? (rc.Right + rc.Left - v2.TexCoords.X) : v2.TexCoords.X, ver ? (rc.Bottom + rc.Top - v2.TexCoords.Y) : v2.TexCoords.Y);
+            v3.TexCoords = new Vector2(hor ? (rc.Right + rc.Left - v3.TexCoords.X) : v3.TexCoords.X, ver ? (rc.Bottom + rc.Top - v3.TexCoords.Y) : v3.TexCoords.Y);
+
+            v0.TexCoordsAlt = new Vector2(hor ? (rc.Right + rc.Left - v0.TexCoordsAlt.X) : v0.TexCoordsAlt.X, ver ? (rc.Bottom + rc.Top - v0.TexCoordsAlt.Y) : v0.TexCoordsAlt.Y);
+            v1.TexCoordsAlt = new Vector2(hor ? (rc.Right + rc.Left - v1.TexCoordsAlt.X) : v1.TexCoordsAlt.X, ver ? (rc.Bottom + rc.Top - v1.TexCoordsAlt.Y) : v1.TexCoordsAlt.Y);
+            v2.TexCoordsAlt = new Vector2(hor ? (rc.Right + rc.Left - v2.TexCoordsAlt.X) : v2.TexCoordsAlt.X, ver ? (rc.Bottom + rc.Top - v2.TexCoordsAlt.Y) : v2.TexCoordsAlt.Y);
+            v3.TexCoordsAlt = new Vector2(hor ? (rc.Right + rc.Left - v3.TexCoordsAlt.X) : v3.TexCoordsAlt.X, ver ? (rc.Bottom + rc.Top - v3.TexCoordsAlt.Y) : v3.TexCoordsAlt.Y);
         }
 
         private void UVAspect<T>(ref T vertex, bool uv1, bool uv2) where T : unmanaged, ITessellatorVertex<T>
@@ -163,7 +331,10 @@ namespace piconavx.ui.graphics.ui
             switch (imageType)
             {
                 case ImageType.Simple:
-                    if (!preserveAspect)
+                    if (!visibleSegments.HasFlag(ImageSegment.Middle))
+                        break;
+
+                    if (!preserveAspect && !flipHorizontal && !flipVertical)
                     {
                         tessellator.DrawQuad(bounds, color);
                     }
@@ -197,16 +368,27 @@ namespace piconavx.ui.graphics.ui
                             new Vector2(1, 1)
                             );
 
-                        UVAspect(ref topLeft, true, true);
-                        UVAspect(ref topRight, true, true);
-                        UVAspect(ref bottomLeft, true, true);
-                        UVAspect(ref bottomRight, true, true);
+                        if (flipHorizontal || flipVertical)
+                        {
+                            UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, flipHorizontal, flipVertical);
+                        }
+
+                        if (preserveAspect)
+                        {
+                            UVAspect(ref topLeft, true, true);
+                            UVAspect(ref topRight, true, true);
+                            UVAspect(ref bottomLeft, true, true);
+                            UVAspect(ref bottomRight, true, true);
+                        }
 
                         tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                     }
                     break;
                 case ImageType.Tiled:
                     {
+                        if (!visibleSegments.HasFlag(ImageSegment.Middle))
+                            break;
+
                         Vector2 uvScale = new Vector2(bounds.Width / Size.Width, bounds.Height / Size.Height);
 
                         T topLeft = T.Create(
@@ -236,6 +418,11 @@ namespace piconavx.ui.graphics.ui
                             uvScale,
                             new Vector2(1, 1)
                             );
+
+                        if (flipHorizontal || flipVertical)
+                        {
+                            UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, flipHorizontal, flipVertical);
+                        }
 
                         if (preserveAspect)
                         {
@@ -269,6 +456,7 @@ namespace piconavx.ui.graphics.ui
                             new Vector4(1);
 
                         // TL
+                        if (visibleSegments.HasFlag(ImageSegment.TopLeft))
                         {
                             T topLeft = T.Create(
                               new Vector2(bounds.Left, bounds.Top),
@@ -306,10 +494,16 @@ namespace piconavx.ui.graphics.ui
                                 UVAspect(ref bottomRight, false, true);
                             }
 
+                            if (flipHorizontal || flipVertical)
+                            {
+                                UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                            }
+
                             tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                         }
 
                         // T
+                        if (visibleSegments.HasFlag(ImageSegment.Top))
                         {
                             if (bounds.Right - size.Width > bounds.Left + size.Width)
                             {
@@ -321,7 +515,7 @@ namespace piconavx.ui.graphics.ui
                                 );
 
                                 T topRight = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Top),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top),
                                   color,
                                   new Vector2(borderUV.Z, 0),
                                   new Vector2(altUV.Z, 0)
@@ -335,7 +529,7 @@ namespace piconavx.ui.graphics.ui
                                 );
 
                                 T bottomRight = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Top + size.Height),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top + size.Height),
                                   color,
                                   new Vector2(borderUV.Z, borderUV.Y),
                                   new Vector2(altUV.Z, altUV.Y)
@@ -349,14 +543,20 @@ namespace piconavx.ui.graphics.ui
                                     UVAspect(ref bottomRight, false, true);
                                 }
 
+                                if (flipHorizontal || flipVertical)
+                                {
+                                    UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                                }
+
                                 tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                             }
                         }
 
                         // TR
+                        if (visibleSegments.HasFlag(ImageSegment.TopRight))
                         {
                             T topLeft = T.Create(
-                              new Vector2(bounds.Right - size.Width, bounds.Top),
+                              new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top),
                               color,
                               new Vector2(borderUV.Z, 0),
                               new Vector2(altUV.Z, 0)
@@ -370,14 +570,14 @@ namespace piconavx.ui.graphics.ui
                             );
 
                             T bottomLeft = T.Create(
-                              new Vector2(bounds.Right - size.Width, bounds.Top + size.Height),
+                              new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top + (HasSizeAlt ? sizeAlt.Height : size.Height)),
                               color,
                               new Vector2(borderUV.Z, borderUV.Y),
                               new Vector2(altUV.Z, altUV.Y)
                             );
 
                             T bottomRight = T.Create(
-                              new Vector2(bounds.Right, bounds.Top + size.Height),
+                              new Vector2(bounds.Right, bounds.Top + (HasSizeAlt ? sizeAlt.Height : size.Height)),
                               color,
                               new Vector2(1, borderUV.Y),
                               new Vector2(1, altUV.Y)
@@ -391,10 +591,16 @@ namespace piconavx.ui.graphics.ui
                                 UVAspect(ref bottomRight, false, true);
                             }
 
+                            if (flipHorizontal || flipVertical)
+                            {
+                                UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                            }
+
                             tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                         }
 
                         // BL
+                        if (visibleSegments.HasFlag(ImageSegment.BottomLeft))
                         {
                             T topLeft = T.Create(
                               new Vector2(bounds.Left, bounds.Bottom - size.Height),
@@ -432,10 +638,16 @@ namespace piconavx.ui.graphics.ui
                                 UVAspect(ref bottomRight, false, true);
                             }
 
+                            if (flipHorizontal || flipVertical)
+                            {
+                                UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                            }
+
                             tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                         }
 
                         // B
+                        if (visibleSegments.HasFlag(ImageSegment.Bottom))
                         {
                             if (bounds.Right - size.Width > bounds.Left + size.Width)
                             {
@@ -447,7 +659,7 @@ namespace piconavx.ui.graphics.ui
                                 );
 
                                 T topRight = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Bottom - size.Height),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom - size.Height),
                                   color,
                                   new Vector2(borderUV.Z, borderUV.W),
                                   new Vector2(altUV.Z, altUV.W)
@@ -461,7 +673,7 @@ namespace piconavx.ui.graphics.ui
                                 );
 
                                 T bottomRight = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Bottom),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom),
                                   color,
                                   new Vector2(borderUV.Z, 1),
                                   new Vector2(altUV.Z, 1)
@@ -475,28 +687,34 @@ namespace piconavx.ui.graphics.ui
                                     UVAspect(ref bottomRight, false, true);
                                 }
 
+                                if (flipHorizontal || flipVertical)
+                                {
+                                    UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                                }
+
                                 tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                             }
                         }
 
                         // BR
+                        if (visibleSegments.HasFlag(ImageSegment.BottomRight))
                         {
                             T topLeft = T.Create(
-                              new Vector2(bounds.Right - size.Width, bounds.Bottom - size.Height),
+                              new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom - (HasSizeAlt ? sizeAlt.Height : size.Height)),
                               color,
                               new Vector2(borderUV.Z, borderUV.W),
                               new Vector2(altUV.Z, altUV.W)
                             );
 
                             T topRight = T.Create(
-                              new Vector2(bounds.Right, bounds.Bottom - size.Height),
+                              new Vector2(bounds.Right, bounds.Bottom - (HasSizeAlt ? sizeAlt.Height : size.Height)),
                               color,
                               new Vector2(1, borderUV.W),
                               new Vector2(1, altUV.W)
                             );
 
                             T bottomLeft = T.Create(
-                              new Vector2(bounds.Right - size.Width, bounds.Bottom),
+                              new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom),
                               color,
                               new Vector2(borderUV.Z, 1),
                               new Vector2(altUV.Z, 1)
@@ -517,10 +735,16 @@ namespace piconavx.ui.graphics.ui
                                 UVAspect(ref bottomRight, false, true);
                             }
 
+                            if (flipHorizontal || flipVertical)
+                            {
+                                UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                            }
+
                             tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                         }
 
                         // L
+                        if (visibleSegments.HasFlag(ImageSegment.Left))
                         {
                             if (bounds.Bottom - size.Height > bounds.Top + size.Height)
                             {
@@ -560,37 +784,43 @@ namespace piconavx.ui.graphics.ui
                                     UVAspect(ref bottomRight, false, true);
                                 }
 
+                                if (flipHorizontal || flipVertical)
+                                {
+                                    UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                                }
+
                                 tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                             }
                         }
 
                         // R
+                        if (visibleSegments.HasFlag(ImageSegment.Right))
                         {
                             if (bounds.Bottom - size.Height > bounds.Top + size.Height)
                             {
                                 T topLeft = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Top + size.Height),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top + (HasSizeAlt ? sizeAlt.Height : size.Height)),
                                   color,
                                   new Vector2(borderUV.Z, borderUV.Y),
                                   new Vector2(altUV.Z, altUV.Y)
                                 );
 
                                 T topRight = T.Create(
-                                  new Vector2(bounds.Right, bounds.Top + size.Height),
+                                  new Vector2(bounds.Right, bounds.Top + (HasSizeAlt ? sizeAlt.Height : size.Height)),
                                   color,
                                   new Vector2(1, borderUV.Y),
                                   new Vector2(1, altUV.Y)
                                 );
 
                                 T bottomLeft = T.Create(
-                                  new Vector2(bounds.Right - size.Width, bounds.Bottom - size.Height),
+                                  new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom - (HasSizeAlt ? sizeAlt.Height : size.Height)),
                                   color,
                                   new Vector2(borderUV.Z, borderUV.W),
                                   new Vector2(altUV.Z, altUV.W)
                                 );
 
                                 T bottomRight = T.Create(
-                                  new Vector2(bounds.Right, bounds.Bottom - size.Height),
+                                  new Vector2(bounds.Right, bounds.Bottom - (HasSizeAlt ? sizeAlt.Height : size.Height)),
                                   color,
                                   new Vector2(1, borderUV.W),
                                   new Vector2(1, altUV.W)
@@ -604,11 +834,17 @@ namespace piconavx.ui.graphics.ui
                                     UVAspect(ref bottomRight, false, true);
                                 }
 
+                                if (flipHorizontal || flipVertical)
+                                {
+                                    UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
+                                }
+
                                 tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
                             }
                         }
 
                         // M
+                        if (visibleSegments.HasFlag(ImageSegment.Middle))
                         {
                             T topLeft = T.Create(
                               new Vector2(bounds.Left + size.Width, bounds.Top + size.Height),
@@ -618,7 +854,7 @@ namespace piconavx.ui.graphics.ui
                             );
 
                             T topRight = T.Create(
-                              new Vector2(bounds.Right - size.Width, bounds.Top + size.Height),
+                              new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Top + size.Height),
                               color,
                               new Vector2(borderUV.Z, borderUV.Y),
                               new Vector2(altUV.Z, altUV.Y)
@@ -632,7 +868,7 @@ namespace piconavx.ui.graphics.ui
                             );
 
                             T bottomRight = T.Create(
-                                new Vector2(bounds.Right - size.Width, bounds.Bottom - size.Height),
+                                new Vector2(bounds.Right - (HasSizeAlt ? sizeAlt.Width : size.Width), bounds.Bottom - size.Height),
                                 color,
                                 new Vector2(borderUV.Z, borderUV.W),
                                 new Vector2(altUV.Z, altUV.W)
@@ -644,6 +880,11 @@ namespace piconavx.ui.graphics.ui
                                 UVAspect(ref topRight, false, true);
                                 UVAspect(ref bottomLeft, false, true);
                                 UVAspect(ref bottomRight, false, true);
+                            }
+
+                            if (flipHorizontal || flipVertical)
+                            {
+                                UVFlip(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight, new RectangleF(0, 0, 1, 1), flipHorizontal, flipVertical);
                             }
 
                             tessellator.DrawQuad(ref topLeft, ref topRight, ref bottomLeft, ref bottomRight);
@@ -729,5 +970,22 @@ namespace piconavx.ui.graphics.ui
         Simple,
         Sliced,
         Tiled
+    }
+
+    [Flags]
+    public enum ImageSegment
+    {
+        TopLeft = 1 << 0,
+        Top = 1 << 1,
+        TopRight = 1 << 2,
+        Left = 1 << 3,
+        Middle = 1 << 4,
+        Right = 1 << 5,
+        BottomLeft = 1 << 6,
+        Bottom = 1 << 7,
+        BottomRight = 1 << 8,
+
+        None = 0,
+        All = TopLeft | Top | TopRight | Left | Middle | Right | BottomLeft | Bottom | BottomRight
     }
 }

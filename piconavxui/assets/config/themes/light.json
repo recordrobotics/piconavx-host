@@ -14,15 +14,29 @@
   "scroll_thumb": "#f7f7f7",
   "scroll_thumb_hover": "#f0f0f0",
   "scroll_thumb_active": "#e6e6e6",
+  "status_ok": "#87e088",
+  "status_error": "#d97777",
   "neutral": {
     "text_is_background": false,
     "background": "#fff",
     "background_disabled": "#cfcfcf",
     "background_hover": "#f0f0f0",
     "background_active": "#e3e3e3",
+    "border": "#c9c9c9",
     "text": "#000",
     "text_secondary": "#616161",
     "text_disabled": "#828282"
+  },
+  "outline": {
+    "text_is_background": false,
+    "background": "#f2f2f2",
+    "background_disabled": "#f2f2f2",
+    "background_hover": "#e3e3e3",
+    "background_active": "#cccccc",
+    "border": "#c9c9c9",
+    "text": "#616161",
+    "text_secondary": "#9c9c9c",
+    "text_disabled": "#bfbfbf"
   },
   "primary": {
     "text_is_background": false,
@@ -30,6 +44,7 @@
     "background_disabled": "#0e2247",
     "background_hover": "#3b76e3",
     "background_active": "#2a5dbd",
+    "border": "#9dbffa",
     "text": "#fff",
     "text_secondary": "#BCBCBC",
     "text_disabled": "#b3b3b3"
@@ -40,6 +55,7 @@
     "background_disabled": "#90ab91",
     "background_hover": "#ceedd1",
     "background_active": "#c8f7cc",
+    "border": "#c9c9c9",
     "text": "#1f451b",
     "text_secondary": "#4d7d48",
     "text_disabled": "#567353"
@@ -50,6 +66,7 @@
     "background_disabled": "#c9b9b9",
     "background_hover": "#ebd8d8",
     "background_active": "#e3c3c3",
+    "border": "#c9c9c9",
     "text": "#9c2828",
     "text_secondary": "#c46c6c",
     "text_disabled": "#996767"
@@ -60,6 +77,7 @@
     "background_disabled": "#c9c7bb",
     "background_hover": "#ebe6d1",
     "background_active": "#ebe4c7",
+    "border": "#c9c9c9",
     "text": "#998511",
     "text_secondary": "#a89c54",
     "text_disabled": "#6e6848"
@@ -70,6 +88,7 @@
     "background_disabled": "#666666",
     "background_hover": "#878787",
     "background_active": "#737373",
+    "border": "#c9c9c9",
     "text": "#000",
     "text_secondary": "#616161",
     "text_disabled": "#828282"

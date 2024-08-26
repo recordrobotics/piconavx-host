@@ -16,6 +16,7 @@ namespace piconavx.ui.graphics.ui
                 UIColor backgroundDisabled,
                 UIColor backgroundHover,
                 UIColor backgroundActive,
+                UIColor border,
                 UIColor text,
                 UIColor textSecondary,
                 UIColor textDisabled
@@ -26,6 +27,7 @@ namespace piconavx.ui.graphics.ui
                 BackgroundDisabled = backgroundDisabled;
                 BackgroundHover = backgroundHover;
                 BackgroundActive = backgroundActive;
+                Border = border;
                 Text = text;
                 TextSecondary = textSecondary;
                 TextDisabled = textDisabled;
@@ -36,6 +38,7 @@ namespace piconavx.ui.graphics.ui
                 UIColor backgroundDisabled,
                 UIColor backgroundHover,
                 UIColor backgroundActive,
+                UIColor border,
                 UIColor text,
                 UIColor textSecondary,
                 UIColor textDisabled
@@ -44,6 +47,7 @@ namespace piconavx.ui.graphics.ui
                     backgroundDisabled,
                     backgroundHover,
                     backgroundActive,
+                    border,
                     text,
                     textSecondary,
                     textDisabled)
@@ -56,6 +60,7 @@ namespace piconavx.ui.graphics.ui
             public UIColor BackgroundDisabled { get; }
             public UIColor BackgroundHover { get; }
             public UIColor BackgroundActive { get; }
+            public UIColor Border { get; }
             public UIColor Text { get; }
             public UIColor TextSecondary { get; }
             public UIColor TextDisabled { get; }
@@ -75,6 +80,8 @@ namespace piconavx.ui.graphics.ui
                 public string? BackgroundHover { get; set; }
                 [JsonPropertyName("background_active")]
                 public string? BackgroundActive { get; set; }
+                [JsonPropertyName("border")]
+                public string? Border { get; set; }
 
                 [JsonPropertyName("text")]
                 public string? Text { get; set; }
@@ -101,6 +108,8 @@ namespace piconavx.ui.graphics.ui
                 ScrollThumb = "#383838",
                 ScrollThumbHover = "#424242",
                 ScrollThumbActive = "#4d4d4d",
+                StatusOk = "#2F6D30",
+                StatusError = "#6E3131",
                 Neutral = new()
                 {
                     TextIsBackground = false,
@@ -108,8 +117,21 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#242424",
                     BackgroundHover = "#424242",
                     BackgroundActive = "#4d4d4d",
-                    Text= "#fff",
+                    Border = "#797979",
+                    Text = "#fff",
                     TextSecondary = "#BCBCBC",
+                    TextDisabled = "#b3b3b3"
+                },
+                Outline = new()
+                {
+                    TextIsBackground = false,
+                    Background = "#0F0F0F",
+                    BackgroundDisabled = "#0F0F0F",
+                    BackgroundHover = "#1a1a1a",
+                    BackgroundActive = "#262626",
+                    Border = "#797979",
+                    Text = "#BCBCBC",
+                    TextSecondary = "#858585",
                     TextDisabled = "#b3b3b3"
                 },
                 Primary = new()
@@ -119,6 +141,7 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#0e2247",
                     BackgroundHover = "#3b76e3",
                     BackgroundActive = "#2a5dbd",
+                    Border = "#7EA6ED",
                     Text = "#fff",
                     TextSecondary = "#BCBCBC",
                     TextDisabled = "#b3b3b3"
@@ -130,6 +153,7 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#151c16",
                     BackgroundHover = "#152b17",
                     BackgroundActive = "#1b381d",
+                    Border = "#797979",
                     Text = "#c3f7be",
                     TextSecondary = "#7eab79",
                     TextDisabled = "#72916e"
@@ -141,6 +165,7 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#170404",
                     BackgroundHover = "#331212",
                     BackgroundActive = "#421717",
+                    Border = "#797979",
                     Text = "#f2a7a7",
                     TextSecondary = "#d97e7e",
                     TextDisabled = "#8c6565"
@@ -152,6 +177,7 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#242115",
                     BackgroundHover = "#362f0f",
                     BackgroundActive = "#4a4010",
+                    Border = "#797979",
                     Text = "#edcc47",
                     TextSecondary = "#ded4ad",
                     TextDisabled = "#a39b7c"
@@ -163,6 +189,7 @@ namespace piconavx.ui.graphics.ui
                     BackgroundDisabled = "#242424",
                     BackgroundHover = "#424242",
                     BackgroundActive = "#4d4d4d",
+                    Border = "#797979",
                     Text = "#fff",
                     TextSecondary = "#BCBCBC",
                     TextDisabled = "#b3b3b3"
@@ -199,8 +226,14 @@ namespace piconavx.ui.graphics.ui
             public string? ScrollThumbHover { get; set; }
             [JsonPropertyName("scroll_thumb_active")]
             public string? ScrollThumbActive { get; set; }
+            [JsonPropertyName("status_ok")]
+            public string? StatusOk { get; set; }
+            [JsonPropertyName("status_error")]
+            public string? StatusError { get; set; }
             [JsonPropertyName("neutral")]
             public ButtonColorFile? Neutral { get; set; }
+            [JsonPropertyName("outline")]
+            public ButtonColorFile? Outline { get; set; }
             [JsonPropertyName("primary")]
             public ButtonColorFile? Primary { get; set; }
             [JsonPropertyName("success")]
@@ -243,23 +276,41 @@ namespace piconavx.ui.graphics.ui
         public static UIColor ScrollThumbHover => _ScrollThumbHover;
         private static DelegateUIColor _ScrollThumbActive = new DelegateUIColor(() => ParseColor(current?.ScrollThumbActive));
         public static UIColor ScrollThumbActive => _ScrollThumbActive;
+        private static DelegateUIColor _StatusOk = new DelegateUIColor(() => ParseColor(current?.StatusOk));
+        public static UIColor StatusOk => _StatusOk;
+        private static DelegateUIColor _StatusError = new DelegateUIColor(() => ParseColor(current?.StatusError));
+        public static UIColor StatusError => _StatusError;
         private static ThemeButtonColor _Neutral = new(
             () => current?.Neutral?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Neutral?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Neutral?.Border)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.Text)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.Neutral?.TextDisabled))
             );
         public static ThemeButtonColor Neutral => _Neutral;
+        private static ThemeButtonColor _Outline = new(
+            () => current?.Outline?.TextIsBackground,
+            new DelegateUIColor(() => ParseColor(current?.Outline?.Background)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.BackgroundDisabled)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.BackgroundHover)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.Border)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.Text)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.TextSecondary)),
+            new DelegateUIColor(() => ParseColor(current?.Outline?.TextDisabled))
+            );
+        public static ThemeButtonColor Outline => _Outline;
         private static ThemeButtonColor _Primary = new(
             () => current?.Primary?.TextIsBackground,
             new DelegateUIColor(() => ParseColor(current?.Primary?.Background)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Primary?.Border)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.Text)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.Primary?.TextDisabled))
@@ -271,6 +322,7 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.Success?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Success?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.Success?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Success?.Border)),
             new DelegateUIColor(() => ParseColor(current?.Success?.Text)),
             new DelegateUIColor(() => ParseColor(current?.Success?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.Success?.TextDisabled))
@@ -282,6 +334,7 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.Error?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Error?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.Error?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Error?.Border)),
             new DelegateUIColor(() => ParseColor(current?.Error?.Text)),
             new DelegateUIColor(() => ParseColor(current?.Error?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.Error?.TextDisabled))
@@ -293,6 +346,7 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.Warning?.Border)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.Text)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.Warning?.TextDisabled))
@@ -304,6 +358,7 @@ namespace piconavx.ui.graphics.ui
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundDisabled)),
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundHover)),
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.BackgroundActive)),
+            new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.Border)),
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.Text)),
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.TextSecondary)),
             new DelegateUIColor(() => ParseColor(current?.TextSecondaryButton?.TextDisabled))
