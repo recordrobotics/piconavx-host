@@ -75,6 +75,50 @@ namespace piconavx.ui.graphics.ui
             Scene.InvokeLater(row.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
         }
 
+        private void AddHeader(string name, UIController second, bool first = false)
+        {
+            FlowPanel cont = new FlowPanel(Canvas);
+            cont.Direction = FlowDirection.Horizontal;
+            cont.AlignItems = AlignItems.Middle;
+            cont.Stretch = true;
+            cont.AutoSize = FlowLayout.AutoSize.Y;
+            if (!first)
+                cont.Padding = new Insets(0, 30, 0, 0);
+
+            FlowPanel row = new FlowPanel(Canvas);
+            row.Direction = FlowDirection.Horizontal;
+            row.AlignItems = AlignItems.Middle;
+            row.Gap = 6;
+
+            cont.Components.Add(row);
+
+            Label label = new Label(name, Canvas);
+            label.Font = FontFace.InterSemiBold;
+            label.FontSize = 20;
+            label.Color = Theme.Header;
+            row.Components.Add(label);
+
+            Button refreshBtn = new Button("Refresh", Canvas);
+            refreshBtn.IsIconButton = true;
+            refreshBtn.Icon = refreshIcon;
+            refreshBtn.Color = Theme.TextSecondaryButton;
+            refreshBtn.Padding = new Insets(0);
+            refreshBtn.IconSize = new SizeF(27, 27);
+            refreshBtn.SetTooltip("Refresh");
+            row.Components.Add(refreshBtn);
+
+            Canvas.AddComponent(cont);
+            Canvas.AddComponent(row);
+            Canvas.AddComponent(label);
+            Canvas.AddComponent(refreshBtn);
+            Components.Add(row);
+            cont.ZIndex = ZIndex;
+            row.ZIndex = ZIndex;
+            label.ZIndex = ZIndex;
+            refreshBtn.ZIndex = ZIndex;
+            Scene.InvokeLater(cont.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
+        }
+
         private FlowPanel AddSection()
         {
             FlowPanel row = new FlowPanel(Canvas);
@@ -203,26 +247,18 @@ namespace piconavx.ui.graphics.ui
                 AddStatusIndicator(statusRow, "Fused Heading Valid", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.FusedHeadingValid) ?? false);
                 AddStatusIndicator(statusRow, "Magnetic Disturbance", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.MagDisturbance) ?? false);
 
-                AddHeader("Data");
-
-                section = AddSection();
-
-                Label tmpLab = new Label("Selected: ---", Canvas);
-                tmpLab.ZIndex = ZIndex;
-                tmpLab.Color = Theme.Text;
-                Canvas.AddComponent(tmpLab);
 
                 SplitButton button = new SplitButton(Canvas, 0, "AHRS+", "AHRS", "YPR", "Raw");
-                tmpLab.Text = "Selected: " + button.SelectedText;
+                AddHeader("Data", button);
+
                 button.SelectionChanged += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
                 {
-                    tmpLab.Text = "Selected: " + button.SelectedText;
+
                 });
                 button.ZIndex = ZIndex;
                 Canvas.AddComponent(button);
-                section.Components.Add(button);
 
-                section.Components.Add(tmpLab);
+                section = AddSection();
             }
         }
 
