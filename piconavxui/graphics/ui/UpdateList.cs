@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using piconavx.ui.controllers;
 
 namespace piconavx.ui.graphics.ui
 {
-    public class UpdateList
+    public class UpdateList : FlowPanel
     {
+        public UpdateList(Canvas canvas) : base(canvas)
+        {
+            Direction = FlowDirection.Vertical;
+            Gap = 7.5f;
+        }
     }
 }

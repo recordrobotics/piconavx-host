@@ -85,12 +85,18 @@ namespace piconavx.ui.graphics.ui
             if (!first)
                 cont.Padding = new Insets(0, 30, 0, 0);
 
+            AnchorLayout contLayout = new AnchorLayout(cont, VirtualWorkingRectangle);
+            contLayout.Anchor = Anchor.Left | Anchor.Right;
+            contLayout.Insets = new Insets(0);
+            unsubscribeList.Add(contLayout);
+
             FlowPanel row = new FlowPanel(Canvas);
             row.Direction = FlowDirection.Horizontal;
             row.AlignItems = AlignItems.Middle;
             row.Gap = 6;
 
             cont.Components.Add(row);
+            cont.Components.Add(second);
 
             Label label = new Label(name, Canvas);
             label.Font = FontFace.InterSemiBold;
@@ -111,12 +117,13 @@ namespace piconavx.ui.graphics.ui
             Canvas.AddComponent(row);
             Canvas.AddComponent(label);
             Canvas.AddComponent(refreshBtn);
-            Components.Add(row);
+            Components.Add(cont);
             cont.ZIndex = ZIndex;
             row.ZIndex = ZIndex;
             label.ZIndex = ZIndex;
             refreshBtn.ZIndex = ZIndex;
             Scene.InvokeLater(cont.Subscribe, DeferralMode.NextFrame); // NextFrame because we want them to render after update, but NextEvent is just render
+            Scene.InvokeLater(contLayout.Subscribe, DeferralMode.NextFrame);
         }
 
         private FlowPanel AddSection()
@@ -250,15 +257,20 @@ namespace piconavx.ui.graphics.ui
 
                 SplitButton button = new SplitButton(Canvas, 0, "AHRS+", "AHRS", "YPR", "Raw");
                 AddHeader("Data", button);
-
-                button.SelectionChanged += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
-                {
-
-                });
                 button.ZIndex = ZIndex;
                 Canvas.AddComponent(button);
 
                 section = AddSection();
+
+                UpdateList updateList = new UpdateList(Canvas);
+                section.Components.Add(updateList);
+                updateList.ZIndex = ZIndex;
+                Canvas.AddComponent(updateList);
+
+                button.SelectionChanged += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
+                {
+                    Debug.WriteLine("Selected: " + button.SelectedText);
+                });
             }
         }
 
