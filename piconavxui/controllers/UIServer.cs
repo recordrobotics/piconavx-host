@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace piconavx.ui.controllers
 {
@@ -39,10 +40,10 @@ namespace piconavx.ui.controllers
 
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client>> ClientConnected = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client>> ClientDisconnected = new();
-        public static PrioritizedList<PrioritizedAction<GenericPriority, Client, AHRSPosUpdate>> ClientUpdate = new();
+        public static PrioritizedList<PrioritizedAction<GenericPriority, Client, ClientUpdate>> ClientUpdate = new();
         public static PrioritizedList<PrioritizedAction<GenericPriority, Client, FeedChunk[]>> ClientFeedUpdate = new();
 
-        private readonly ConcurrentQueue<(Client, AHRSPosUpdate)> clientUpdates = new();
+        private readonly ConcurrentQueue<(Client, ClientUpdate)> clientUpdates = new();
         private readonly ConcurrentQueue<(Client, FeedChunk[])> clientFeedUpdates = new();
         private readonly ConcurrentQueue<Client> clientConnects = new();
         private readonly ConcurrentQueue<Client> clientDisconnects = new();
@@ -234,7 +235,22 @@ namespace piconavx.ui.controllers
             {
                 case DataType.AHRSPosUpdate:
                     {
-                        clientUpdates.Enqueue((e.Client, (AHRSPosUpdate)e.Data));
+                        clientUpdates.Enqueue((e.Client, new((AHRSPosUpdate)e.Data)));
+                    }
+                    break;
+                case DataType.AHRSUpdate:
+                    {
+                        clientUpdates.Enqueue((e.Client, new((AHRSUpdate)e.Data)));
+                    }
+                    break;
+                case DataType.YPRUpdate:
+                    {
+                        clientUpdates.Enqueue((e.Client, new((YPRUpdate)e.Data)));
+                    }
+                    break;
+                case DataType.RawUpdate:
+                    {
+                        clientUpdates.Enqueue((e.Client, new((RawUpdate)e.Data)));
                     }
                     break;
                 case DataType.FeedUpdate:
@@ -290,7 +306,7 @@ namespace piconavx.ui.controllers
                 }
             }
             {
-                if (clientUpdates.TryDequeue(out (Client, AHRSPosUpdate) update))
+                if (clientUpdates.TryDequeue(out (Client, ClientUpdate) update))
                 {
                     foreach (var action in ClientUpdate)
                     {
@@ -316,6 +332,53 @@ namespace piconavx.ui.controllers
                     }
                 }
             }
+        }
+    }
+
+    public enum ClientUpdateType : byte
+    {
+        AHRSPos = 0,
+        AHRS = 1,
+        YPR = 2,
+        Raw = 3
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct ClientUpdate
+    {
+        [FieldOffset(0)]
+        public ClientUpdateType Type;
+        [FieldOffset(1)]
+        public AHRSPosUpdate AHRSPosUpdate;
+        [FieldOffset(1)]
+        public AHRSUpdate AHRSUpdate;
+        [FieldOffset(1)]
+        public YPRUpdate YPRUpdate;
+        [FieldOffset(1)]
+        public RawUpdate RawUpdate;
+
+        public ClientUpdate(AHRSPosUpdate update)
+        {
+            Type = ClientUpdateType.AHRSPos;
+            AHRSPosUpdate = update;
+        }
+
+        public ClientUpdate(AHRSUpdate update)
+        {
+            Type = ClientUpdateType.AHRS;
+            AHRSUpdate = update;
+        }
+
+        public ClientUpdate(YPRUpdate update)
+        {
+            Type = ClientUpdateType.YPR;
+            YPRUpdate = update;
+        }
+
+        public ClientUpdate(RawUpdate update)
+        {
+            Type = ClientUpdateType.Raw;
+            RawUpdate = update;
         }
     }
 }

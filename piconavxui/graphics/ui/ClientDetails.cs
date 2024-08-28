@@ -9,7 +9,7 @@ namespace piconavx.ui.graphics.ui
 {
     public class ClientDetails : FlowPanel
     {
-        private Dictionary<Client, AHRSPosUpdate?> lastUpdates = [];
+        private Dictionary<Client, ClientUpdate?> lastUpdates = [];
         private Client? client;
         public Client? Client { get; set; }
 
@@ -29,7 +29,7 @@ namespace piconavx.ui.graphics.ui
 
         public override void Subscribe()
         {
-            UIServer.ClientUpdate += new PrioritizedAction<GenericPriority, Client, AHRSPosUpdate>(GenericPriority.Medium, Server_ClientUpdate);
+            UIServer.ClientUpdate += new PrioritizedAction<GenericPriority, Client, ClientUpdate>(GenericPriority.Medium, Server_ClientUpdate);
             Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
             base.Subscribe();
         }
@@ -223,9 +223,17 @@ namespace piconavx.ui.graphics.ui
                 AddLabel(section,
                     () =>
                     {
-                        AHRSPosUpdate? lastUpdate = client == null ? null : lastUpdates.GetValueOrDefault(client);
+                        ClientUpdate? lastUpdate = client == null ? null : lastUpdates.GetValueOrDefault(client);
+                        double? temp =
+                            lastUpdate?.Type == ClientUpdateType.AHRSPos ?
+                            lastUpdate?.AHRSPosUpdate.MpuTemp :
+                            lastUpdate?.Type == ClientUpdateType.AHRS ?
+                            lastUpdate?.AHRSUpdate.MpuTemp :
+                            lastUpdate?.Type == ClientUpdateType.Raw ?
+                            lastUpdate?.RawUpdate.TempC : null;
+
                         return Segment(
-                            $"{TextSecondary}Temperature:{Default} {(client == null ? "----" : client.Health.CoreTemp.ToString("N2"))} °C (Core) | {(lastUpdate == null ? "----" : lastUpdate.Value.MpuTemp.ToString("N2"))} °C (Sensor)"
+                            $"{TextSecondary}Temperature:{Default} {(client == null ? "----" : client.Health.CoreTemp.ToString("N2"))} °C (Core) | {((temp == null || !temp.HasValue) ? "----" : temp.Value.ToString("N2"))} °C (Sensor)"
                             );
                     });
 
@@ -278,7 +286,7 @@ namespace piconavx.ui.graphics.ui
         private Stopwatch sw_lowfreq = Stopwatch.StartNew();
         private Stopwatch sw_tick = Stopwatch.StartNew();
 
-        private void Server_ClientUpdate(Client client, AHRSPosUpdate update)
+        private void Server_ClientUpdate(Client client, ClientUpdate update)
         {
             if (client == this.client)
             {
