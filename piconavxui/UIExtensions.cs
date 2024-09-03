@@ -70,7 +70,7 @@ namespace piconavx.ui
             if (!update.HasValue)
                 return null;
 
-            switch(update.Value.Type)
+            switch (update.Value.Type)
             {
                 case ClientUpdateType.AHRSPos:
                     return update.Value.AHRSPosUpdate.MpuTemp;
@@ -81,6 +81,32 @@ namespace piconavx.ui
             }
 
             return null;
+        }
+
+        public static ClientUpdateType ToClientUpdateType(this HostSetDataType hostSetDataType)
+        {
+            switch (hostSetDataType)
+            {
+                case HostSetDataType.AHRSPos:
+                    return ClientUpdateType.AHRSPos;
+                case HostSetDataType.AHRS:
+                    return ClientUpdateType.AHRS;
+                case HostSetDataType.YPR:
+                    return ClientUpdateType.YPR;
+                case HostSetDataType.Raw:
+                    return ClientUpdateType.Raw;
+                default:
+                    return ClientUpdateType.AHRSPos;
+            }
+        }
+
+        public static TValue? GetValueOrDefaultNullable<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict, TKey? key)
+            where TKey : notnull
+        {
+            if (key == null)
+                return default;
+
+            return dict.GetValueOrDefault(key);
         }
     }
 }

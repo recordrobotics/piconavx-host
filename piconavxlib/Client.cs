@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -58,6 +59,11 @@ namespace piconavx
         public void SetDataType(HostSetDataType dataType)
         {
             CommandQueue.Enqueue(new ClientCommand(HostCommandType.SetDataType, dataType));
+            if (IsVirtual)
+            {
+                // force set when virtual
+                DataType = dataType;
+            }
         }
 
         public void RequestHealth()
@@ -88,6 +94,11 @@ namespace piconavx
         public void SetFeedOverflow(HostSetFeedOverflowType feedOverflow)
         {
             CommandQueue.Enqueue(new ClientCommand(HostCommandType.SetFeedOverflow, feedOverflow));
+            if (IsVirtual)
+            {
+                // force set when virtual
+                FeedOverflow = feedOverflow;
+            }
         }
 
         public async Task<HealthUpdate> GetHealth()

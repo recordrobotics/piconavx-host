@@ -86,7 +86,7 @@ namespace piconavx.ui.controllers
                         }
                     case ClientUpdateType.YPR:
                         {
-                            var quat = Quaternion.CreateFromYawPitchRoll((float)lastUpdate.YPRUpdate.Yaw, (float)lastUpdate.YPRUpdate.Pitch, (float)lastUpdate.YPRUpdate.Roll);
+                            var quat = Quaternion.CreateFromYawPitchRoll(-MathHelper.DegreesToRadians((float)lastUpdate.YPRUpdate.Roll), MathHelper.DegreesToRadians((float)lastUpdate.YPRUpdate.Pitch), -MathHelper.DegreesToRadians((float)lastUpdate.YPRUpdate.Yaw));
                             quatX = quat.X;
                             quatY = quat.Y;
                             quatZ = quat.Z;

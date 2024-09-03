@@ -278,6 +278,7 @@ namespace piconavx.ui.graphics.ui
                 button.SelectionChanged += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
                 {
                     Client.SetDataType(ClientIndexToDataType(button.SelectedIndex));
+                    Scene.InvokeLater(updateList.InvalidateComponents, DeferralMode.NextFrame);
                 });
             }
         }
