@@ -225,8 +225,11 @@ namespace piconavx.ui.graphics.ui
 
         private void ClickHandler(int index)
         {
-            SelectedIndex = index;
-            NotifySelectionChanged();
+            if (SelectedIndex != index)
+            {
+                SelectedIndex = index;
+                NotifySelectionChanged();
+            }
         }
     }
 }

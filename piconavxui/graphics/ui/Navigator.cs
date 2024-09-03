@@ -27,7 +27,7 @@
                 currentPage.Hide();
             }
             currentPage = page;
-            Scene.ComplainLayoutShift(2);
+            Scene.ComplainLayoutShift(4);
         }
 
         public void Replace(Page page)
@@ -41,7 +41,7 @@
             page.Show();
             currentPage?.Hide();
             currentPage = page;
-            Scene.ComplainLayoutShift(2);
+            Scene.ComplainLayoutShift(4);
         }
 
         public void Back()
@@ -57,7 +57,7 @@
                 page.Show();
                 currentPage?.Hide();
                 currentPage = page;
-                Scene.ComplainLayoutShift(2);
+                Scene.ComplainLayoutShift(4);
             }
         }
 

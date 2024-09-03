@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
-using System.Net;
 using static piconavx.ui.graphics.ui.RichTextSegmentation;
 
 namespace piconavx.ui.graphics.ui
@@ -36,6 +35,11 @@ namespace piconavx.ui.graphics.ui
 
         public override void Unsubscribe()
         {
+            while (unsubscribeList.TryTake(out var component))
+            {
+                component.Unsubscribe();
+            }
+
             UIServer.ClientUpdate -= Server_ClientUpdate;
             Scene.Update -= Scene_Update;
             base.Unsubscribe();

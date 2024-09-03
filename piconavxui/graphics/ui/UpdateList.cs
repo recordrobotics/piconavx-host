@@ -1,5 +1,6 @@
 ﻿using piconavx.ui.controllers;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using static piconavx.ui.graphics.ui.RichTextSegmentation;
 
 namespace piconavx.ui.graphics.ui
@@ -52,6 +53,7 @@ namespace piconavx.ui.graphics.ui
 
         public void InvalidateComponents()
         {
+            Debug.WriteLine("InvalidateComponents()");
             foreach (var component in Components)
             {
                 Scene.InvokeLater(component.Unsubscribe, DeferralMode.NextEvent); // Destroy as soon as possible
@@ -152,6 +154,8 @@ namespace piconavx.ui.graphics.ui
                         break;
                 }
             }
+
+            Scene.ComplainLayoutShift(2);
         }
 
         private void Server_ClientUpdate(Client client, ClientUpdate update)

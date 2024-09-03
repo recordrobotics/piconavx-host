@@ -236,7 +236,7 @@ namespace piconavx.ui.graphics.ui
             properties.Canvas = this;
             Matrix = CreateMatrix();
 
-            if(isInputInvalid)
+            if (isInputInvalid)
             {
                 isInputInvalid = false;
                 InvalidateInput();
