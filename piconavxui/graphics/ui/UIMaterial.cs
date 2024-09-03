@@ -44,7 +44,7 @@ namespace piconavx.ui.graphics.ui
             Window.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             Shader.Use();
-            Shader.SetUniform("uMatrix", properties.Canvas!.Matrix);
+            Shader.SetUniform("uMatrix", properties.Canvas?.Matrix ?? Matrix4x4.Identity);
             Shader.SetUniform("tMatrix", transform?.Matrix ?? Matrix4x4.Identity);
         }
 

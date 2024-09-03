@@ -35,7 +35,7 @@ namespace piconavx.ui.graphics
 
         public static Matrix4x4 CreatePerspectiveFieldOfViewOffCenter(float fieldOfView, float aspectRatio, float offsetX, float offsetY, float nearPlaneDistance, float farPlaneDistance)
         {
-            offsetX *= nearPlaneDistance;
+            offsetX *= aspectRatio * nearPlaneDistance;
             offsetY *= nearPlaneDistance;
 
             float top = MathF.Tan(fieldOfView * 0.5f) * nearPlaneDistance;
