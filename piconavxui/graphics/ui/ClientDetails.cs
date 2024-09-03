@@ -1,4 +1,5 @@
 ﻿using piconavx.ui.controllers;
+using SixLabors.ImageSharp.ColorSpaces;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
@@ -263,7 +264,7 @@ namespace piconavx.ui.graphics.ui
                 AddStatusIndicator(statusRow, "Magnetic Disturbance", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.MagDisturbance) ?? false);
 
 
-                SplitButton button = new SplitButton(Canvas, 0, "AHRS+", "AHRS", "YPR", "Raw");
+                SplitButton button = new SplitButton(Canvas, ClientDataTypeIndex(Client.DataType), "AHRS+", "AHRS", "YPR", "Raw");
                 AddHeader("Data", button);
                 button.ZIndex = ZIndex;
                 Canvas.AddComponent(button);
@@ -273,12 +274,47 @@ namespace piconavx.ui.graphics.ui
                 UpdateList updateList = new UpdateList(Canvas);
                 section.Components.Add(updateList);
                 updateList.ZIndex = ZIndex;
+                updateList.Client = Client;
                 Canvas.AddComponent(updateList);
 
                 button.SelectionChanged += new PrioritizedAction<GenericPriority>(GenericPriority.Highest, () =>
                 {
-                    Debug.WriteLine("Selected: " + button.SelectedText);
+                    Client.SetDataType(ClientIndexToDataType(button.SelectedIndex));
                 });
+            }
+        }
+
+        private int ClientDataTypeIndex(HostSetDataType dataType)
+        {
+            switch (dataType)
+            {
+                case HostSetDataType.AHRSPos:
+                    return 0;
+                case HostSetDataType.AHRS:
+                    return 1;
+                case HostSetDataType.YPR:
+                    return 2;
+                case HostSetDataType.Raw:
+                    return 3;
+                default:
+                    return -1;
+            }
+        }
+
+        private HostSetDataType ClientIndexToDataType(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return HostSetDataType.AHRSPos;
+                case 1:
+                    return HostSetDataType.AHRS;
+                case 2:
+                    return HostSetDataType.YPR;
+                case 3:
+                    return HostSetDataType.Raw;
+                default:
+                    return HostSetDataType.AHRSPos;
             }
         }
 
