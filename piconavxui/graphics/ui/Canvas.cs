@@ -1,4 +1,5 @@
 ﻿using Silk.NET.OpenGL;
+using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 
@@ -16,6 +17,8 @@ namespace piconavx.ui.graphics.ui
         /// while in an event. Instead, defer the modification (see <see cref="Scene.InvokeLater(Action, DeferralMode)"/>)
         /// </summary>
         public bool InEvent { get { return inEvent; } }
+
+        private bool isInputInvalid = false;
 
         public static Canvas? InputCanvas { get; set; } = null;
 
@@ -62,10 +65,18 @@ namespace piconavx.ui.graphics.ui
 
         public void InvalidateHierarchy()
         {
+            InvalidateHierarchy(true);
+        }
+
+        public void InvalidateHierarchy(bool invalidateInput)
+        {
             if (InEvent)
                 throw new InvalidOperationException("Editing the hierarchy inside events is not supported.");
 
             components.Sort();
+
+            if (invalidateInput)
+                isInputInvalid = true;
         }
 
         private Matrix4x4 CreateMatrix()
@@ -153,6 +164,7 @@ namespace piconavx.ui.graphics.ui
 
         public void InvalidateInput()
         {
+            Debug.WriteLine("[Canvas] InvalidateInput()");
             var mouse = Window.Current.Input!.Mice[0];
             Scene_MouseMove(mouse.Position.X, mouse.Position.Y, 0, 0);
         }
@@ -225,6 +237,12 @@ namespace piconavx.ui.graphics.ui
             inEvent = true;
             properties.Canvas = this;
             Matrix = CreateMatrix();
+
+            if(isInputInvalid)
+            {
+                isInputInvalid = false;
+                InvalidateInput();
+            }
 
             // Render components in Z-index order
             foreach (UIController component in components)

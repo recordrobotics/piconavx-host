@@ -18,7 +18,7 @@ namespace piconavx.ui
             options.Size = new Vector2D<int>((int)(1920 * dpi.X), (int)(1080 * dpi.Y));
             options.Title = "piconavx ui";
             options.VSync = false;
-            options.Samples = 8;
+            options.Samples = 16;
             options.IsVisible = false;
             options.WindowBorder = Silk.NET.Windowing.WindowBorder.Resizable;
             options.WindowState = Silk.NET.Windowing.WindowState.Maximized;
