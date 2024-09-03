@@ -318,13 +318,13 @@ namespace piconavx.ui.graphics.ui
             backButton.ZIndex = ZIndex + 11;
             headerTitle.ZIndex = ZIndex + 11;
             scrollPanel.ZIndex = ZIndex + 3;
-            scrollContent.ZIndex = ZIndex + 3;
-            recordingRow.ZIndex = ZIndex + 3;
-            recordPart.ZIndex = ZIndex + 3;
-            startRecordingButton.ZIndex = ZIndex + 3;
-            stopRecordingButton.ZIndex = ZIndex + 3;
-            manageRecordingsButton.ZIndex = ZIndex + 3;
-            dataPanel.ZIndex = ZIndex + 3;
+            scrollContent.ZIndex = ZIndex + 4;
+            recordingRow.ZIndex = ZIndex + 4;
+            recordPart.ZIndex = ZIndex + 4;
+            startRecordingButton.ZIndex = ZIndex + 4;
+            stopRecordingButton.ZIndex = ZIndex + 4;
+            manageRecordingsButton.ZIndex = ZIndex + 4;
+            dataPanel.ZIndex = ZIndex + 4;
         }
 
         public override void Show()
