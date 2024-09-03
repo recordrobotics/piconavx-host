@@ -1,5 +1,4 @@
 ﻿using piconavx.ui.controllers;
-using SixLabors.ImageSharp.ColorSpaces;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
@@ -262,7 +261,6 @@ namespace piconavx.ui.graphics.ui
                 AddStatusIndicator(statusRow, "Sea Level", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.SealevelPressSet) ?? false);
                 AddStatusIndicator(statusRow, "Fused Heading Valid", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.FusedHeadingValid) ?? false);
                 AddStatusIndicator(statusRow, "Magnetic Disturbance", () => client?.BoardState.SensorStatus.HasFlag(NavXSensorStatus.MagDisturbance) ?? false);
-
 
                 SplitButton button = new SplitButton(Canvas, ClientDataTypeIndex(Client.DataType), "AHRS+", "AHRS", "YPR", "Raw");
                 AddHeader("Data", button);
