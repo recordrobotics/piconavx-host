@@ -53,8 +53,8 @@ namespace piconavx.ui.controllers
                 {
                     card.Id = client.Id ?? "<UNKNOWN>";
                     card.HighBandwidth = client.HighBandwidthMode;
-                    card.Address = (((IPEndPoint?)client.Tcp?.Client.RemoteEndPoint)?.Address)?.ToString() ?? "<UNKNOWN>";
-                    card.Port = (((IPEndPoint?)client.Tcp?.Client.RemoteEndPoint)?.Port)?.ToString() ?? "<UNKNOWN>";
+                    card.Address = (client.GetRemoteEndPoint()?.Address)?.ToString() ?? "<UNKNOWN>";
+                    card.Port = (client.GetRemoteEndPoint()?.Port)?.ToString() ?? "<UNKNOWN>";
                     card.Version = client.BoardId.FwVerMajor + "." + client.BoardId.FwVerMinor + "." + client.BoardId.FwRevision;
                     card.Status =
                         client.BoardState.OpStatus == NavXOPStatus.Initializing ? "Initializing" :

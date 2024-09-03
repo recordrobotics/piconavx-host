@@ -1,6 +1,7 @@
 ﻿using piconavx.ui.controllers;
 using piconavx.ui.graphics.ui;
 using System.Drawing;
+using System.Net;
 using System.Numerics;
 
 namespace piconavx.ui
@@ -107,6 +108,18 @@ namespace piconavx.ui
                 return default;
 
             return dict.GetValueOrDefault(key);
+        }
+
+        public static IPEndPoint? GetRemoteEndPoint(this Client client)
+        {
+            try
+            {
+                return (IPEndPoint?)client.Tcp?.Client.RemoteEndPoint;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

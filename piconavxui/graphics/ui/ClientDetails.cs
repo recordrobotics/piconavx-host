@@ -188,7 +188,7 @@ namespace piconavx.ui.graphics.ui
 
                 AddLabel(section,
                     () => Segment(
-                        $"{TextSecondary}Endpoint:{Default} {(((IPEndPoint?)client?.Tcp?.Client.RemoteEndPoint)?.Address)?.ToString() ?? "<UNKNOWN>"}{TextSecondary}:{(((IPEndPoint?)client?.Tcp?.Client.RemoteEndPoint)?.Port)?.ToString() ?? "<UNKNOWN>"}"
+                        $"{TextSecondary}Endpoint:{Default} {(client?.GetRemoteEndPoint()?.Address)?.ToString() ?? "<UNKNOWN>"}{TextSecondary}:{(client?.GetRemoteEndPoint()?.Port)?.ToString() ?? "<UNKNOWN>"}"
                         ));
 
                 AddLabel(section,
