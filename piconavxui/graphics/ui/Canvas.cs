@@ -1,5 +1,4 @@
 ﻿using Silk.NET.OpenGL;
-using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 
@@ -164,7 +163,6 @@ namespace piconavx.ui.graphics.ui
 
         public void InvalidateInput()
         {
-            Debug.WriteLine("[Canvas] InvalidateInput()");
             var mouse = Window.Current.Input!.Mice[0];
             Scene_MouseMove(mouse.Position.X, mouse.Position.Y, 0, 0);
         }

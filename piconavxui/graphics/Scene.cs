@@ -44,9 +44,6 @@ namespace piconavx.ui.graphics
 /*                ShowBounds = true,
                 ShowNonRenderableBounds = true,
                 FlowLayoutContentBoundsOutline = true,*/
-                DebugRaycastGraphics = true,
-                HighlightMouseDown = true,
-                HighlightMouseOver = true
             });
 
             UIServer server = AddController(new UIServer());
