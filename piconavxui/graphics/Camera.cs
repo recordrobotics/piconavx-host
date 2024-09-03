@@ -1,4 +1,5 @@
 ﻿using piconavx.ui.graphics.ui;
+using Silk.NET.Assimp;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using System;
@@ -35,7 +36,9 @@ namespace piconavx.ui.graphics
 
         public Matrix4x4 GetProjectionMatrix()
         {
-            return Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(Fov), AspectRatio, 0.1f, 100.0f);
+            float target = (Window.Current.Internal.FramebufferSize.X + 831f) / 2f;
+            float middle = Window.Current.Internal.FramebufferSize.X / 2f;
+            return MathHelper.CreatePerspectiveFieldOfViewOffCenter(MathHelper.DegreesToRadians(Fov), AspectRatio, (middle - target) / Window.Current.Internal.FramebufferSize.X, 0, 0.1f, 100.0f);
         }
 
         public override void Subscribe()

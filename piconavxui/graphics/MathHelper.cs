@@ -32,5 +32,17 @@ namespace piconavx.ui.graphics
                 (float)Math.Acos(dot)
                 );
         }
+
+        public static Matrix4x4 CreatePerspectiveFieldOfViewOffCenter(float fieldOfView, float aspectRatio, float offsetX, float offsetY, float nearPlaneDistance, float farPlaneDistance)
+        {
+            offsetX *= nearPlaneDistance;
+            offsetY *= nearPlaneDistance;
+
+            float top = MathF.Tan(fieldOfView * 0.5f) * nearPlaneDistance;
+            float bottom = -top;
+            float left = aspectRatio * bottom;
+            float right = aspectRatio * top;
+            return Matrix4x4.CreatePerspectiveOffCenter(left + offsetX, right + offsetX, bottom + offsetY, top + offsetY, nearPlaneDistance, farPlaneDistance);
+        }
     }
 }
