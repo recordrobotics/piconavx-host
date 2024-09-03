@@ -7,7 +7,7 @@ namespace piconavx.ui.controllers
 {
     public class ClientCardUpdateController : Controller
     {
-        private AHRSPosUpdate? lastUpdate = null;
+        private ClientUpdate? lastUpdate = null;
         private Client? client;
         public Client? Client { get; set; }
 
@@ -22,7 +22,7 @@ namespace piconavx.ui.controllers
 
         public override void Subscribe()
         {
-            UIServer.ClientUpdate += new PrioritizedAction<GenericPriority, Client, AHRSPosUpdate>(GenericPriority.Medium, Server_ClientUpdate);
+            UIServer.ClientUpdate += new PrioritizedAction<GenericPriority, Client, ClientUpdate>(GenericPriority.Medium, Server_ClientUpdate);
             Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
         }
 
@@ -32,7 +32,7 @@ namespace piconavx.ui.controllers
             Scene.Update -= Scene_Update;
         }
 
-        private void Server_ClientUpdate(Client client, AHRSPosUpdate update)
+        private void Server_ClientUpdate(Client client, ClientUpdate update)
         {
             if (client == this.client)
             {
@@ -40,7 +40,7 @@ namespace piconavx.ui.controllers
             }
         }
 
-        public static ClientCard UpdateClient(ClientCard card, Client? client, AHRSPosUpdate? lastUpdate)
+        public static ClientCard UpdateClient(ClientCard card, Client? client, ClientUpdate? lastUpdate)
         {
             if (client != null)
             {
@@ -64,7 +64,7 @@ namespace piconavx.ui.controllers
                         client.BoardState.OpStatus == NavXOPStatus.SelftestInProgress ? "Testing" :
                         "Unsupported";
                     card.Memory = $"{client.Health.MemoryUsed / 1024}kB / {client.Health.MemoryTotal / 1024}kB ({(client.Health.MemoryTotal == 0 ? "0" : ((long)client.Health.MemoryUsed * 10000L / (long)client.Health.MemoryTotal).ToString().InsertFromEnd(2, "."))}%)";
-                    card.Temperature = $"{client.Health.CoreTemp:N2} °C | {(lastUpdate == null ? "----" : lastUpdate.Value.MpuTemp.ToString("N2"))} °C";
+                    card.Temperature = $"{client.Health.CoreTemp:N2} °C | {(lastUpdate == null ? "----" : lastUpdate.GetMpuTemp()?.ToString("N2") ?? "----")} °C";
                 }
                 catch
                 {

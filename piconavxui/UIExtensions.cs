@@ -1,4 +1,5 @@
-﻿using piconavx.ui.graphics.ui;
+﻿using piconavx.ui.controllers;
+using piconavx.ui.graphics.ui;
 using System.Drawing;
 using System.Numerics;
 
@@ -62,6 +63,24 @@ namespace piconavx.ui
                     j++;
             }
             return j;
+        }
+
+        public static double? GetMpuTemp(this ClientUpdate? update)
+        {
+            if (!update.HasValue)
+                return null;
+
+            switch(update.Value.Type)
+            {
+                case ClientUpdateType.AHRSPos:
+                    return update.Value.AHRSPosUpdate.MpuTemp;
+                case ClientUpdateType.AHRS:
+                    return update.Value.AHRSUpdate.MpuTemp;
+                case ClientUpdateType.Raw:
+                    return update.Value.RawUpdate.TempC;
+            }
+
+            return null;
         }
     }
 }
