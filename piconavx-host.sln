@@ -5,8 +5,6 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "piconavxlib", "piconavxlib\piconavxlib.csproj", "{7CE73B68-05BD-44B8-A86B-7C54F4328308}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "piconavxtest", "piconavxtest\piconavxtest.csproj", "{1BAFE70E-C560-4620-9C5B-E2B15AC11C06}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "piconavxui", "piconavxui\piconavxui.csproj", "{5BDEE6EC-4D46-48F5-8E9A-70016A0248BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F2FD5EE3-326F-421F-8D18-8ADD62636534}"
@@ -24,10 +22,6 @@ Global
 		{7CE73B68-05BD-44B8-A86B-7C54F4328308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CE73B68-05BD-44B8-A86B-7C54F4328308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CE73B68-05BD-44B8-A86B-7C54F4328308}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1BAFE70E-C560-4620-9C5B-E2B15AC11C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1BAFE70E-C560-4620-9C5B-E2B15AC11C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1BAFE70E-C560-4620-9C5B-E2B15AC11C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1BAFE70E-C560-4620-9C5B-E2B15AC11C06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5BDEE6EC-4D46-48F5-8E9A-70016A0248BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5BDEE6EC-4D46-48F5-8E9A-70016A0248BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BDEE6EC-4D46-48F5-8E9A-70016A0248BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
