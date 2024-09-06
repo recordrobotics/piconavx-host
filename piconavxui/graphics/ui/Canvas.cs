@@ -75,7 +75,9 @@ namespace piconavx.ui.graphics.ui
             components.Sort();
 
             if (invalidateInput)
+            {
                 isInputInvalid = true;
+            }
         }
 
         private Matrix4x4 CreateMatrix()
@@ -147,6 +149,7 @@ namespace piconavx.ui.graphics.ui
 
         public override void Subscribe()
         {
+            Scene.Update += new PrioritizedAction<UpdatePriority, double>(UpdatePriority.BeforeGeneral, Scene_Update);
             Scene.Render += new PrioritizedAction<RenderPriority, double, RenderProperties>(RenderPriority.UI, Scene_Render);
             Scene.ViewportChange += new PrioritizedAction<GenericPriority, Silk.NET.Maths.Rectangle<int>>(GenericPriority.Highest, Scene_ViewportChange);
             Scene.MouseMove += new PrioritizedAction<GenericPriority, float, float, float, float>(GenericPriority.Highest, Scene_MouseMove);
@@ -157,6 +160,7 @@ namespace piconavx.ui.graphics.ui
 
         public override void Unsubscribe()
         {
+            Scene.Update -= Scene_Update;
             Scene.Render -= Scene_Render;
             Scene.ViewportChange -= Scene_ViewportChange;
         }
@@ -230,17 +234,24 @@ namespace piconavx.ui.graphics.ui
             inEvent = false;
         }
 
-        private void Scene_Render(double deltaTime, RenderProperties properties)
+        private void Scene_Update(double deltaTime)
         {
             inEvent = true;
-            properties.Canvas = this;
-            Matrix = CreateMatrix();
 
             if (isInputInvalid)
             {
                 isInputInvalid = false;
                 InvalidateInput();
             }
+
+            inEvent = false;
+        }
+
+        private void Scene_Render(double deltaTime, RenderProperties properties)
+        {
+            inEvent = true;
+            properties.Canvas = this;
+            Matrix = CreateMatrix();
 
             // Render components in Z-index order
             foreach (UIController component in components)
